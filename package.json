@@ -1,0 +1,18 @@
+{
+  "name": "olojs",
+  "version": "0.1.0",
+  "description": "Library allowing concurrent editing of data structures.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test"
+  },
+  "author": "Marcello Del Buono",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.5.3"
+  },
+  "dependencies": {
+    "co": "^4.6.0"
+  }
+}
