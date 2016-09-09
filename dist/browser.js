@@ -9,6 +9,13 @@ exports.Observable = exports.observable.Observable;
 exports.Subscription = exports.observable.Subscription;
 
 },{"./lib/deep":2,"./lib/observable":3}],2:[function(require,module,exports){
+/**
+ *
+ *  This module provides classes and function for deep manipulation of
+ *  objects and arrays.
+ *
+ */
+
 /*!
  *  MIT License
  * 
@@ -31,16 +38,6 @@ exports.Subscription = exports.observable.Subscription;
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
- */
-
-
-
-/**
- *  # Module `olojs.deep`
- *
- *  This module provides classes and function for deep manipulation of
- *  objects and arrays.
- *
  */
 
 
@@ -84,19 +81,19 @@ function isInteger (val) {
 
 
 /**
- *  ## class Path
+ *  # class Path
  *
  *  A Path object represents a sequence of object keys (same concept of direcory path).
- *  It is implemented as an array of names and numbers.
- *
+ *  It is implemented as an array of names and numbers.  
+ *    
  *      ['path',3,'to','target']
- *
- *  The Path constructor accepts a variable number of arguments. Each of them can be:
- *      * a path represented as a string (e.g. `"a[3].b.c"`)
- *      * a path represented as an array (e.g. `['a',3,'b','c']`)
- *      * another Path object  
- *
- *  Example:
+ *    
+ *  The Path constructor accepts a variable number of arguments. Each of them can be:  
+ *  * a path represented as a string (e.g. `"a[3].b.c"`)
+ *  * a path represented as an array (e.g. `['a',3,'b','c']`)
+ *  * another Path object  
+ *    
+ *  Example:  
  *  
  *  ```js
  *  new Path('a', 'b', 'c')                 // -> ['a','b','c']
@@ -147,8 +144,8 @@ class Path extends Array {
     /**
      *  ### Path.prototype.slice(begin, end)
      *
-     *  It works as Array.prototype.slice, with the only difference that the
-     *  return value is a Path object.
+     *  It works as [Array.prototype.slice](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice), with the only difference that the
+     *  return value is a [Path][] object.
      */
     slice (begin, end) {
         return new Path(Array.from(this).slice(begin, end));
@@ -241,12 +238,12 @@ class Path extends Array {
 
 
 /**
- *  ## function equal(obj1, obj2)
+ *  # function equal(obj1, obj2)
  *
  *  Compares the two objects and returns true if they are deeply equal.
  *  If obj1 has the symbol `deep.$equal`, `equal(obj1, obj2)` will return 
- *  `obj1[deep.$equal](obj2)`.
- *
+ *  `obj1[deep.$equal](obj2)`.  
+ *    
  *  Example:  
  *  
  *  ```js
@@ -291,12 +288,13 @@ function equal (obj1, obj2) {
 
 
 /**
- *  ## function copy(obj)
+ *  # function copy(obj)
  *
- *  Creates and returns a deep copy of the given object.
- *  If `obj` has the symbol `deep.$copy`, `copy()` will return `obj[deep.$copy]()`.
+ *  Creates and returns a deep copy of the given object.  
+ *    
+ *  If `obj` has the symbol `deep.$copy`, `copy()` will return `obj[deep.$copy]()`.  
  *  
- *  Example
+ *  Example:
  *  
  *  ```js
  *  var obj1 = {a:1, b:2, c:[3,4,5]};
@@ -335,20 +333,21 @@ function copy (obj) {
 
 
 /**
- *  ## class Change 
- *
+ *  # class Change 
+ *    
  *      var change = new Change(path, oldValue, newValue)  
- *
+ *    
  *  This object represents an athomic change in an object or an array. 
+ *    
  *  A change is defined by three properties: 
- *      * `path`: the [Path][] of the property/item that changes
- *      * `old` : the value of the property/item before change
- *      * `new` : the value of the property/item after change
- *
- *  If both `old` and `new` are defined, the change represents a `set` operation.
- *  If only `old` is defined, the change represents a `delete` operation.
- *  If only `new` is defined, the change represents an `insert` operation.
- *
+ *  * `path`: the [Path][] of the property/item that changes
+ *  * `old` : the value of the property/item before change
+ *  * `new` : the value of the property/item after change
+ *    
+ *  If both `old` and `new` are defined, the change represents a `set` operation.  
+ *  If only `old` is defined, the change represents a `delete` operation.  
+ *  If only `new` is defined, the change represents an `insert` operation.  
+ *    
  *  ### Properties
  *  * `change.path` : the [Path][] that changes.
  *  * `change.old`  : the value befor change. If this is undefined, the change is an `insert` operation.
@@ -367,13 +366,13 @@ class Change {
      *  ### Change.prototype.apply(obj)
      *
      *  Changes the obj according to this change specification and returns the applied
-     *  change or null in case of failure.
-     *
+     *  change or null in case of failure.  
+     *    
      *  In order to succeed, the following conditions must be matched:
      *
-     *      * the obj value before change must be deeply equal to the change.old property
-     *      * the Path change.path must exist in obj
-     *  
+     *  * the obj value before change must be deeply equal to the change.old property
+     *  * the Path change.path must exist in obj
+     *      
      *  Example:
      *
      *  ```js
@@ -389,7 +388,6 @@ class Change {
      *  (new Change(['c',1],undefined,4)).apply(obj)    // results in obj.c.splice(1,0,4)
      *  (new Change(['c','1'],4,40)).apply(obj)         // fails because '1' means object key, not array index
      *  ```
-     *
      */
     apply (obj) {
         var parent = this.path.slice(0,-1).lookup(obj);
@@ -450,12 +448,12 @@ class Change {
 
 
     /**
-     *  @method Change.prototype.SubChange(path)
+     *  ### Change.prototype.SubChange(path)
      *
-     *  Generates a new equivalent change object that applies to a subpath. 
+     *  Generates a new equivalent change object that applies to a subpath.  
      *  For example: `change` applied to `obj` produces the same resuts as `change.SubChange("a.b")`
-     *  applied to `obj.a.b`.
-     *
+     *  applied to `obj.a.b`.  
+     *    
      *  Example:
      *
      *  ```js
@@ -502,12 +500,12 @@ class Change {
 
 
 /**
- *  ## function diff(oldObj, newObj)
+ *  # function diff(oldObj, newObj)
  *
  *  Compares oldObj and newObj and returns the array of [Change][] objects that need to be
- *  applied to oldObj to make it deeply equal to newObj.
+ *  applied to oldObj to make it deeply equal to newObj.  
+ *    
  *  If oldObj has the symbol `deep.$diff`, `diff()` will return `oldObj[deep.$diff](newObj)`.
- *
  */
 function diff (oldObj, newObj) {
     var changes = [];
@@ -661,12 +659,12 @@ function stringDiff (oldStr,newStr) {
 
 
 /**
- *  ## function assign(dest, orig)
+ *  # function assign(dest, orig)
  *
- *  Applies to `dest` the minimum number of changes required to make it deeply equal `orig`.
- *  After running this function successfully: `equal(dest,orig)` will return true.
- *  
- *  Returns the array of applied [changes][Change].
+ *  Applies to `dest` the minimum number of changes required to make it deeply equal `orig`.  
+ *  After running this function successfully: `equal(dest,orig)` will return true.  
+ *    
+ *  Returns the array of the applied [Change][] objects.
  */
 function assign (dest, orig) {
     var changes = diff(dest, orig);
@@ -712,23 +710,31 @@ exports.assign = assign;
 // DOCUMENTATION LINKS
 
 /**
- *  [Path]: #class-path
- *  [Change]: #class-change
- *  [equal]: #function-equalobj1-obj2
- *  [copy]: #function-copyobj
- *  [diff]: #function-diffoldobj-newobj
- *  [assign]: #function-assigndest-orig
-
- *  [olojs.observable]: ./docs/observable.md
- *  [ObservableObject]: ./docs/observable.md#class-observableobject
- *  [ObservableArray]: ./docs/observable.md#class-observablearray
- *  [Observable]: ./docs/observable.md#function-observableobj
- *  [Subscription]: ./docs/observable.md#class-subscription
-
- *  [olojs.remote]: ./docs/remote.md
- *  [Hub]: ./docs/remote.md#class-hub
+ *  [Path]: #class-path  
+ *  [Change]: #class-change  
+ *  [equal]: #function-equalobj1-obj2  
+ *  [copy]: #function-copyobj  
+ *  [diff]: #function-diffoldobj-newobj  
+ *  [assign]: #function-assigndest-orig  
+ *    
+ *  [olojs.observable]: ./olojs.observable
+ *  [ObservableObject]: ./olojs.observable#class-observableobject  
+ *  [ObservableArray]: ./olojs.observable#class-observablearray  
+ *  [Observable]: ./olojs.observable#function-observableobj  
+ *  [Subscription]: ./olojs.observable#class-subscription  
+ *    
  */
+
+
 },{}],3:[function(require,module,exports){
+/**
+ *  This module provides classes that produce observable object instances.
+ *
+ *  An observable object intercepts all the change attempts and  
+ *  1) allows to autorize or deny them,  
+ *  2) notifies the changes to registered callbacks.  
+ */
+
 /*!
  *  MIT License
  * 
@@ -754,17 +760,6 @@ exports.assign = assign;
  */
 
 
-
-/**
- *  # Module `olojs.observable`
- *
- *  This module provides classes that produce observable object instances.
- *
- *  An observable object intercepts all the change attempts and
- *  1) allows to autorize or deny them,
- *  2) notifies the changes through registered callbacks.
- *
- */
 
 
 
@@ -797,20 +792,20 @@ var $auth = Symbol("olojs.observable.$auth");
 
 
 /**
- *  ##class ObservableObject
+ *  # class ObservableObject
  *
  *  This class generates a proxy to a generic javascript object that intercepts
- *  the change operations and:
- *
+ *  the change operations and:  
+ *    
  *  1) Before applying the change, calls the `this[observable.$auth]` method in
- *  order to check if the operation is autorized or forbidden.
- *
+ *  order to check if the operation is autorized or forbidden.  
+ *    
  *  2) After applyind the change, call the registerted callbacks, passing the
- *  a [Change][] object.
- *
+ *  a [Change][] object.  
+ *    
  *  The constructor accepts an hash with the initial properties of the instance.
- *  If any of the properties are objects, they will be converted to ObservableObjects.
- *
+ *  If any of the properties are objects, they will be converted to ObservableObjects.  
+ *    
  *  Example:
  *
  *  ```js
@@ -824,10 +819,10 @@ var $auth = Symbol("olojs.observable.$auth");
  *  oobj.a = [1,2,3]    // ->   oobj.a instanceof ObservableArray
  *  ```
  *
- *  ### Subscribe to change notifications
- *  In order to register a callback to be called on chages, you use the [Subscription][olojs.observable.Subscription] class.
+ *  ### Subscription to change notifications
+ *  In order to register a callback to be called on chages, you use the [Subscription][] class.
  *  On every change, including deep changes, the callback will receive a [Change][] object.
- *
+ *    
  *  ```js
  *  var oobj = new ObservableObject({x:10,y:20,o:{a:1,b:2}});
  *
@@ -840,15 +835,15 @@ var $auth = Symbol("olojs.observable.$auth");
  *  oobj.z = 30;        // -> logs: {"path":['z'], "new":30}
  *  oobj.o.a = 1.1;     // -> logs: {"path":['o','a'], "old":1, "new":1.1}
  *  ```
- *
+ *    
  *  ### Auth
  *  By default all the changes are allowed. In order to implement your access control,
- *  you need to extend the ObservableObject class and provide your own `[$auth]` method.
- *  
- *  Before each change, the `[$auth]` method will be called with the `Change` object as
+ *  you need to extend the ObservableObject class and provide your own `[$auth]` method.  
+ *    
+ *  Before each change, the `[$auth]` method will be called with the [Change][] object as
  *  parameter. When the method returns `true`, the operation goes through. When the
- *  method returns `false`, the access is deinied and an error message thrown.
- *
+ *  method returns `false`, the access is deinied and an error message thrown.  
+ *    
  *  Example:
  *
  *  ```js
@@ -1023,12 +1018,13 @@ class ObservableObject extends ProxyObject {
 
 
 /**
- *  ## class ObservableArray
+ *  # class ObservableArray
  *  
- *  This class generates an [ObservableObject][] that behaves like an Array.
+ *  This class generates an [ObservableObject][] that behaves like an Array.  
+ *    
  *  Not all the javascript Array method are implemented yet and some of the 
- *  implemented methods behave a bit differently.
- *
+ *  implemented methods behave a bit differently.  
+ *    
  *  The only changeable properties are the array items:
  *  key-properties are read only.
  */
@@ -1128,8 +1124,8 @@ class ObservableArray extends ObservableObject {
     /**
      *  ### Iterability
      *
-     *  The observable arry is iterable:
-     *
+     *  The observable arry is iterable:  
+     *    
      *  ```js
      *  var oarr = new ObservableArray([1,2,3])
      *  for (let item of oarr) console.log(item)    // -> logs: 1 2 3
@@ -1197,13 +1193,14 @@ function isIndex (key) {
 
 
 /**
- *  ##function Observable(obj)
- *
- *  This is an utility function. It will return:
- *
- *      * an [ObservableObject][] if obj is a plain object,
- *      * an [ObservableArray][] if obj is a plain array,
- *      * `obj` if it is already an instance of [ObservableObject][]
+ *  # function Observable(obj)
+ *  
+ *  This is an utility function. It will return:  
+ *    
+ *  * an [ObservableObject][] if obj is a plain object,
+ *  * an [ObservableArray][] if obj is a plain array,
+ *  * `obj` if it is already an instance of [ObservableObject][]  
+ *     
  */
 function Observable (obj) {
     if (obj instanceof ObservableObject) {
@@ -1220,11 +1217,11 @@ function Observable (obj) {
 
 
 /**
- *  ##class Subscription
+ *  # class Subscription
  *
- *  The class subscription accepts an [ObservableObject][] instance and a callback.
- *  It will register the callback for change notificactions.
- *
+ *  The class subscription accepts an [ObservableObject][] instance and a callback.  
+ *  It will register the callback for change notificactions.  
+ *    
  *  ```js
  *  var subscrption = new Subscription(observableObject, function (change) {...})
  *  ```
@@ -1263,22 +1260,21 @@ exports.$auth = $auth;
 // DOCUMENTATION LINKS
 
 /**
- *  [olojs.deep]: ./docs/deep.md
- *  [Path]: ./docs/deep.md#class-path
- *  [Change]: ./docs/deep.md#class-change
- *  [equal]: ./docs/deep.md#function-equalobj1-obj2
- *  [copy]: ./docs/deep.md#function-copyobj
- *  [diff]: ./docs/deep.md#function-diffoldobj-newobj
- *  [assign]: ./docs/deep.md#function-assigndest-orig
-
- *  [ObservableObject]: #class-observableobject
- *  [ObservableArray]: #class-observablearray
- *  [Observable]: #function-observableobj
- *  [Subscription]: #class-subscription
-
- *  [olojs.remote]: ./docs/remote.md
- *  [Hub]: ./docs/remote.md#class-hub
+ *  [olojs.deep]: ./olojs.deep  
+ *  [Path]: ./olojs.deep#class-path  
+ *  [Change]: ./olojs.deep#class-change  
+ *  [equal]: ./olojs.deep#function-equalobj1-obj2  
+ *  [copy]: ./olojs.deep#function-copyobj  
+ *  [diff]: ./olojs.deep#function-diffoldobj-newobj  
+ *  [assign]: ./olojs.deep#function-assigndest-orig  
+ *    
+ *  [ObservableObject]: #class-observableobject  
+ *  [ObservableArray]: #class-observablearray  
+ *  [Observable]: #function-observableobj  
+ *  [Subscription]: #class-subscription  
+ *    
  */
+
 },{"./deep":2,"./proxy":4}],4:[function(require,module,exports){
 
 var $init  = exports.$init  = Symbol("olojs.deep.$init");

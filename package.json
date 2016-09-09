@@ -1,6 +1,6 @@
 {
   "name": "olojs",
-  "version": "0.1.0",
+  "version": "0.0.7",
   "description": "Library allowing concurrent editing of data structures.",
   "main": "index.js",
   "scripts": {

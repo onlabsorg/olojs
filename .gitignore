@@ -37,7 +37,7 @@ jspm_packages
 .node_repl_history
 
 # Wiki repository
-doc
+wiki
 
 # Development Utilities
 build.js
