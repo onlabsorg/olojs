@@ -13,6 +13,7 @@
     "mocha": "^2.5.3"
   },
   "dependencies": {
+    "autobahn": "^0.10.1",
     "co": "^4.6.0"
   }
 }

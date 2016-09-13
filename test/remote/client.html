@@ -1,0 +1,63 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>olojs client Tests</title>
+  <script src="browser.js"></script>
+</head>
+<body>
+
+    <h1>olojs client test</h1>
+    <p>The global objects `olojs` and `o` are available for testing at the console.</p>
+    <p>`o` is a subscribed object synchronized with the server and other clients</p>
+
+    <script>
+        var co = olojs.co;
+
+        var deep = olojs.deep;
+        var Path = olojs.deep.Path;
+        var Change = olojs.deep.Change;
+
+        var Observable = olojs.observable.Observable;
+        var Subscription = olojs.observable.Subscription;
+
+        var Hub = olojs.remote.Hub;
+
+        var logger = {
+
+            log: function (message) {
+                console.log(new Date(), message);
+            },
+
+            logChange: function (change) {
+                var message = "change " 
+                            + String(change.path) + " : "
+                            + JSON.stringify(deep.copy(change.old)) + " -> "
+                            + JSON.stringify(deep.copy(change.new));
+                this.log(message);
+            }                    
+        }
+
+        co(function * () {
+            var hub = yield (new Hub('ws://127.0.0.1:8080/ws', "test")).connect();
+            logger.log("subscribing to test.o ...");
+            var o = yield hub.subscribe('test.o');
+            var subs = new Subscription(o, function (change) { 
+                logger.logChange(change) 
+            });
+            return o;
+        })
+        .then(function (o) {
+            logger.log("test.o loaded.");
+            window.o = o;
+        })
+        .catch(function (err) {
+            throw err;
+            console.log("Make sure that the WAMP router and the test server are running:");
+            console.log("olojs/test: crossbar start");
+            console.log("olojs/test/remote: node server.js");
+        });
+
+    </script>
+
+</body>
+</html>

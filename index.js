@@ -1,8 +1,26 @@
 
-exports.deep = require("./lib/deep");
-exports.Path = exports.deep.Path;
-exports.Change = exports.deep.Change;
+var olojs = {}
 
-exports.observable = require("./lib/observable");
-exports.Observable = exports.observable.Observable;
-exports.Subscription = exports.observable.Subscription;
+olojs.deep   = require("./lib/deep");
+olojs.Path   = olojs.deep.Path;
+olojs.Change = olojs.deep.Change;
+
+olojs.observable   = require("./lib/observable");
+olojs.Observable   = olojs.observable.Observable;
+olojs.Subscription = olojs.observable.Subscription;
+
+olojs.remote = require("./lib/remote");
+olojs.Hub    = olojs.remote.Hub;
+
+olojs.co = require("co");
+
+try {
+    window.olojs = olojs;
+}
+
+catch (e) {}
+
+finally {
+    module.exports = olojs;    
+}
+
