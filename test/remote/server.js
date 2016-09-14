@@ -35,6 +35,3 @@ co(function * () {
 .catch(function (err) {
     throw err;
 });
-
-
-

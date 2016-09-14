@@ -12,22 +12,16 @@
 
     <script>
         var co = olojs.co;
-
         var deep = olojs.deep;
         var Path = olojs.deep.Path;
         var Change = olojs.deep.Change;
-
         var Observable = olojs.observable.Observable;
         var Subscription = olojs.observable.Subscription;
-
         var Hub = olojs.remote.Hub;
-
         var logger = {
-
             log: function (message) {
                 console.log(new Date(), message);
             },
-
             logChange: function (change) {
                 var message = "change " 
                             + String(change.path) + " : "
@@ -36,7 +30,6 @@
                 this.log(message);
             }                    
         }
-
         co(function * () {
             var hub = yield (new Hub('ws://127.0.0.1:8080/ws', "test")).connect();
             logger.log("subscribing to test.o ...");
@@ -56,7 +49,6 @@
             console.log("olojs/test: crossbar start");
             console.log("olojs/test/remote: node server.js");
         });
-
     </script>
 
 </body>

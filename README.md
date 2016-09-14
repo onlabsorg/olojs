@@ -41,9 +41,10 @@ hub.connect()
     hub.subscribe('path.to.obj')
     .then(function (obj) {
 
-        // obj is a copy of the shared Observable objec
-        // any change to obj will be synchronized with all the subscribers
-        obj.y = 22   // -> change published in background
+        // obj is a copy of the shared Observable object
+        // any change to obj will be synchronized with the publisher
+        // and whith all the other subscribers
+        obj.y = 22   // -> change sent to the publisher
 
     });
 
@@ -61,13 +62,13 @@ new olojs.Subscription(obj, function (change) {
 
 ## Installation
 On NodeJs:
-```
+```js
 npm install olojs
 ```
 
 In the browser:
-```
-<script src="olojs/dist/browser.js"></script>
+```html
+<script src="path-to-olojs/dist/browser.js"></script>
 <!-- the global object olojs is now available in the browser -->
 ```
 
@@ -75,7 +76,7 @@ In order to publish and subscribe objects, you need a WAMP Router to connect to.
 
 
 ## Documentation
-The documentation is available in the [wiki][].
+The documentation is available [here][wiki].
 
 
 ## License

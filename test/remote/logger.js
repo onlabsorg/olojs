@@ -1,4 +1,3 @@
-
 var olojs = require("../../index");
 var deep = olojs.deep;
 
