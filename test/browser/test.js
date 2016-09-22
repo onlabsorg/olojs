@@ -388,7 +388,7 @@ class Change {
         }
 
         var objectChange = isString(key) && isObject(parent);
-        var arrayChange  = isInteger(key)  && isArray(parent);
+        var arrayChange  = isInteger(key) && isArray(parent);
 
         var remove = 'old' in this;
         var insert = 'new' in this;
@@ -765,6 +765,8 @@ var ProxyObject = proxy.ProxyObject;
 
 
 
+
+
 /*!
  *  Symbol used as keys of the ObservableObject properties and methods
  *  Using symbols avoids conflicts with user defined properties.
@@ -777,176 +779,44 @@ var $dispatch = Symbol("olojs.observable.$dispatch");
 var $subscribe = Symbol("olojs.observable.$subscribe");
 var $unsubscribe = Symbol("olojs.observable.$unsubscribe");
 
-var $auth = Symbol("olojs.observable.$auth");
+var $validate = Symbol("olojs.observable.$validate");
 
 
 
-/**
- *  # class ObservableObject
- *
- *  This class generates a proxy to a generic javascript object that intercepts
- *  the change operations and:  
- *    
- *  1) Before applying the change, calls the `this[observable.$auth]` method in
- *  order to check if the operation is autorized or forbidden.  
- *    
- *  2) After applyind the change, call the registerted callbacks, passing the
- *  a [Change][] object.  
- *    
- *  The constructor accepts an hash with the initial properties of the instance.
- *  If any of the properties are objects, they will be converted to ObservableObjects.  
- *    
- *  Example:
- *
- *  ```js
- *  var oobj = new ObservableObject({x:10, y:20, z:30})
- *
- *  var x = obj.x       // ->   x === 10
- *  oobj.y = 22         // ->   oobj.y === 22
- *  delete oobj.z       // ->   oobj.z === undefined
- *
- *  oobj.o = {a:1,b:2}  // ->   oobj.o instanceof ObservableObject
- *  oobj.a = [1,2,3]    // ->   oobj.a instanceof ObservableArray
- *  ```
- *
- *  ### Subscription to change notifications
- *  In order to register a callback to be called on chages, you use the [Subscription][] class.
- *  On every change, including deep changes, the callback will receive a [Change][] object.
- *    
- *  ```js
- *  var oobj = new ObservableObject({x:10,y:20,o:{a:1,b:2}});
- *
- *  var subs = new Subscription(oobj, function (change) { 
- *      console.log(JSON.stringify(change)) 
- *  });
- *
- *  oobj.x = 10;        // -> logs: {"path":['x'], "old":10, "new":10}
- *  delete oobj.y;      // -> logs: {"path":['y'], "old":20}
- *  oobj.z = 30;        // -> logs: {"path":['z'], "new":30}
- *  oobj.o.a = 1.1;     // -> logs: {"path":['o','a'], "old":1, "new":1.1}
- *  ```
- *    
- *  ### Auth
- *  By default all the changes are allowed. In order to implement your access control,
- *  you need to extend the ObservableObject class and provide your own `[$auth]` method.  
- *    
- *  Before each change, the `[$auth]` method will be called with the [Change][] object as
- *  parameter. When the method returns `true`, the operation goes through. When the
- *  method returns `false`, the access is deinied and an error message thrown.  
- *    
- *  Example:
- *
- *  ```js
- *  import {ObservableObject, $auth} from "olojs"  
- *
- *  class MyObsObj extends ObservableObject {
- *
- *      [$auth] (change) {
- *          return String(change.path) !== "b"
- *      }
- *           
- *  }
- *
- *  var oobj = new MyObsObj({a:1, b:2});
- *
- *  oobj.a = 10;    // -> oobj.a === 10
- *  oobj.b = 20;    // -> Error!
- *  ```
+
+
+/*!
+ *  Base abstract class for observable objects
  */
-class ObservableObject extends ProxyObject {
+class ObservableContainer extends ProxyObject {
 
-    [proxy.$init] (data={}) {
+    [proxy.$init] () {
 
         // this map stores this object parents as follows:
-        // // if obj[key] === this, then this[$parents].get(obj) === key        
+        // - if obj is a parent of this (obj[key] === this), 
+        // - then this[$parents] maps obj to key 
         this[$parents] = new Map();
 
         // array of all the callbacks to be called in case of change
         this[$callbacks] = [];
 
-        // object that holds the observed properties
-        this[$data] = new data.constructor();
-        for (let key in data) {
-            this[proxy.$set](key, data[key]);
+        // record containing the actual data. To be defined by the extended classes.
+        this[$data] = null;
+    }
+
+    // validates the new value and converts objects in observable objects
+    [$validate] (value) {
+        var newValue = Observable(value) || value;
+
+        var valid = newValue instanceof ObservableContainer ||
+                    ["string", "number", "boolean"].includes(typeof newValue) ||
+                    newValue === null;
+                    
+        if (!valid) {
+            throw new TypeError("Observable properties can only be Observable, Object, Array, String, Number, Boolean or null")
+        } else {
+            return newValue;            
         }
-    }
-
-    // trap for: value = this[key]
-    [proxy.$get] (key) {
-        return this[$data][key] !== undefined ? this[$data][key] : this[key];
-    }
-
-    // trap for: Reflect.ownKeys(this)
-    [proxy.$keys] () {
-        return Reflect.ownKeys(this[$data]);
-    }
-
-    // trap for: key in this
-    [proxy.$has] (key) {
-        return Reflect.has(this[$data], key);
-    }
-
-    // trap for: this[key] = value
-    [proxy.$set] (key, value) {
-        var change = this[deep.$change](key, this[proxy.$get](key), value);
-        return (change !== null);
-    }
-
-    // trap for: delete this[key]
-    [proxy.$del] (key) {
-        var change = this[deep.$change](key, this[proxy.$get](key), undefined);
-        return (change !== null);
-    }
-
-    // handles property changes
-    [deep.$change] (key, oldValue, newValue) {
-
-        // validate the new value
-        if (newValue !== undefined) {
-            newValue = Observable(newValue) || newValue;
-            if (!(newValue instanceof ObservableObject)
-                    && !(["string", "number", "boolean"].includes(typeof newValue))
-                    && newValue !== null) {
-                throw new TypeError("Observable properties can only be Observable, Object, Array, String, Number, Boolean or null")
-            }
-        }
-
-        // define the change object to be applied to this[$data]
-        var requiredChange = new Change(key, oldValue, newValue);
-
-        // varify that the requested change is allowed 
-        if (!this[$auth](requiredChange)) throw new Error("Access denied");
-
-        // apply the requested change to the inner data object
-        var appliedChange = requiredChange.apply(this[$data]);
-
-        // if the change has been successfully applied ...
-        if (appliedChange !== null) {
-
-            // ... update parent-child links
-            if (oldValue instanceof ObservableObject) {
-                oldValue[$parents].delete(this);
-            }
-            for (let ckey of Object.keys(this[$data])) {
-                if (Array.isArray(this[$data])) ckey = Number(ckey);
-                let child = this[$data][ckey];
-                if (child instanceof ObservableObject) {
-                    child[$parents].set(this, ckey);
-                }
-            }
-
-            // ... dispatch the change to all the registered callbacks
-            this[$dispatch](appliedChange);
-        }
-
-        return appliedChange;
-    }
-
-    // this method will be called before applying any change
-    // if it returns true, the change is allowed
-    // if it returns false, the change is rejected and an errero will be thrown
-    [$auth] (change) {
-        return true;
     }
 
     // this method calls all the registered callbacks, passing change
@@ -1007,6 +877,161 @@ class ObservableObject extends ProxyObject {
 
 
 
+
+
+/**
+ *  # class ObservableObject
+ *
+ *  This class generates a proxy to a generic javascript object that intercepts
+ *  the change operations and:  
+ *    
+ *  1) Before applying the change, calls the `this[observable.$auth]` method in
+ *  order to check if the operation is autorized or forbidden.  
+ *    
+ *  2) After applyind the change, call the registerted callbacks, passing the
+ *  a [Change][] object.  
+ *    
+ *  The constructor accepts an hash with the initial properties of the instance.
+ *  If any of the properties are objects, they will be converted to ObservableObjects.  
+ *    
+ *  Example:
+ *
+ *  ```js
+ *  var oobj = new ObservableObject({x:10, y:20, z:30})
+ *
+ *  var x = obj.x       // ->   x === 10
+ *  oobj.y = 22         // ->   oobj.y === 22
+ *  delete oobj.z       // ->   oobj.z === undefined
+ *
+ *  oobj.o = {a:1,b:2}  // ->   oobj.o instanceof ObservableObject
+ *  oobj.a = [1,2,3]    // ->   oobj.a instanceof ObservableArray
+ *  ```
+ *
+ *  ### Subscription to change notifications
+ *  In order to register a callback to be called on chages, you use the [Subscription][] class.
+ *  On every change, including deep changes, the callback will receive a [Change][] object.
+ *    
+ *  ```js
+ *  var oobj = new ObservableObject({x:10,y:20,o:{a:1,b:2}});
+ *
+ *  var subs = new Subscription(oobj, function (change) { 
+ *      console.log(JSON.stringify(change)) 
+ *  });
+ *
+ *  oobj.x = 10;        // -> logs: {"path":['x'], "old":10, "new":10}
+ *  delete oobj.y;      // -> logs: {"path":['y'], "old":20}
+ *  oobj.z = 30;        // -> logs: {"path":['z'], "new":30}
+ *  oobj.o.a = 1.1;     // -> logs: {"path":['o','a'], "old":1, "new":1.1}
+ *  ```
+ *    
+ *  ### Auth
+ *  By default it is always allowed to delete a key and it is allowed to set a key value
+ *  only to primitive types, objects, arrays or null.  
+ *  In order to define additional restrictions, you need to overwrite the `set` and `del` traps.
+ *    
+ *  Example:
+ *
+ *  ```js
+ *  class MyObsObj extends olojs.observable.ObservableObject {
+ *
+ *      [olojs.observable.$set] (key, value) {
+ *
+ *          // here you can deny access by throwing an exception.
+ *          // for example:
+ *          if (key === "b") throw new Error("Property b is read-only");       
+ *
+ *          super[olojs.observable.$set](key,value);
+ *      }
+ *           
+ *      [olojs.observable.$del] (key) {
+ *
+ *          // here you can deny access by throwing an exception.
+ *          // for example:
+ *          if (key === "c") throw new Error("Property c cannot be removed.");       
+ *
+ *          super[olojs.observable.$det](key);
+ *      }
+ *
+ *  }
+ *
+ *  var oobj = new MyObsObj({a:1, b:2});
+ *
+ *  oobj.a = 10;    // -> oobj.a === 10
+ *  oobj.b = 20;    // -> Error!
+ *
+ *  delete obj.a;   // -> oobj.a === undefined
+ *  delete oobj.c;  // -> Error!
+ *  ```
+ */
+class ObservableObject extends ObservableContainer {
+
+    [proxy.$init] (data={}) {
+
+        super[proxy.$init]();
+
+        // object that holds the observed properties
+        this[$data] = {};
+        for (let key in data) {
+            this[proxy.$set](key, data[key]);
+        }
+    }
+
+    // trap for: value = this[key]
+    [proxy.$get] (key) {
+        return this[$data][key] !== undefined ? this[$data][key] : this[key];
+    }
+
+    // trap for: Reflect.ownKeys(this)
+    [proxy.$keys] () {
+        return Reflect.ownKeys(this[$data]);
+    }
+
+    // trap for: key in this
+    [proxy.$has] (key) {
+        return Reflect.has(this[$data], key);
+    }
+
+    // trap for: this[key] = value
+    [proxy.$set] (key, value) {
+        var newValue = this[$validate](value);
+        var oldValue = this[proxy.$get](key);
+
+        // if there is a change ...
+        if (!deep.equal(oldValue, newValue)) {
+            this[$data][key] = newValue;
+
+            // ... update parent-child links
+            if (oldValue instanceof ObservableContainer) {
+                oldValue[$parents].delete(this);
+            }
+            if (newValue instanceof ObservableContainer) {
+                newValue[$parents].set(this, key);
+            }
+
+            // ... dispatch the change to the observers
+            this[$dispatch](new Change(key, oldValue, newValue));
+        }
+    }
+
+    // trap for: delete this[key]
+    [proxy.$del] (key) {
+        var oldValue = this[proxy.$get](key);
+        if (oldValue !== undefined) {
+            delete this[$data][key];
+
+            // ... update parent-child links
+            if (oldValue instanceof ObservableContainer) {
+                oldValue[$parents].delete(this);
+            }
+
+            // ... dispatch the change to the observers
+            this[$dispatch](new Change(key, oldValue, undefined));            
+        }
+    }
+}
+
+
+
 /**
  *  # class ObservableArray
  *  
@@ -1018,10 +1043,14 @@ class ObservableObject extends ProxyObject {
  *  The only changeable properties are the array items:
  *  key-properties are read only.
  */
-class ObservableArray extends ObservableObject {
+class ObservableArray extends ObservableContainer {
 
     [proxy.$init] (data=[]) {
-        super[proxy.$init](Array.from(data));
+        super[proxy.$init]();
+        this[$data] = [];
+        for (let item of data) {
+            this.push(item);
+        }
     }
 
     // trap for: value = this[key]
@@ -1029,20 +1058,17 @@ class ObservableArray extends ObservableObject {
         return isIndex(key) ? this[$data][key] : this[key];
     }
 
-    // handles property changes
-    [deep.$change] (index, oldValue, newValue) {
-
-        // validate the index
+    // trap for: this[index] = value
+    [proxy.$set] (index, value) {
         if (!isIndex(index)) throw new Error("Invalid index");
-        if (index < 0 || this.length < index 
-                || (index == this.length && newValue === undefined)) {
-            throw new Error("Index out of range");
-        }
-
-        // apply the change
-        return super[deep.$change](Number(index), oldValue, newValue);
+        if (index < 0 || this.length < index) throw new Error("Index out of range");
+        return ObservableObject.prototype[proxy.$set].call(this, Number(index), value);
     }
 
+    // trap for: delete this[index]
+    [proxy.$del] (index) {
+        this.pop(index);
+    }
 
     /**
      *  ### ObservableArray.prototype.lenght
@@ -1052,7 +1078,6 @@ class ObservableArray extends ObservableObject {
         return this[$data].length;
     }
 
-
     /**
      *  ### ObservableArray.prototype.pop(index)
      *
@@ -1061,8 +1086,27 @@ class ObservableArray extends ObservableObject {
      *  In the index is out of range, it will throw an error.
      */
     pop (index=this.length-1) {
-        var change = this[deep.$change](index, this[proxy.$get](index), undefined);
-        return change !== null ? change.old : undefined;
+        if (!isIndex(index)) throw new Error("Invalid index");
+        if (index < 0 || this.length <= index) throw new Error("Index out of range");
+
+        var oldValue = this[proxy.$get](index);
+
+        this[$data].splice(index, 1);
+
+        // update parent-child links
+        if (oldValue instanceof ObservableContainer) {
+            oldValue[$parents].delete(this);
+        }
+        for (let i=index; i<this.lenght; i++) {
+            let child = this[proxy.$get][i];
+            if (child instanceof ObservableContainer) {
+                child[$parents].set(this, i);
+            }
+        }
+
+        this[$dispatch](new Change(Number(index), oldValue, undefined));
+
+        return oldValue;
     }
 
     /**
@@ -1073,7 +1117,26 @@ class ObservableArray extends ObservableObject {
      *  In the index is out of range, it will throw an error.
      */
     push (item, index=this.length) {
-        this[deep.$change](index, undefined, item);
+        if (!isIndex(index)) throw new Error("Invalid index");
+        if (index < 0 || this.length < index) throw new Error("Index out of range");
+
+        var newItem = this[$validate](item);
+
+        this[$data].splice(index, 0, newItem);
+
+        // update parent-child links
+        if (newItem instanceof ObservableContainer) {
+            newItem[$parents].set(this, index);
+        }
+        for (let i=index; i<this.lenght; i++) {
+            let child = this[proxy.$get][i];
+            if (child instanceof ObservableContainer) {
+                child[$parents].set(this, i);
+            }
+        }
+
+        // ... dispatch the change to the observers
+        this[$dispatch](new Change(Number(index), undefined, newItem));
     }
 
 
@@ -1193,7 +1256,7 @@ function isIndex (key) {
  *     
  */
 function Observable (obj) {
-    if (obj instanceof ObservableObject) {
+    if (obj instanceof ObservableContainer) {
         return obj
     } else if (Array.isArray(obj)) {
         return new ObservableArray(obj);
@@ -1243,7 +1306,10 @@ exports.ObservableObject = ObservableObject;
 exports.ObservableArray = ObservableArray;
 exports.Observable = Observable;
 exports.Subscription = Subscription;
-exports.$auth = $auth;
+exports.$init = proxy.$init;
+exports.$get = proxy.$get;
+exports.$set = proxy.$set;
+exports.$del = proxy.$del;
 
 
 
@@ -1332,11 +1398,13 @@ var proxyHandler = {
     },
 
     set: function (target, key, value, proxy) {
-        return target[$set](key, value);
+        target[$set](key, value);
+        return true;
     },
 
     deleteProperty: function (target, key) {
-        return target[$del](key);
+        target[$del](key);
+        return true;
     },
 
     ownKeys: function (target) {
@@ -59880,7 +59948,6 @@ describe("ObservableObject", function () {
             oo.n = 123;
             oo.b = true;
             oo.z = null;
-            oo.z = undefined;
             function assign_function () {oo.foo = function () {}};
             expect(assign_function).to.throw(TypeError);
         });
@@ -59930,7 +59997,6 @@ describe("ObservableArray", function () {
     it("should produce an ObservableObject instance", function () {
         var oa = new ObservableArray();
         expect(oa).to.be.instanceof(ObservableArray);
-        expect(oa).to.be.instanceof(ObservableObject);
     });
 
     it("should toString-ify to '[object Array]'", function () {
@@ -59990,12 +60056,6 @@ describe("ObservableArray", function () {
             var oa = new ObservableArray(['a','b','c','d','e']);
             oa[1] = 'bb';
             expect(Array.from(oa)).to.deep.equal(['a','bb','c','d','e']);
-        });
-
-        it("should remove the item when assigning undefined", function () {
-            var oa = new ObservableArray(['a','b','c']);
-            oa[1] = undefined;
-            expect(Array.from(oa)).to.deep.equal(['a','c']);
         });
 
         it("should assign plain objects as observable objects", function () {
@@ -60084,7 +60144,7 @@ describe("ObservableArray", function () {
             var oa = new ObservableArray(['a','b','c']);
             expect(function () { delete oa[100] }).to.throw(Error);
             expect(function () { delete oa[-100] }).to.throw(Error);
-            expect(function () { delete oa[oa.length] }).to.throw(Error);            
+            expect(function () { delete oa[oa.length] }).to.throw(Error);
             expect(Array.from(oa)).to.deep.equal(['a','b','c']);
         });
     });
@@ -60223,11 +60283,6 @@ describe("Subscription", function () {
         expect(lastChange.old).to.equal(1);
         expect(lastChange.new).to.equal(10);
 
-        oo.x = undefined;
-        expect(lastChange.path).to.deep.equal(['x']);
-        expect(lastChange.old).to.equal(10);
-        expect(lastChange.new).to.be.undefined;
-
         oo.y = 20;
         expect(lastChange.path).to.deep.equal(['y']);
         expect(lastChange.old).to.be.undefined;
@@ -60260,11 +60315,6 @@ describe("Subscription", function () {
         expect(lastChange.path).to.deep.equal([1]);
         expect(lastChange.old).to.equal('b');
         expect(lastChange.new).to.equal('bb');
-
-        oa[1] = undefined;
-        expect(lastChange.path).to.deep.equal([1]);
-        expect(lastChange.old).to.equal('bb');
-        expect(lastChange.new).to.be.undefined;
 
         lastChange = null;
         oa[0] = 'a';
@@ -60312,6 +60362,40 @@ describe("Subscription", function () {
     });
 
     it("should callback on sub-key value changes", function () {
+
+        var oo = new ObservableObject({
+            a: {
+                b: 2
+            }
+        });
+        var subscription = new Subscription(oo, callback);
+
+        oo.a.b = 20;
+        expect(lastChange.path).to.deep.equal(['a','b']);
+        expect(lastChange.old).to.equal(2);
+        expect(lastChange.new).to.equal(20);
+
+        oo.a.b = {c:3};
+        oo.a.b.c = 30;
+        expect(lastChange.path).to.deep.equal(['a','b','c']);
+        expect(lastChange.old).to.equal(3);
+        expect(lastChange.new).to.equal(30);
+
+        oo.a.b = [1,2,3];
+        oo.a.b[1] = 20;
+        expect(lastChange.path).to.deep.equal(['a','b',1]);
+        expect(lastChange.old).to.equal(2);
+        expect(lastChange.new).to.equal(20);
+
+        oo.a.b[1] = {c:3};
+        oo.a.b[1].c = 30;
+        expect(lastChange.path).to.deep.equal(['a','b',1,'c']);
+        expect(lastChange.old).to.equal(3);
+        expect(lastChange.new).to.equal(30);
+
+        subscription.cancel();
+
+
         var oo = new ObservableObject({
             a: {
                 b: [1,2,{c:3}]
@@ -60334,6 +60418,8 @@ describe("Subscription", function () {
         lastChange = null;
         a.b[1] = 20;
         expect(lastChange).to.be.null;
+
+        subscription.cancel();
     });
 
     it("should prevent recursive dispatching of the same change", function () {
@@ -60375,46 +60461,6 @@ describe("Subscription", function () {
         lastChange = null;
         oo.x = 100;
         expect(lastChange).to.be.null;
-    });
-});
-
-
-
-describe("Auth", function () {
-
-    it("should be called before every write operation", function () {
-        var counter = 0;
-
-        class OAuth extends ObservableObject {
-            [observable.$auth] (key, oldValue, newValue) {
-                counter = counter+1;
-                expect(oa[key]).to.equal(oldValue);
-                return true;
-            }
-        }
-
-        var oa = new OAuth();
-
-        oa.x = 10;
-        expect(counter).to.equal(1);
-
-        oa.x = 11;
-        expect(counter).to.equal(2);
-
-        delete oa.x;
-        expect(counter).to.equal(3);
-    });
-
-    it("should cause an error to be thrown when it returns false", function () {
-
-        class OAuth extends ObservableObject {
-            [observable.$auth] (key, oldValue, newValue) {
-                return false;
-            }
-        }
-
-        var oa = new OAuth();
-        expect(function () { oa.x=10 }).to.throw(Error);
     });
 });
 

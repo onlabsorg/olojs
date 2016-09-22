@@ -93,7 +93,6 @@ describe("ObservableObject", function () {
             oo.n = 123;
             oo.b = true;
             oo.z = null;
-            oo.z = undefined;
             function assign_function () {oo.foo = function () {}};
             expect(assign_function).to.throw(TypeError);
         });
@@ -143,7 +142,6 @@ describe("ObservableArray", function () {
     it("should produce an ObservableObject instance", function () {
         var oa = new ObservableArray();
         expect(oa).to.be.instanceof(ObservableArray);
-        expect(oa).to.be.instanceof(ObservableObject);
     });
 
     it("should toString-ify to '[object Array]'", function () {
@@ -203,12 +201,6 @@ describe("ObservableArray", function () {
             var oa = new ObservableArray(['a','b','c','d','e']);
             oa[1] = 'bb';
             expect(Array.from(oa)).to.deep.equal(['a','bb','c','d','e']);
-        });
-
-        it("should remove the item when assigning undefined", function () {
-            var oa = new ObservableArray(['a','b','c']);
-            oa[1] = undefined;
-            expect(Array.from(oa)).to.deep.equal(['a','c']);
         });
 
         it("should assign plain objects as observable objects", function () {
@@ -297,7 +289,7 @@ describe("ObservableArray", function () {
             var oa = new ObservableArray(['a','b','c']);
             expect(function () { delete oa[100] }).to.throw(Error);
             expect(function () { delete oa[-100] }).to.throw(Error);
-            expect(function () { delete oa[oa.length] }).to.throw(Error);            
+            expect(function () { delete oa[oa.length] }).to.throw(Error);
             expect(Array.from(oa)).to.deep.equal(['a','b','c']);
         });
     });
@@ -436,11 +428,6 @@ describe("Subscription", function () {
         expect(lastChange.old).to.equal(1);
         expect(lastChange.new).to.equal(10);
 
-        oo.x = undefined;
-        expect(lastChange.path).to.deep.equal(['x']);
-        expect(lastChange.old).to.equal(10);
-        expect(lastChange.new).to.be.undefined;
-
         oo.y = 20;
         expect(lastChange.path).to.deep.equal(['y']);
         expect(lastChange.old).to.be.undefined;
@@ -473,11 +460,6 @@ describe("Subscription", function () {
         expect(lastChange.path).to.deep.equal([1]);
         expect(lastChange.old).to.equal('b');
         expect(lastChange.new).to.equal('bb');
-
-        oa[1] = undefined;
-        expect(lastChange.path).to.deep.equal([1]);
-        expect(lastChange.old).to.equal('bb');
-        expect(lastChange.new).to.be.undefined;
 
         lastChange = null;
         oa[0] = 'a';
@@ -525,6 +507,40 @@ describe("Subscription", function () {
     });
 
     it("should callback on sub-key value changes", function () {
+
+        var oo = new ObservableObject({
+            a: {
+                b: 2
+            }
+        });
+        var subscription = new Subscription(oo, callback);
+
+        oo.a.b = 20;
+        expect(lastChange.path).to.deep.equal(['a','b']);
+        expect(lastChange.old).to.equal(2);
+        expect(lastChange.new).to.equal(20);
+
+        oo.a.b = {c:3};
+        oo.a.b.c = 30;
+        expect(lastChange.path).to.deep.equal(['a','b','c']);
+        expect(lastChange.old).to.equal(3);
+        expect(lastChange.new).to.equal(30);
+
+        oo.a.b = [1,2,3];
+        oo.a.b[1] = 20;
+        expect(lastChange.path).to.deep.equal(['a','b',1]);
+        expect(lastChange.old).to.equal(2);
+        expect(lastChange.new).to.equal(20);
+
+        oo.a.b[1] = {c:3};
+        oo.a.b[1].c = 30;
+        expect(lastChange.path).to.deep.equal(['a','b',1,'c']);
+        expect(lastChange.old).to.equal(3);
+        expect(lastChange.new).to.equal(30);
+
+        subscription.cancel();
+
+
         var oo = new ObservableObject({
             a: {
                 b: [1,2,{c:3}]
@@ -547,6 +563,8 @@ describe("Subscription", function () {
         lastChange = null;
         a.b[1] = 20;
         expect(lastChange).to.be.null;
+
+        subscription.cancel();
     });
 
     it("should prevent recursive dispatching of the same change", function () {
@@ -588,46 +606,6 @@ describe("Subscription", function () {
         lastChange = null;
         oo.x = 100;
         expect(lastChange).to.be.null;
-    });
-});
-
-
-
-describe("Auth", function () {
-
-    it("should be called before every write operation", function () {
-        var counter = 0;
-
-        class OAuth extends ObservableObject {
-            [observable.$auth] (key, oldValue, newValue) {
-                counter = counter+1;
-                expect(oa[key]).to.equal(oldValue);
-                return true;
-            }
-        }
-
-        var oa = new OAuth();
-
-        oa.x = 10;
-        expect(counter).to.equal(1);
-
-        oa.x = 11;
-        expect(counter).to.equal(2);
-
-        delete oa.x;
-        expect(counter).to.equal(3);
-    });
-
-    it("should cause an error to be thrown when it returns false", function () {
-
-        class OAuth extends ObservableObject {
-            [observable.$auth] (key, oldValue, newValue) {
-                return false;
-            }
-        }
-
-        var oa = new OAuth();
-        expect(function () { oa.x=10 }).to.throw(Error);
     });
 });
 

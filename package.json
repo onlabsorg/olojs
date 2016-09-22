@@ -1,6 +1,6 @@
 {
   "name": "olojs",
-  "version": "0.0.9",
+  "version": "0.0.12",
   "description": "Library allowing concurrent editing of data structures.",
   "main": "index.js",
   "scripts": {
@@ -15,5 +15,10 @@
   "dependencies": {
     "autobahn": "^0.10.1",
     "co": "^4.6.0"
+  },
+  "jspm": {
+    "map": {
+      "autobahn": "./vendor/autobahn"
+    }
   }
 }
