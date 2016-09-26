@@ -152,11 +152,11 @@ class Path extends Array {
      *  
      *  ```js
      *  var obj = {a:[10,{b:2}]}
-     *  query(obj, "a[1].b")        // -> obj.a[1].b -> 2
-     *  query(obj, ['a',1,'b'])     // -> obj.a[1].b -> 2
-     *  query(obj, ['a[1]','b'])    // -> obj.a[1].b -> 2
-     *  query(obj, "a.x")           // -> undefined
-     *  query(obj, "a.1.b")         // -> undefined, because obj.a is an Array
+     *  (new Path("a[1].b")).lookup(obj)    // -> obj.a[1].b -> 2
+     *  (new Path('a',1,'b')).lookup(obj)   // -> obj.a[1].b -> 2
+     *  (new Path('a[1]','b')).lookup(obj)  // -> obj.a[1].b -> 2
+     *  (new Path("a.x")).lookup(obj)       // -> undefined
+     *  (new Path("a.1.b")).lookup(obj)     // -> undefined, because obj.a is an Array
      *  ```
      */
     lookup (obj) {
