@@ -1,24 +1,10 @@
 {
-  "name": "olojs",
-  "version": "0.0.12",
-  "description": "Library allowing concurrent editing of data structures.",
-  "main": "index.js",
-  "scripts": {
-    "test": "node test"
-  },
-  "author": "Marcello Del Buono",
-  "license": "MIT",
-  "devDependencies": {
-    "chai": "^3.5.0",
-    "mocha": "^2.5.3"
-  },
-  "dependencies": {
-    "autobahn": "^0.10.1",
-    "co": "^4.6.0"
-  },
   "jspm": {
-    "map": {
-      "autobahn": "./vendor/autobahn"
+    "dependencies": {
+      "lodash": "npm:lodash@^4.17.4",
+      "sharedb": "npm:sharedb@^1.0.0-beta.7",
+      "url": "github:jspm/nodelibs-url@^0.1.0",
+      "uuid": "npm:uuid@^3.0.1"
     }
   }
 }
