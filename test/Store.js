@@ -158,6 +158,7 @@ define([
                     store = new TestStore(host);
                     await store.connect();
                     doc = await store.getDocument('test-doc');
+                    for (let key of doc.getDictKeys()) doc.removeDictItem('', key);
                     doc.setDictItem('', 'd0', utils.clone(content));
                 }
                 init().then(done).catch(done);
