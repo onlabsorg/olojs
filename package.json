@@ -1,5 +1,8 @@
 {
   "jspm": {
+    "directories": {
+        "lib": "src"
+    },
     "dependencies": {
       "lodash": "npm:lodash@^4.17.4",
       "sharedb": "npm:sharedb@^1.0.0-beta.7",
