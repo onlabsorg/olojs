@@ -1,10 +1,8 @@
-define([
-    "olojs/stores/MemoryStore"
-], function (MemoryStore) {
 
-    class LocalStore extends MemoryStore {}
+var MemoryStore = require("./MemoryStore")';'
 
-    LocalStore.scheme = "local:";
+class LocalStore extends MemoryStore {}
 
-    return LocalStore;
-});
+LocalStore.scheme = "local:";
+
+module.exports = LocalStore;

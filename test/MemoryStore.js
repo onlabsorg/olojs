@@ -1,8 +1,5 @@
-define([
-    "test/Store",
-    "olojs/stores/MemoryStore"
-], function (describeStore, MemoryStore) {
 
-    describeStore("MemoryStore", MemoryStore, "test-memory-store");
-    
-});
+import describeStore from "test/Store";
+import MemoryStore from "olojs/stores/MemoryStore";
+
+describeStore("MemoryStore", MemoryStore, "test-memory-store");
