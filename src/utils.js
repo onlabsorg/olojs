@@ -1,25 +1,39 @@
+import isObjectLike from "lodash/isObjectLike";
+import isPlainObject from "lodash/isPlainObject";
+import isArray from "lodash/isArray";
+import isString from "lodash/isString";
+import isBoolean from "lodash/isBoolean";
+import isNumber from "lodash/isNumber";
+import isInteger from "lodash/isInteger";
+import toInteger from "lodash/toInteger";
+import isEqual from "lodash/isEqual";
+import cloneDeep from "lodash/cloneDeep";
+
+import URL from "url";
+
+import uuid from "uuid";
+
+
+
 var utils = {}
 
-utils.isObjectLike = require("lodash/isObjectLike")
-utils.isPlainObject = require("lodash/isPlainObject");
-utils.isArray = require("lodash/isArray");
-utils.isString = require("lodash/isString");
-utils.isBoolean = require("lodash/isBoolean");
-utils.isNumber = require("lodash/isNumber");
-utils.isInteger = require("lodash/isInteger");
-utils.toInteger = require("lodash/toInteger");
-utils.isEqual = require("lodash/isEqual");
-utils.clone = require("lodash/cloneDeep");
+utils.isObjectLike = isObjectLike
+utils.isPlainObject = isPlainObject;
+utils.isArray = isArray;
+utils.isString = isString;
+utils.isBoolean = isBoolean;
+utils.isNumber = isNumber;
+utils.isInteger = isInteger;
+utils.toInteger = toInteger;
+utils.isEqual = isEqual;
+utils.clone = cloneDeep;
 
-var URL = require("url");
-
-var uuid = require("uuid");
 utils.uuid1 = uuid.v1;
 utils.uuid4 = uuid.v4;
 
 
 utils.parseURL = function (urlString) {
-    url = URL.parse(urlString);
+    var url = URL.parse(urlString);
     url.pathArray = url.pathname ? url.pathname.split("/").slice(1) : [];
     return url;
 }
@@ -136,4 +150,4 @@ function objectDiff (oldObj, newObj) {
 
 
 
-module.exports = utils;
+export default utils;
