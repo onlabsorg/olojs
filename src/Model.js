@@ -12,9 +12,6 @@ var cache = {
     models: {}
 }
 
-var $doc = Symbol("olojs.Model.$doc");
-var $path = Symbol("olojs.Model.$path");
-
 
 async function Model (urlStr) {
     var model = cache.models[urlStr];
@@ -59,20 +56,20 @@ async function Model (urlStr) {
 class SubModel {
 
     constructor (doc, path) {
-        this[$doc] = doc;
-        this[$path] = Path.from(path);
+        this._doc = doc;
+        this._path = Path.from(path);
     }
 
     get path () {
-        return this[$path];
+        return this._path;
     }
 
     get url () {
-        return this[$doc].url + "/" + this.path.join("/");
+        return this._doc.url + "/" + this.path.join("/");
     }
 
     get type () {
-        return this[$doc].type(this.path);
+        return this._doc.type(this.path);
     }
 
     getSubModel (path) {
@@ -82,8 +79,8 @@ class SubModel {
             var subModelPath = this.path.subPath(path);
             if (subModelPath === null) return null;
         }
-        var modelURL = this[$doc].url + "/" + subModelPath.join("/");
-        var model = cache.models[modelURL] || (cache.models[modelURL] = new SubModel(this[$doc], subModelPath));
+        var modelURL = this._doc.url + "/" + subModelPath.join("/");
+        var model = cache.models[modelURL] || (cache.models[modelURL] = new SubModel(this._doc, subModelPath));
         return model;
     }
 
@@ -92,7 +89,7 @@ class SubModel {
     }
 
     get value () {
-        return this[$doc].clone(this.path);
+        return this._doc.clone(this.path);
     }
 
     set value (newValue) {
@@ -114,7 +111,7 @@ class SubModel {
 
     get keys () {
         if (this.type === "dict") {
-            return this[$doc].getDictKeys(this.path);
+            return this._doc.getDictKeys(this.path);
         } else {
             throwInvalidMethod(this.type, 'keys');
         }
@@ -124,11 +121,11 @@ class SubModel {
         switch (this.type) {
 
             case 'list':
-                return this[$doc].getListSize(this.path);
+                return this._doc.getListSize(this.path);
                 break;
 
             case 'text':
-                return this[$doc].getTextSize(this.path);
+                return this._doc.getTextSize(this.path);
                 break;
 
             default:
@@ -160,13 +157,13 @@ class SubModel {
             case 'dict':
                 key = String(key);
                 value = validValue(value);
-                this[$doc].setDictItem(this.path, key, value);
+                this._doc.setDictItem(this.path, key, value);
                 break;
 
             case 'list':
                 var index = validIndex(key, this.size);
                 var item = validValue(value);
-                this[$doc].setListItem(this.path, index, item);
+                this._doc.setListItem(this.path, index, item);
                 break;
 
             default:
@@ -180,13 +177,13 @@ class SubModel {
             case 'list':
                 index = validIndex(index, this.size, 1);
                 items = items.map((item) => validValue(item));
-                this[$doc].insertListItems(this.path, index, ...items);
+                this._doc.insertListItems(this.path, index, ...items);
                 break;
 
             case 'text':
                 index = validIndex(index, this.size, 1);
                 var subString = items.join("");
-                this[$doc].insertText(this.path, index, subString);
+                this._doc.insertText(this.path, index, subString);
                 break;
 
             default:
@@ -204,21 +201,21 @@ class SubModel {
 
             case 'dict':
                 key = String(key);
-                this[$doc].removeDictItem(this.path, key);
+                this._doc.removeDictItem(this.path, key);
                 break;
 
             case 'list':
                 var size = this.size;
                 var index = validIndex(key, size);
                 count = validCount(count, index, size);
-                this[$doc].removeListItems(this.path, index, count);
+                this._doc.removeListItems(this.path, index, count);
                 break;
 
             case 'text':
                 var size = this.size;
                 var index = validIndex(key, size);
                 count = validCount(count, index, size);
-                this[$doc].removeText(this.path, index, count);            
+                this._doc.removeText(this.path, index, count);            
                 break;
 
             default:
@@ -227,7 +224,7 @@ class SubModel {
     }
 
     subscribe (callback) {
-        return this[$doc].subscribe(this.path, callback);
+        return this._doc.subscribe(this.path, callback);
     }
 }
 

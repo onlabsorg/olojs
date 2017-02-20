@@ -3,9 +3,6 @@ import utils from "../utils";
 import Path from "../Path";
 
 
-var $doc = Symbol("olojs.stores.$doc");
-
-
 class AbstractStore {
 
     constructor (host) {
@@ -186,13 +183,13 @@ class Change {
 class Subscription {
 
     constructor (doc, path, callback) {
-        this[$doc] = doc;
+        this._doc = doc;
         this.path = Path.from(path);
         this.callback = callback;
     }
 
     cancel () {
-        this[$doc].unsubscribe(this);
+        this._doc.unsubscribe(this);
     }
 }
 
