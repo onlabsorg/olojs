@@ -1,9 +1,9 @@
 
-import AbstractStore from "olojs/stores/AbstractStore";
-import utils from "olojs/utils";
+var AbstractStore = require("olojs/stores/AbstractStore");
+var utils = require("olojs/utils");
 
 
-export default function describeStore (storeName, TestStore, host) {
+module.exports = function describeStore (storeName, TestStore, host) {
 
 
     describe(storeName, function () {

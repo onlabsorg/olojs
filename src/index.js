@@ -1,10 +1,9 @@
 
-import Path from "./Path";
+exports.Path = require("./Path");
 
-import AbstractStore from "./stores/AbstractStore";
-import MemoryStore from "./stores/MemoryStore";
-import SharedbStore from "./stores/SharedbStore";
+exports.AbstractStore = require("./stores/AbstractStore");
+exports.MemoryStore = require("./stores/MemoryStore");
+exports.SharedbStore = require("./stores/SharedbStore");
 
-import Model from "./Model";
+exports.Model = require("./Model");
 
-export {Path, AbstractStore, MemoryStore, SharedbStore, Model};

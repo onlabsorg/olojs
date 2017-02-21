@@ -1,5 +1,5 @@
 
-import utils from "./utils";
+var utils = require("./utils");
 
 
 class Path extends Array {
@@ -130,4 +130,4 @@ class Path extends Array {
 }
 
 
-export default Path;
+module.exports = Path;

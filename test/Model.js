@@ -1,11 +1,11 @@
 
-import utils from "olojs/utils";
-import Path from "olojs/Path";
-import MemoryStore from "olojs/stores/MemoryStore";
-import Model from "olojs/Model";
+var utils = require("olojs/utils");
+var Path = require("olojs/Path");
+var MemoryStore = require("olojs/stores/MemoryStore");
+var Model = require("olojs/Model");
 
 
-export default function describeModel (url) {
+module.exports = function describeModel (url) {
 
     describe("Model", function () {
         var store, doc, model;

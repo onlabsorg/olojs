@@ -1,5 +1,5 @@
 
-import describeModel from "./Model";
+var describeModel = require("./Model");
 
 describeModel("memory://test-store/test-doc");
 

@@ -1,7 +1,7 @@
 
-import utils from "../utils";
-import Path from "../Path";
-import AbstractStore from "./AbstractStore";
+var utils = require("../utils");
+var Path = require("../Path");
+var AbstractStore = require("./AbstractStore");
 
 
 
@@ -127,4 +127,4 @@ class Document extends AbstractStore.Document {
 }
 
 
-export default MemoryStore;
+module.exports = MemoryStore;

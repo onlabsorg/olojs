@@ -1,9 +1,9 @@
 
 
-import ShareDB from "sharedb/lib/client/index";
-import Path from "../Path";
-import utils from "../utils";
-import AbstractStore from "./AbstractStore";
+var ShareDB = require("sharedb/lib/client/index");
+var Path = require("../Path");
+var utils = require("../utils");
+var AbstractStore = require("./AbstractStore");
 
 
 class Connection {
@@ -254,4 +254,4 @@ class Document extends AbstractStore.Document {
 }
 
 
-export default SharedbStore;
+module.exports = SharedbStore;

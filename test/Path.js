@@ -1,5 +1,5 @@
 
-import Path from "olojs/Path";
+var Path = require("olojs/Path");
 
 describe("Path", function () {
 

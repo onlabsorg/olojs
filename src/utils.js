@@ -1,17 +1,17 @@
-import isObjectLike from "lodash/isObjectLike";
-import isPlainObject from "lodash/isPlainObject";
-import isArray from "lodash/isArray";
-import isString from "lodash/isString";
-import isBoolean from "lodash/isBoolean";
-import isNumber from "lodash/isNumber";
-import isInteger from "lodash/isInteger";
-import toInteger from "lodash/toInteger";
-import isEqual from "lodash/isEqual";
-import cloneDeep from "lodash/cloneDeep";
+var isObjectLike = require("lodash/isObjectLike");
+var isPlainObject = require("lodash/isPlainObject");
+var isArray = require("lodash/isArray");
+var isString = require("lodash/isString");
+var isBoolean = require("lodash/isBoolean");
+var isNumber = require("lodash/isNumber");
+var isInteger = require("lodash/isInteger");
+var toInteger = require("lodash/toInteger");
+var isEqual = require("lodash/isEqual");
+var cloneDeep = require("lodash/cloneDeep");
 
-import URL from "url";
+var URL = require("url");
 
-import uuid from "uuid";
+var uuid = require("uuid");
 
 
 
@@ -150,4 +150,4 @@ function objectDiff (oldObj, newObj) {
 
 
 
-export default utils;
+module.exports = utils;

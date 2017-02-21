@@ -1,6 +1,6 @@
 
-import utils from "../utils";
-import Path from "../Path";
+var utils = require("../utils");
+var Path = require("../Path");
 
 
 class AbstractStore {
@@ -194,4 +194,4 @@ class Subscription {
 }
 
 
-export default AbstractStore;
+module.exports = AbstractStore;

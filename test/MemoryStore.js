@@ -1,5 +1,7 @@
 
-import describeStore from "test/Store";
-import MemoryStore from "olojs/stores/MemoryStore";
+var describeStore = require("test/Store");
+var MemoryStore = require("olojs/stores/MemoryStore");
 
 describeStore("MemoryStore", MemoryStore, "test-memory-store");
+
+

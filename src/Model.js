@@ -1,9 +1,9 @@
 
-import utils from "./utils";
-import Path from "./Path";
-import AbstractStore from "./stores/AbstractStore";
-import MemoryStore from "./stores/MemoryStore";
-import SharedbStore from "./stores/SharedbStore";
+var utils = require("./utils");
+var Path = require("./Path");
+var AbstractStore = require("./stores/AbstractStore");
+var MemoryStore = require("./stores/MemoryStore");
+var SharedbStore = require("./stores/SharedbStore");
 
 var storeTypes = [MemoryStore, SharedbStore];
 
@@ -273,4 +273,4 @@ function throwInvalidMethod (type, method) {
 
 Model.prototype = SubModel.prototype;
 
-export default Model;
+module.exports = Model;
