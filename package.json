@@ -4,6 +4,7 @@
       "lib": "src"
     },
     "dependencies": {
+      "lockr": "npm:lockr@^0.8.4",
       "lodash": "npm:lodash@^4.17.4",
       "sharedb": "npm:sharedb@^1.0.0-beta.7",
       "url": "github:jspm/nodelibs-url@^0.1.0",

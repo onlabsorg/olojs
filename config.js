@@ -8,6 +8,7 @@ System.config({
   },
 
   map: {
+    "lockr": "npm:lockr@0.8.4",
     "lodash": "npm:lodash@4.17.4",
     "olojs": "/lib",
     "sharedb": "npm:sharedb@1.0.0-beta.7",
