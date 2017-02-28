@@ -1,7 +1,7 @@
 {
   "jspm": {
     "directories": {
-      "lib": "src"
+      "lib": "lib"
     },
     "dependencies": {
       "lockr": "npm:lockr@^0.8.4",
