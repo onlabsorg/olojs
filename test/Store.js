@@ -601,6 +601,103 @@ module.exports = function describeStore (storeName, TestStore, host) {
             });
         });
 
+        describe('doc.canWrite', () => {
+
+
+            it("should be a function", () => {
+                expect(doc.canWrite).to.be.a("function");
+            });
+
+            describe('case doc.writable === 1', () => {
+
+                before(() => {
+                    doc.setDictItem('', 'root', {});
+                    doc.writable = 1;
+                });
+
+                it("should return false if trying to write an item starting with more than 1 underscore", () => {
+                    expect(doc.canWrite('__key')).to.be.false;
+                });
+
+                it("should return true if trying to write an item starting with 1 underscore or less", () => {
+                    expect(doc.canWrite('_key')).to.be.true;
+                    expect(doc.canWrite('key')).to.be.true;
+                });
+
+                it("should return false if any parent container has a key with more than 1 underscore", () => {
+                    expect(doc.canWrite('a/__b/c/d')).to.be.false;
+                });
+
+                it("should return true if none of the parents has a key with more than 1 underscore", () => {
+                    expect(doc.canWrite('a/_b/_c/d')).to.be.true;                    
+                });
+
+                it("should return false if any child has a key with more than 1 underscore", () => {
+                    doc.setDictItem('', 'root', {
+                        a: {
+                            b: 1,
+                            c: {
+                                __key: 4
+                            }
+                        }
+                    });
+                    expect(doc.canWrite('root/a')).to.be.false;
+                });
+
+                it("should return true if none of the children has a key with more than 1 underscore", () => {
+                    doc.setDictItem('', 'root', {
+                        a: {
+                            b: 1,
+                            c: {
+                                _key: 4
+                            }
+                        }
+                    });
+                    expect(doc.canWrite('root/a')).to.be.true;                    
+                });
+            });
+
+            describe('case doc.writable === true', () => {
+
+                before(() => {
+                    doc.writable = true;
+                });
+
+                it("should always return true", () => {
+                    doc.setDictItem('', 'root', {
+                        _a: {
+                            __b: 1,
+                            __c: {
+                                ______key: 4
+                            }
+                        }
+                    });                    
+                    expect(doc.canWrite('root/_a')).to.be.true;
+                    expect(doc.canWrite('root/_a/__c')).to.be.true;
+                });
+            });
+
+            describe('case doc.writable === false', () => {
+
+                before(() => {
+                    doc.writable = false;
+                });
+
+                it("should always return false", () => {
+                    doc.setDictItem('', 'root', {
+                        a: {
+                            b: 1,
+                            c: {
+                                key: 4
+                            }
+                        }
+                    });                    
+                    expect(doc.canWrite('root/a')).to.be.false;
+                    expect(doc.canWrite('root/a/c')).to.be.false;
+                });
+            });
+        });
+
         after((done) => {
             store.disconnect().then(done).catch(done);
         });

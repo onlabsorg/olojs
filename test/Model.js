@@ -3,12 +3,12 @@ var utils = require("olojs/utils");
 var Path = require("olojs/Path");
 var MemoryStore = require("olojs/stores/MemoryStore");
 var Model = require("olojs/Model");
-
+var stores = require("olojs/stores");
 
 module.exports = function describeModel (url) {
 
     describe("Model", function () {
-        var store, doc, model;
+        var store, $doc, doc, model;
 
         var root = {
             'n1': 1,
@@ -33,7 +33,9 @@ module.exports = function describeModel (url) {
 
         before((done) => {
             async function init () {
-                doc = await Model(url);
+                doc = await Model.load(url);
+                var purl = stores.parseURL(doc.url);
+                $doc = await purl.store.getDocument(purl.docId);
             }
             init().then(done).catch(done);
         });
@@ -44,7 +46,7 @@ module.exports = function describeModel (url) {
         });
 
 
-        describe("model = await Model(url)", () => {
+        describe("model = await Model.load(url)", () => {
 
             before(() => {
                 doc.set('root', utils.clone(root));
@@ -52,7 +54,7 @@ module.exports = function describeModel (url) {
 
             it("should resolve a Model object", (done) => {
                 async function test () {
-                    model = await Model(url+"/root");
+                    model = await Model.load(url+"/root");
                     expect(model).to.be.instanceof(Model);
                 }
                 test().then(done).catch(done);
@@ -60,7 +62,7 @@ module.exports = function describeModel (url) {
 
             it("should return the same object for the same url", (done) => {
                 async function test () {
-                    var m = await Model(url+"/root");
+                    var m = await Model.load(url+"/root");
                     expect(m).to.equal(model);
                 }
                 test().then(done).catch(done);
@@ -71,7 +73,7 @@ module.exports = function describeModel (url) {
         describe("Model.prototype.path - getter", () => {
             it("should return the model path relative to the document", (done) => {
                 async function test () {
-                    var m = await Model(url+"/root/a/b/c");
+                    var m = await Model.load(url+"/root/a/b/c");
                     expect(String(m.path)).to.equal("root/a/b/c");                    
                 }
                 test().then(done);
@@ -82,7 +84,7 @@ module.exports = function describeModel (url) {
         describe("Model.prototype.url - getter", () => {
             it("should return the model url", (done) => {
                 async function test () {
-                    var m = await Model(url+"/root/a/b/c");
+                    var m = await Model.load(url+"/root/a/b/c");
                     expect(m.url).to.equal(url+"/root/a/b/c");
                 }
                 test().then(done);
@@ -93,25 +95,25 @@ module.exports = function describeModel (url) {
         describe("Model.prototype.type - getter", () => {
             it("should return the type name of the model item", (done) => {
                 async function test () {
-                    var doc = await Model(url);
+                    var doc = await Model.load(url);
                     doc.set('root', root);
 
-                    var d1 = await Model(url+"/root/d1");
+                    var d1 = await Model.load(url+"/root/d1");
                     expect(d1.type).to.equal("dict");
 
-                    var l1 = await Model(url+"/root/l1");
+                    var l1 = await Model.load(url+"/root/l1");
                     expect(l1.type).to.equal("list");
 
-                    var t1 = await Model(url+"/root/t1");
+                    var t1 = await Model.load(url+"/root/t1");
                     expect(t1.type).to.equal("text");
 
-                    var n1 = await Model(url+"/root/n1");
+                    var n1 = await Model.load(url+"/root/n1");
                     expect(n1.type).to.equal("numb");
 
-                    var b1 = await Model(url+"/root/b1");
+                    var b1 = await Model.load(url+"/root/b1");
                     expect(b1.type).to.equal("bool");
 
-                    var nn = await Model(url+"/root/nn");
+                    var nn = await Model.load(url+"/root/nn");
                     expect(nn.type).to.equal("none");
                 }
                 test().then(done).catch(done);
@@ -127,19 +129,19 @@ module.exports = function describeModel (url) {
 
             it("should return the value of the document item at path", (done) => {
                 async function test () {
-                    var n1 = await Model(url+"/root/n1");
+                    var n1 = await Model.load(url+"/root/n1");
                     expect(n1.value).to.equal(root.n1);
 
-                    var b1 = await Model(url+"/root/b1");
+                    var b1 = await Model.load(url+"/root/b1");
                     expect(b1.value).to.equal(root.b1);
 
-                    var d1 = await Model(url+"/root/d1");
+                    var d1 = await Model.load(url+"/root/d1");
                     expect(d1.value).to.deep.equal(root.d1);
 
-                    var l1 = await Model(url+"/root/l1");
+                    var l1 = await Model.load(url+"/root/l1");
                     expect(l1.value).to.deep.equal(root.l1);
 
-                    var t1 = await Model(url+"/root/t1");
+                    var t1 = await Model.load(url+"/root/t1");
                     expect(t1.value).to.equal(root.t1);
                 }
                 test().then(done);
@@ -147,7 +149,7 @@ module.exports = function describeModel (url) {
 
             it("should return null it the document path doesn't exist", (done) => {
                 async function test () {
-                    var nn = await Model(url+"/root/non-existing-key");
+                    var nn = await Model.load(url+"/root/non-existing-key");
                     expect(nn.value).to.be.null;                
                 }
                 test().then(done);
@@ -155,7 +157,7 @@ module.exports = function describeModel (url) {
 
             it("should return a deep copy of the document item", (done) => {
                 async function test () {
-                    var d1 = await Model(url+"/root/d1");
+                    var d1 = await Model.load(url+"/root/d1");
                     expect(d1.value.n2).to.equal(2);
                     d1.value.n2 = 20;
                     expect(d1.value.n2).to.equal(2);
@@ -171,7 +173,7 @@ module.exports = function describeModel (url) {
             before((done) => {
                 async function init () {
                     doc.set('root', utils.clone(root));
-                    rootModel = await Model(url+"/root");
+                    rootModel = await Model.load(url+"/root");
                 }
                 init().then(done);
             });
@@ -182,12 +184,12 @@ module.exports = function describeModel (url) {
 
             it("should return a sub model given a relative path", (done) => {
                 async function test () {
-                    expect(rootModel.getSubModel("./a/b")).to.equal(await Model(url+"/root/a/b"));
-                    expect(rootModel.getSubModel("a/././b")).to.equal(await Model(url+"/root/a/b"));
-                    expect(rootModel.getSubModel("../a")).to.equal(await Model(url+"/a"));
-                    expect(rootModel.getSubModel("a/../b/../c")).to.equal(await Model(url+"/root/c"));
-                    expect(rootModel.getSubModel("a/../b/././../c")).to.equal(await Model(url+"/root/c"));
-                    expect(rootModel.getSubModel("/a/b/c")).to.equal(await Model(url+"/a/b/c"));
+                    expect(rootModel.getSubModel("./a/b")).to.equal(await Model.load(url+"/root/a/b"));
+                    expect(rootModel.getSubModel("a/././b")).to.equal(await Model.load(url+"/root/a/b"));
+                    expect(rootModel.getSubModel("../a")).to.equal(await Model.load(url+"/a"));
+                    expect(rootModel.getSubModel("a/../b/../c")).to.equal(await Model.load(url+"/root/c"));
+                    expect(rootModel.getSubModel("a/../b/././../c")).to.equal(await Model.load(url+"/root/c"));
+                    expect(rootModel.getSubModel("/a/b/c")).to.equal(await Model.load(url+"/a/b/c"));
                     expect(rootModel.getSubModel("../../../../..")).to.be.null;
                 }
                 test().then(done);
@@ -203,12 +205,12 @@ module.exports = function describeModel (url) {
 
             it("should return the parent model", (done) => {
                 async function test () {
-                    var d1 = await Model(url+"/root/d1");
-                    var n2 = await Model(url+"/root/d1/n2");
+                    var d1 = await Model.load(url+"/root/d1");
+                    var n2 = await Model.load(url+"/root/d1/n2");
                     expect(n2.parent).to.equal(d1);
 
-                    var l1 = await Model(url+"/root/l1");
-                    var l1_i0 = await Model(url+"/root/l1/0");
+                    var l1 = await Model.load(url+"/root/l1");
+                    var l1_i0 = await Model.load(url+"/root/l1/0");
                     expect(l1_i0.parent).to.equal(l1);                
                 }
                 test().then(done);
@@ -216,7 +218,7 @@ module.exports = function describeModel (url) {
         });
 
 
-        describe("Model.prototype.keys - getter", () => {
+        describe("Model.Dict.prototype.keys - getter", () => {
 
             before(() => {
                 doc.set('root', utils.clone(root));
@@ -224,7 +226,7 @@ module.exports = function describeModel (url) {
 
             it("should return an array with the dictionary keys", (done) => {
                 async function test () {
-                    var rootModel = await Model(url+"/root");
+                    var rootModel = await Model.load(url+"/root");
                     var keys = rootModel.keys;
                     expect(keys.sort()).to.deep.equal(['b1', 'd1', 'l1', 'n1', 't1']);
                 }
@@ -233,13 +235,13 @@ module.exports = function describeModel (url) {
         });
 
 
-        describe("Model.prototype.get(key) - dict model", () => {
+        describe("Model.Dict.prototype.get(key)", () => {
             var d1;
 
             before((done) => {
                 async function init () {
                     doc.set('root', utils.clone(root));
-                    d1 = await Model(url+"/root/d1");
+                    d1 = await Model.load(url+"/root/d1");
                 }
                 init().then(done);
             });
@@ -250,68 +252,25 @@ module.exports = function describeModel (url) {
 
             it("should return the sub-model mapped to the passed key", (done) => {
                 async function test () {
-                    expect(d1.get('b1')).to.equal(await Model(url+"/root/d1/b1"));
-                    expect(d1.get('d1')).to.equal(await Model(url+"/root/d1/d1"));
-                    expect(d1.get('l1')).to.equal(await Model(url+"/root/d1/l1"));
-                    expect(d1.get('n1')).to.equal(await Model(url+"/root/d1/n1"));
-                    expect(d1.get('t1')).to.equal(await Model(url+"/root/d1/t1"));
-                    expect(d1.get('nn')).to.equal(await Model(url+"/root/d1/nn"));
+                    expect(d1.get('b1')).to.equal(await Model.load(url+"/root/d1/b1"));
+                    expect(d1.get('d1')).to.equal(await Model.load(url+"/root/d1/d1"));
+                    expect(d1.get('l1')).to.equal(await Model.load(url+"/root/d1/l1"));
+                    expect(d1.get('n1')).to.equal(await Model.load(url+"/root/d1/n1"));
+                    expect(d1.get('t1')).to.equal(await Model.load(url+"/root/d1/t1"));
+                    expect(d1.get('nn')).to.equal(await Model.load(url+"/root/d1/nn"));
                 }
                 test().then(done);
             });
         });
 
 
-        describe("Model.prototype.get(index) - list model", () => {
-            var rootModel, l1;
-
-            before((done) => {
-                async function init (done) {
-                    doc.set('root', utils.clone(root));
-                    rootModel = await Model(url+"/root");
-                    l1 = rootModel.getSubModel('l1');
-                }
-                init().then(done);
-            });
-
-            it("should be a function", () => {
-                expect(l1.get).to.be.a("function");
-            });
-
-            it("should return the sub-model mapped to the passed index", (done) => {
-                async function test () {
-                    expect(l1.get(0)).to.equal(await Model(url+"/root/l1/0"));
-                    expect(l1.get(1)).to.equal(await Model(url+"/root/l1/1"));
-                    expect(l1.get(2)).to.equal(await Model(url+"/root/l1/2"));                    
-                }
-                test().then(done);
-            });
-
-            it("should consider a negative index as relative to the end of the list", () => {
-                doc.set('root', {l1: ['a','b','c']});
-                expect(l1.get(-1).value).to.equal('c');
-                expect(l1.get(-2).value).to.equal('b');
-                expect(l1.get(-3).value).to.equal('a');
-            });
-
-            it("should throw an exception if index is not an integer", () => {
-                expect(() => l1.get('key')).to.throw(Error);
-            });
-
-            it("should throw an exception if index is out of range", () => {
-                expect(() => l1.get(100)).to.throw(Error);
-                expect(() => l1.get(-100)).to.throw(Error);
-            });
-        });
-
-
-        describe("Model.prototype.set(key, value) - dict model", () => {
+        describe("Model.Dict.prototype.set(key, value)", () => {
             var d1;
 
             before((done) => {
                 async function init () {
                     doc.set('root', utils.clone(root));
-                    d1 = await Model(url+"/root/d1");                    
+                    d1 = await Model.load(url+"/root/d1");   
                 }
                 init().then(done).catch(done);
             });
@@ -355,16 +314,131 @@ module.exports = function describeModel (url) {
                 expect(() => {d1.set('u', undefined)}).to.throw(Error);
                 expect(() => {d1.set('n', null)}).to.throw(Error);
             });
+
+            it("should throw an exception if the key is not writable", () => {
+                d1.set('__key', 1);
+                $doc.writable = 1;
+                expect(() => d1.set('__key',2)).to.throw(Error);
+                $doc.writable = true;
+            });
         });
 
 
-        describe("Model.List.prototype.set(index, item) - list model", () => {
+        describe("Model.Dict.prototype.remove(key)", () => {
+            var d1;
+
+            before((done) => {
+                async function init () {
+                    doc.set('root', utils.clone(root));
+                    d1 = await Model.load(url+"/root/d1");
+                }
+                init().then(done).catch(done);
+            });
+
+            it("should be a function", () => {
+                expect(d1.remove).to.be.a("function");
+            });
+
+            it("should remove the key from the dictionary", () => {
+                d1.set('x', 10);
+                d1.remove('x');
+                expect(d1.get('x').value).to.be.null;
+
+                d1.remove('non-existing-key');
+                expect(d1.get('non-existing-key').value).to.be.null;
+            });
+
+            it("should convert the key to a string", () => {
+                var key = {toString: () => 'keyStr'};
+                d1.set(key, 'kk');
+                expect(d1.get('keyStr').value).to.equal('kk');
+                d1.remove(key);
+                expect(d1.get('keyStr').value).to.be.null;
+            });
+
+            it("should throw an exception if the key is not writable", () => {
+                d1.set('__key', 1);
+                $doc.writable = 1;
+                expect(() => d1.remove('__key')).to.throw(Error);
+                $doc.writable = true;
+            });
+        });
+
+
+        describe("Model.List.prototype.size - getter", () => {
+            var docModel;
+
+            before((done) => {
+                async function init () {
+                    doc.set('root', utils.clone(root));
+                    docModel = await Model.load(url);                    
+                }
+                init().then(done);
+            });
+
+            it("should return the number of items in the array", () => {
+                docModel.set('list', [1,2,3]);
+                expect(docModel.getSubModel('list').size).to.equal(3);
+
+                docModel.set('list', []);
+                expect(docModel.getSubModel('list').size).to.equal(0);
+
+                docModel.set('list', [1,2,3,4,5]);
+                expect(docModel.getSubModel('list').size).to.equal(5);
+            });
+        });
+
+
+        describe("Model.List.prototype.get(index)", () => {
+            var rootModel, l1;
+
+            before((done) => {
+                async function init (done) {
+                    doc.set('root', utils.clone(root));
+                    rootModel = await Model.load(url+"/root");
+                    l1 = rootModel.getSubModel('l1');
+                }
+                init().then(done);
+            });
+
+            it("should be a function", () => {
+                expect(l1.get).to.be.a("function");
+            });
+
+            it("should return the sub-model mapped to the passed index", (done) => {
+                async function test () {
+                    expect(l1.get(0)).to.equal(await Model.load(url+"/root/l1/0"));
+                    expect(l1.get(1)).to.equal(await Model.load(url+"/root/l1/1"));
+                    expect(l1.get(2)).to.equal(await Model.load(url+"/root/l1/2"));                    
+                }
+                test().then(done);
+            });
+
+            it("should consider a negative index as relative to the end of the list", () => {
+                doc.set('root', {l1: ['a','b','c']});
+                expect(l1.get(-1).value).to.equal('c');
+                expect(l1.get(-2).value).to.equal('b');
+                expect(l1.get(-3).value).to.equal('a');
+            });
+
+            it("should throw an exception if index is not an integer", () => {
+                expect(() => l1.get('key')).to.throw(Error);
+            });
+
+            it("should throw an exception if index is out of range", () => {
+                expect(() => l1.get(100)).to.throw(Error);
+                expect(() => l1.get(-100)).to.throw(Error);
+            });
+        });
+
+
+        describe("Model.List.prototype.set(index, item)", () => {
             var l1;
 
             before((done) => {
                 async function init () {
                     doc.set('root', utils.clone(root));
-                    l1 = await Model(url+"/root/l1");
+                    l1 = await Model.load(url+"/root/l1");
                 }
                 init().then(done);
             });
@@ -427,208 +501,24 @@ module.exports = function describeModel (url) {
                 expect(() => {l1.set(1, undefined)}).to.throw(Error);
                 expect(() => {l1.set(1, null)}).to.throw(Error);
             });
-        });
 
-
-        describe("Model.prototype.remove(key) - dict model", () => {
-            var d1;
-
-            before((done) => {
-                async function init () {
-                    doc.set('root', utils.clone(root));
-                    d1 = await Model(url+"/root/d1");
-                }
-                init().then(done);
-            });
-
-            it("should be a function", () => {
-                expect(d1.remove).to.be.a("function");
-            });
-
-            it("should remove the key from the dictionary", () => {
-                d1.set('x', 10);
-                d1.remove('x');
-                expect(d1.get('x').value).to.be.null;
-
-                d1.remove('non-existing-key');
-                expect(d1.get('non-existing-key').value).to.be.null;
-            });
-
-            it("should convert the key to a string", () => {
-                var key = {toString: () => 'keyStr'};
-                d1.set(key, 'kk');
-                expect(d1.get('keyStr').value).to.equal('kk');
-                d1.remove(key);
-                expect(d1.get('keyStr').value).to.be.null;
+            it("should throw an exception if the item is not writable", () => {
+                l1.set(0, {__key:1});
+                $doc.writable = 1;
+                expect(() => l1.set(0,2)).to.throw(Error);
+                $doc.writable = true;
             });
         });
 
 
-        describe("Model.prototype.remove(index, count) - list model", () => {
+        describe("Model.List.prototype.insert(index, ...items)", () => {
             var rm, lm;
 
             before((done) => {
                 async function init () {
                     doc.set('root', {list: ['a','b','c']});
-                    rm = await Model(url+"/root");
-                    lm = await Model(url+"/root/list");
-                }
-                init().then(done);
-            });
-
-            it("should be a function", () => {
-                expect(lm.remove).to.be.a("function");
-            });
-
-            it("should remove count values starting at index", () => {
-                rm.set('list', ['a','b','c','d','e']);
-                lm.remove(1, 3);
-                expect(lm.value).to.deep.equal(['a','e']);
-            });
-
-            it("should remove 1 value if count is not specified", () => {
-                rm.set('list', ['a','b','c']);
-                lm.remove(1);
-                expect(lm.value).to.deep.equal(['a','c']);                
-            });
-
-            it("should remove up to the end of the array if count overflows the list size", () => {
-                rm.set('list', ['a','b','c','d','e']);
-                lm.remove(2, 100);
-                expect(lm.value).to.deep.equal(['a','b']);                
-            });
-
-            it("should throw an exception if index is not an integer", () => {
-                rm.set('list', ['a','b','c']);
-                expect(() => {lm.remove('key')}).to.throw(Error);
-                expect(lm.value).to.deep.equal(['a','b','c']);                
-            });
-
-            it("should throw an exception if index is out of range", () => {
-                rm.set('list', ['a','b','c']);
-                expect(() => {lm.remove(100)}).to.throw(Error);
-                expect(() => {lm.remove(-100)}).to.throw(Error);
-                expect(lm.value).to.deep.equal(['a','b','c']);                
-            });            
-
-            it("should throw an exception if count is not an integer", () => {
-                rm.set('list', ['a','b','c']);
-                expect(() => {lm.remove(1, 'count')}).to.throw(Error);
-                expect(lm.value).to.deep.equal(['a','b','c']);                
-            });
-        });
-
-
-        describe("Model.prototype.remove(index, count) - text model", () => {
-            var rm, tm;
-
-            before((done) => {
-                async function init () {
-                    rm = await Model(url+"/root");
-                    tm = await Model(url+"/root/text");
-                }
-                init().then(done);
-            });
-
-            it("should be a function", () => {
-                expect(tm.remove).to.be.a("function");
-            });
-
-            it("should remove count characters starting at index", () => {
-                rm.set('text', "abcdef");
-                tm.remove(1, 3);
-                expect(tm.value).to.equal("aef");
-            });
-
-            it("should remove 1 character if count is not specified", () => {
-                rm.set('text', "abcdef");
-                tm.remove(1);
-                expect(tm.value).to.equal("acdef");
-            });
-
-            it("should remove up to the end of the array if count overflows the text size", () => {
-                rm.set('text', "abcdef");
-                tm.remove(2, 100);
-                expect(tm.value).to.equal("ab");
-            });
-
-            it("should throw an exception if index is not an integer", () => {
-                rm.set('text', "abcdef");
-                expect(() => {tm.remove('key')}).to.throw(Error);
-                expect(tm.value).to.equal("abcdef");
-            });
-
-            it("should throw an exception if index is out of range", () => {
-                rm.set('text', "abcdef");
-                expect(() => {tm.remove(100)}).to.throw(Error);
-                expect(() => {tm.remove(-100)}).to.throw(Error);
-                expect(tm.value).to.equal("abcdef");
-            });            
-
-            it("should throw an exception if count is not an integer", () => {
-                rm.set('text', "abcdef");
-                expect(() => {tm.remove(1, 'count')}).to.throw(Error);
-                expect(tm.value).to.equal("abcdef");
-            });
-        });
-
-
-        describe("Model.prototype.size - list model getter", () => {
-            var docModel;
-
-            before((done) => {
-                async function init () {
-                    doc.set('root', utils.clone(root));
-                    docModel = await Model(url);                    
-                }
-                init().then(done);
-            });
-
-            it("should return the number of items in the array", () => {
-                docModel.set('list', [1,2,3]);
-                expect(docModel.getSubModel('list').size).to.equal(3);
-
-                docModel.set('list', []);
-                expect(docModel.getSubModel('list').size).to.equal(0);
-
-                docModel.set('list', [1,2,3,4,5]);
-                expect(docModel.getSubModel('list').size).to.equal(5);
-            });
-        });
-
-
-        describe("Model.prototype.size - text model getter", () => {
-            var rm, tm;
-
-            before((done) => {
-                async function init () {
-                    rm = await Model(url+"/root");
-                    tm = await Model(url+"/root/text");
-                }
-                init().then(done);
-            });
-
-            it("should return the number of items in the array", () => {
-                rm.set('text', "abc");
-                expect(tm.size).to.equal(3);
-
-                rm.set('text', "");
-                expect(tm.size).to.equal(0);
-
-                rm.set('text', "abcdef");
-                expect(tm.size).to.equal(6);
-            });
-        });
-
-
-        describe("Model.prototype.insert(index, ...items) - list model", () => {
-            var rm, lm;
-
-            before((done) => {
-                async function init () {
-                    doc.set('root', {list: ['a','b','c']});
-                    rm = await Model(url+"/root");
-                    lm = await Model(url+"/root/list");                    
+                    rm = await Model.load(url+"/root");
+                    lm = await Model.load(url+"/root/list");                    
                 }
                 init().then(done);
             });
@@ -678,16 +568,143 @@ module.exports = function describeModel (url) {
                 expect(() => {lm.insert(1, 10, 20, null)}).to.throw(Error);
                 expect(lm.value).to.deep.equal(['a','b','c']);
             });
+
+            it("should throw an exception if the item is not writable", () => {
+                rm.set('__list', [10,20,30]);
+                lm = rm.get('__list');
+                $doc.writable = 1;
+                expect(() => lm.insert(1, 10.5)).to.throw(Error);
+                $doc.writable = true;
+            });
         });
 
 
-        describe("Model.prototype.insert(index, subString) - text model", () => {
+        describe("Model.List.prototype.append(...items)", () => {
+            var rm, lm;
+
+            before((done) => {
+                async function init () {
+                    doc.set('root', {list: ['a','b','c']});
+                    rm = await Model.load(url+"/root");
+                    lm = await Model.load(url+"/root/list");
+                }
+                init().then(done);
+            });
+
+            it("should be a function", () => {
+                expect(lm.append).to.be.a("function");
+            });
+
+            it("should insert the passed items at the end of the list", () => {
+                rm.set('list', ['a','b','c']);
+                lm.append('x', 'y', 'z');
+                expect(lm.value).to.deep.equal(['a','b','c','x','y','z']);
+            });
+
+            it("should throw an exception if the item is not writable", () => {
+                rm.set('__list', [10,20,30]);
+                lm = rm.get('__list');
+                $doc.writable = 1;
+                expect(() => lm.append(40)).to.throw(Error);
+                $doc.writable = true;
+            });
+        });
+
+
+        describe("Model.List.prototype.remove(index, count)", () => {
+            var rm, lm;
+
+            before((done) => {
+                async function init () {
+                    doc.set('root', {list: ['a','b','c']});
+                    rm = await Model.load(url+"/root");
+                    lm = await Model.load(url+"/root/list");
+                }
+                init().then(done);
+            });
+
+            it("should be a function", () => {
+                expect(lm.remove).to.be.a("function");
+            });
+
+            it("should remove count values starting at index", () => {
+                rm.set('list', ['a','b','c','d','e']);
+                lm.remove(1, 3);
+                expect(lm.value).to.deep.equal(['a','e']);
+            });
+
+            it("should remove 1 value if count is not specified", () => {
+                rm.set('list', ['a','b','c']);
+                lm.remove(1);
+                expect(lm.value).to.deep.equal(['a','c']);                
+            });
+
+            it("should remove up to the end of the array if count overflows the list size", () => {
+                rm.set('list', ['a','b','c','d','e']);
+                lm.remove(2, 100);
+                expect(lm.value).to.deep.equal(['a','b']);                
+            });
+
+            it("should throw an exception if index is not an integer", () => {
+                rm.set('list', ['a','b','c']);
+                expect(() => {lm.remove('key')}).to.throw(Error);
+                expect(lm.value).to.deep.equal(['a','b','c']);                
+            });
+
+            it("should throw an exception if index is out of range", () => {
+                rm.set('list', ['a','b','c']);
+                expect(() => {lm.remove(100)}).to.throw(Error);
+                expect(() => {lm.remove(-100)}).to.throw(Error);
+                expect(lm.value).to.deep.equal(['a','b','c']);                
+            });            
+
+            it("should throw an exception if count is not an integer", () => {
+                rm.set('list', ['a','b','c']);
+                expect(() => {lm.remove(1, 'count')}).to.throw(Error);
+                expect(lm.value).to.deep.equal(['a','b','c']);                
+            });
+
+            it("should throw an exception if the item is not writable", () => {
+                lm.set(0, {__key:1});
+                $doc.writable = 1;
+                expect(() => lm.remove(0)).to.throw(Error);
+                $doc.writable = true;
+            });
+        });
+
+
+        describe("Model.Text.prototype.size - getter", () => {
             var rm, tm;
 
             before((done) => {
                 async function init () {
-                    rm = await Model(url+"/root");
-                    tm = await Model(url+"/root/text");
+                    rm = await Model.load(url+"/root");
+                    tm = await Model.load(url+"/root/text");
+                }
+                init().then(done);
+            });
+
+            it("should return the number of items in the array", () => {
+                rm.set('text', "abc");
+                expect(tm.size).to.equal(3);
+
+                rm.set('text', "");
+                expect(tm.size).to.equal(0);
+
+                rm.set('text', "abcdef");
+                expect(tm.size).to.equal(6);
+            });
+        });
+
+
+        describe("Model.Text.prototype.insert(index, subString)", () => {
+            var rm, tm;
+
+            before((done) => {
+                async function init () {
+                    rm = await Model.load(url+"/root");
+                    rm.set('text', "abcdef");
+                    tm = await Model.load(url+"/root/text");
                 }
                 init().then(done);
             });
@@ -732,40 +749,25 @@ module.exports = function describeModel (url) {
                 tm.insert(1, subString)
                 expect(tm.value).to.equal("axxxbc");
             });
-        });
 
-
-        describe("Model.prototype.append(...items) - list model", () => {
-            var rm, lm;
-
-            before((done) => {
-                async function init () {
-                    doc.set('root', {list: ['a','b','c']});
-                    rm = await Model(url+"/root");
-                    lm = await Model(url+"/root/list");
-                }
-                init().then(done);
-            });
-
-            it("should be a function", () => {
-                expect(lm.append).to.be.a("function");
-            });
-
-            it("should insert the passed items at the end of the list", () => {
-                rm.set('list', ['a','b','c']);
-                lm.append('x', 'y', 'z');
-                expect(lm.value).to.deep.equal(['a','b','c','x','y','z']);
+            it("should throw an exception if the item is not writable", () => {
+                rm.set('__text', "abc");
+                tm = rm.get('__text');
+                $doc.writable = 1;
+                expect(() => tm.insert(1, "xxx")).to.throw(Error);
+                $doc.writable = true;
             });
         });
 
 
-        describe("Model.prototype.append(subString) - text model", () => {
+        describe("Model.Text.prototype.append(subString)", () => {
             var rm, tm;
 
             before((done) => {
                 async function init () {
-                    rm = await Model(url+"/root");
-                    tm = await Model(url+"/root/text");
+                    rm = await Model.load(url+"/root");
+                    rm.set('text', "abcdef");
+                    tm = await Model.load(url+"/root/text");
                 }
                 init().then(done);
             });
@@ -779,6 +781,77 @@ module.exports = function describeModel (url) {
                 tm.append("xxx");
                 expect(tm.value).to.equal("abcxxx");
             });
+
+            it("should throw an exception if the item is not writable", () => {
+                rm.set('__text', "abc");
+                tm = rm.get('__text');
+                $doc.writable = 1;
+                expect(() => tm.append("xxx")).to.throw(Error);
+                $doc.writable = true;
+            });
+        });
+
+
+        describe("Model.Text.prototype.remove(index, count)", () => {
+            var rm, tm;
+
+            before((done) => {
+                async function init () {
+                    rm = await Model.load(url+"/root");
+                    rm.set('text', "abcdef");
+                    tm = await Model.load(url+"/root/text");
+                }
+                init().then(done).catch(done);
+            });
+
+            it("should be a function", () => {
+                expect(tm.remove).to.be.a("function");
+            });
+
+            it("should remove count characters starting at index", () => {
+                rm.set('text', "abcdef");
+                tm.remove(1, 3);
+                expect(tm.value).to.equal("aef");
+            });
+
+            it("should remove 1 character if count is not specified", () => {
+                rm.set('text', "abcdef");
+                tm.remove(1);
+                expect(tm.value).to.equal("acdef");
+            });
+
+            it("should remove up to the end of the array if count overflows the text size", () => {
+                rm.set('text', "abcdef");
+                tm.remove(2, 100);
+                expect(tm.value).to.equal("ab");
+            });
+
+            it("should throw an exception if index is not an integer", () => {
+                rm.set('text', "abcdef");
+                expect(() => {tm.remove('key')}).to.throw(Error);
+                expect(tm.value).to.equal("abcdef");
+            });
+
+            it("should throw an exception if index is out of range", () => {
+                rm.set('text', "abcdef");
+                expect(() => {tm.remove(100)}).to.throw(Error);
+                expect(() => {tm.remove(-100)}).to.throw(Error);
+                expect(tm.value).to.equal("abcdef");
+            });            
+
+            it("should throw an exception if count is not an integer", () => {
+                rm.set('text', "abcdef");
+                expect(() => {tm.remove(1, 'count')}).to.throw(Error);
+                expect(tm.value).to.equal("abcdef");
+            });
+
+            it("should throw an exception if the item is not writable", () => {
+                rm.set('__text', "abc");
+                tm = rm.get('__text');
+                $doc.writable = 1;
+                expect(() => tm.remove(1)).to.throw(Error);
+                $doc.writable = true;
+            });
         });
 
 
@@ -788,7 +861,7 @@ module.exports = function describeModel (url) {
             before((done) => {
                 async function init () {
                     doc.set('root', {item:10, d:{}});
-                    item = await Model(url+"/root/item");
+                    item = await Model.load(url+"/root/item");
                 }
                 init().then(done);
             });
@@ -822,6 +895,14 @@ module.exports = function describeModel (url) {
                 expect(() => {item.value = undefined}).to.throw(Error);
                 expect(() => {item.value = null}).to.throw(Error);
             });
+
+            it("should throw an exception if the item is not writable", () => {
+                item.value = {__key:1};
+                $doc.writable = 1;
+                expect(() => {item.value = 2}).to.throw(Error);
+                expect(() => {doc.value = {}}).to.throw(Error);
+                $doc.writable = true;
+            });
         });
 
 
@@ -830,7 +911,7 @@ module.exports = function describeModel (url) {
 
             before((done) => {
                 async function init () {
-                    dm = await Model(url);
+                    dm = await Model.load(url);
                     dm.set('root', root);
                     d1 = dm.get('root').get('d1');
                     subscription = d1.subscribe((change) => lastChange = change);

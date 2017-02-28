@@ -9,7 +9,7 @@ System.config({
 
   map: {
     "lodash": "npm:lodash@4.17.4",
-    "olojs": "/src",
+    "olojs": "/lib",
     "sharedb": "npm:sharedb@1.0.0-beta.7",
     "url": "github:jspm/nodelibs-url@0.1.0",
     "uuid": "npm:uuid@3.0.1",
