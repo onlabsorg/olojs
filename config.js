@@ -8,8 +8,8 @@ System.config({
   },
 
   map: {
-    "lockr": "npm:lockr@0.8.4",
     "lodash": "npm:lodash@4.17.4",
+    "minimatch": "npm:minimatch@3.0.3",
     "olojs": "/lib",
     "sharedb": "npm:sharedb@1.0.0-beta.7",
     "url": "github:jspm/nodelibs-url@0.1.0",
@@ -36,6 +36,9 @@ System.config({
       "stream": "github:jspm/nodelibs-stream@0.1.0",
       "url": "github:jspm/nodelibs-url@0.1.0",
       "util": "github:jspm/nodelibs-util@0.1.0"
+    },
+    "github:jspm/nodelibs-path@0.1.0": {
+      "path-browserify": "npm:path-browserify@0.0.0"
     },
     "github:jspm/nodelibs-process@0.1.2": {
       "process": "npm:process@0.11.9"
@@ -73,6 +76,10 @@ System.config({
     },
     "npm:bn.js@4.11.6": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0"
+    },
+    "npm:brace-expansion@1.1.6": {
+      "balanced-match": "npm:balanced-match@0.4.2",
+      "concat-map": "npm:concat-map@0.0.1"
     },
     "npm:browserify-aes@1.0.6": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
@@ -214,6 +221,10 @@ System.config({
       "bn.js": "npm:bn.js@4.11.6",
       "brorand": "npm:brorand@1.0.7"
     },
+    "npm:minimatch@3.0.3": {
+      "brace-expansion": "npm:brace-expansion@1.1.6",
+      "path": "github:jspm/nodelibs-path@0.1.0"
+    },
     "npm:parse-asn1@5.0.0": {
       "asn1.js": "npm:asn1.js@4.9.1",
       "browserify-aes": "npm:browserify-aes@1.0.6",
@@ -222,6 +233,9 @@ System.config({
       "evp_bytestokey": "npm:evp_bytestokey@1.0.0",
       "pbkdf2": "npm:pbkdf2@3.0.9",
       "systemjs-json": "github:systemjs/plugin-json@0.1.2"
+    },
+    "npm:path-browserify@0.0.0": {
+      "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:pbkdf2@3.0.9": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
