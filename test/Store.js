@@ -113,9 +113,9 @@ module.exports = function describeStore (storeName, store) {
 
                 it("should connect to the document backend", (done) => {
                     async function test () {
-                        expect(doc.readable).to.be.false;
+                        expect(Boolean(doc.isOpen)).to.be.false;
                         await doc.open();
-                        expect(doc.readable).to.be.true;
+                        expect(doc.isOpen).to.be.true;
                     }
                     test().then(done).catch(done);
                 });
@@ -167,9 +167,9 @@ module.exports = function describeStore (storeName, store) {
 
                 it("should disconnect the document", (done) => {
                     async function test () {
-                        expect(doc.readable).to.be.true;
+                        expect(doc.isOpen).to.be.true;
                         await doc.close();
-                        expect(doc.readable).to.be.false;
+                        expect(doc.isOpen).to.be.false;
                     }
                     test().then(done).catch(done);
                 });
@@ -401,8 +401,8 @@ module.exports = function describeStore (storeName, store) {
                 });
             });
 
-            it("should throw a ReadPermissionError when trying to access the document content", () => {
-                expect(() => doc.get('item').value).to.throw(errors.ReadPermissionError);
+            it("should throw a DocumentClosedError when trying to access the document content", () => {
+                expect(() => doc.get('item').value).to.throw(errors.DocumentClosedError);
             });
         });
     }

@@ -1,6 +1,6 @@
 
 const Backend = require("olojs/backends/memory");
-const backend = new Backend.Store();
+const backend = new Backend();
 
 const rights = require("olojs/rights");
 backend.getUserRights = function (collection, id) {

@@ -12,7 +12,6 @@ System.config({
     "minimatch": "npm:minimatch@3.0.3",
     "olojs": "/lib",
     "sharedb": "npm:sharedb@1.0.0-beta.7",
-    "url": "github:jspm/nodelibs-url@0.1.0",
     "uuid": "npm:uuid@3.0.1",
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.4.1"

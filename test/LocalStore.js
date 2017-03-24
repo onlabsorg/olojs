@@ -17,7 +17,7 @@ localStorage.setItem('testStore', JSON.stringify({
 }));
 
 const Backend = require("olojs/backends/local");
-const backend = new Backend.Store('testStore');
+const backend = new Backend('testStore');
 
 const rights = require("olojs/rights");
 backend.getUserRights = function (collection, id) {

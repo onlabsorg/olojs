@@ -1,6 +1,6 @@
 
 const Backend = require("olojs/backends/olodb");
-const backend = new Backend.Store("ws://localhost:8080");
+const backend = new Backend("localhost:8080");
 
 const Store = require("olojs/Store");
 const store = new Store(backend);
