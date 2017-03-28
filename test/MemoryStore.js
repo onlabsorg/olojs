@@ -3,7 +3,7 @@ const Backend = require("olojs/backends/memory");
 const backend = new Backend();
 
 const rights = require("olojs/rights");
-backend.getUserRights = function (collection, id) {
+Backend.getUserRights = function (host, collection, id) {
     if (collection === "writable") return rights.WRITE;
     if (collection === "readonly") return rights.READ;
     if (collection === "private") return rights.NONE;
