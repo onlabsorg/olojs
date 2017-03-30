@@ -428,6 +428,13 @@ module.exports = function describeStore (storeName, store) {
                 });
             });
 
+            describe(`${storeName}.Document.Item.prototype.fullPath - getter`, () => {
+                it("should return the full store path of the item", () => {
+                    item = doc.get('item');
+                    expect(item.fullPath).to.deep.equal([doc.store.host, doc.collection, doc.id, 'item']);
+                });
+            });
+
             describe(`${storeName}.Document.Item.prototype.get(subPath)`, () => {
 
                 it("should be a function", () => {
