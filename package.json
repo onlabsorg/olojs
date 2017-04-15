@@ -12,5 +12,9 @@
   },
   "devDependencies": {
     "jspm": "^0.16.52"
+  },
+  "scripts": {
+    "docgen": "node bin/olodg.js",
+    "docgen-all": "node bin/docgen.js"
   }
 }
