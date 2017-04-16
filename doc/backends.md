@@ -40,3 +40,4 @@ by synchronizing the backend data with the [localStorage](https://developer.mozi
 
 [AbstractBackend]: ./AbstractBackend.md
 [ShareDB]: https://github.com/share/sharedb
+[olodb]: https://github.com/onlabsorg/olodb
