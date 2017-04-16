@@ -11,10 +11,35 @@
     "devDependencies": {}
   },
   "devDependencies": {
-    "jspm": "^0.16.52"
+    "asyncawait": "^1.0.6",
+    "express": "^4.15.2",
+    "jspm": "^0.16.52",
+    "olodb": "^0.1.1"
   },
   "scripts": {
+    "test": "node test.js",
     "docgen": "node bin/olodg.js",
     "docgen-all": "node bin/docgen.js"
-  }
+  },
+  "name": "olojs",
+  "description": "olojs is a javascript library that allows concurrent editing of JSON objects.",
+  "version": "0.1.0",
+  "main": "lib/index.js",
+  "bin": {
+    "olojs": "docgen.js"
+  },
+  "directories": {
+    "doc": "doc",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/onlabsorg/olojs.git"
+  },
+  "author": "Marcello Del Buono (m.delbuono@onlabs.org)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/onlabsorg/olojs/issues"
+  },
+  "homepage": "https://github.com/onlabsorg/olojs#readme"
 }

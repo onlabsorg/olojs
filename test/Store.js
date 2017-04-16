@@ -78,7 +78,7 @@ module.exports = function describeStore (storeName, store) {
 
     function describeDocument () {
 
-        describe(`${storeName}.Document - Writbale`, function () {
+        describe(`${storeName}.Document - Writable`, function () {
 
             before((done) => {
                 async function init () {
@@ -397,6 +397,7 @@ module.exports = function describeStore (storeName, store) {
                 })
                 .catch((err) => {
                     expect(err).to.be.instanceof(errors.ReadPermissionError);
+                    expect(doc.isOpen).to.be.false;
                     done();
                 });
             });

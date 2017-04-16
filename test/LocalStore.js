@@ -32,4 +32,4 @@ const Store = require("olojs/Store");
 const store = new Store(backend);
 
 const describeStore = require("test/Store");
-describeStore("OlodbStore", store);
+describeStore("LocalStore", store);
