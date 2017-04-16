@@ -9,19 +9,20 @@
 Class representing a filesystem-like path.  
 It exteds the javascript Array object.
   
+### Constructor
 - Create a path from a string literal: `var path = new Path("a/b/c");`
 - Create a path from an array: `var path = new Path(['a', 'b', 'c']);`
 - Create a path from a combination of the two: `var path = new Path(['a', 'b/c/d', 'e/f']);`
 - Create a path from a serie of subpaths: `var path = new Path('a/b/c', ['d','e/f'], 'g');`
   
 ### Path.prototype.slice(begin, end)
-Behaves like Array.prototype.slice, with the only difference that it returns a Path object
+Behaves like `Array.prototype.slice`, with the only difference that it returns a `Path` object
   
-### Path.prototype.leaf getter
+### Path.prototype.leaf - getter
 Returns the last item of the path.  
-Example: `(new Path('a/b/c')).leaf` will return `"c"`
+Example: `(new Path('a/b/c')).leaf` returns `"c"`
   
-### Path.prototype.parent getter
+### Path.prototype.parent - getter
 Returns the parent path of this path.  
 Example: `(new Path('a/b/c')).parent` returns `new Path('a/b')`
   
@@ -66,8 +67,8 @@ path.lookup({x:1})              // -> null
 ```
   
 ### Path.prototype.toString()
-Retruns the string represtnatation of the path as a slash-separate sequence of items.  
-Example `String(Path('a','b','c'))` will return `"a/b/c"`
+Retruns the string represtnatation of the path as a slash-separated sequence of items.  
+Example: `String(Path('a','b','c'))` returns `"a/b/c"`
   
 ### Path.from(path)
 Converts a path or path literal to an object.  

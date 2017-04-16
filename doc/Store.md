@@ -3,14 +3,14 @@
 - **Author:** Marcello Del Buono <m.delbuono@onlabs.org>
 - **License:** MIT
 - **Content:**
-    - [class Store](#store-class)
-    - [class Store.Document](#document-class)
-    - [class Store.Document.Item](#ttem-class)
-    - [class Store.Document.Dict](#dict-class)
-    - [class Store.Document.List](#list-class)
-    - [class Store.Document.Text](#text-class)
-    - [class Store.Document.Change](#change-class)
-    - [class Store.Document.Subscription](#subscription-class)
+    - [class Store][Store]
+    - [class Store.Document][Document]
+    - [class Store.Document.Item][Item]
+    - [class Store.Document.Dict][Dict]
+    - [class Store.Document.List][List]
+    - [class Store.Document.Text][Text]
+    - [class Store.Document.Change][Change]
+    - [class Store.Document.Subscription][Subscription]
   
 ## Store class
 A `Store` object represent a database containing JSON documents 
@@ -20,30 +20,30 @@ organized in collections.
 ```javascript
 var store = new Store(backend);
 ```
-- **backend:** an implementation of the [AbstractBackend][] interface.
+- **backend** is an implementation of the [AbstractBackend][] interface.
   [More info about backends](./backends.md).
   
 ### Store.prototype.host - getter
 Returns the URL of the resource hosting the database.
   
-### Store.prototype.connect(credentials) async function
+### Store.prototype.connect(credentials) - async function
 This method establishes a connection with the backend.  
-- **credentials:** an object that identified the user for access control.
-  The content of the credential object is defined by the backend.
+- **credentials** is an object that identified the user for access control.
+  The content of the credential object is defined by the backend implementation.
   
 ### Store.prototype.connected - getter
 It returns true if the store is connected to the backend.
   
 ### Store.prototype.getDocument(collection, docId)
 Returns a [Store.Document](#document-class) object.
-- **collection:** the name of the store collection containing the document
-- **docId:** the name of the document
+- **collection** is the name of the store collection containing the document
+- **docId** is the name of the document
   
 This method caches the returned object, therefore it returns always
-the same object when passing the same collection-docId names.
+the same object when passing the same collection-docId combination.
   
 ### Store.prototype.disconnect() async function
-Closes the connection with the backend.  
+Closes the connection to the backend.  
 Closes all the open documents and cleares the documents cache.
   
 ## Document class
@@ -87,15 +87,15 @@ Returns a pointer to the document item identified by the given path.
 - **path** is a [Path][] object, a path literal or a path array.
   
 The returned pointer object is mutable:
-- It behaves like a [Dict][] object when the target is a javascript object
-- It behaves like a [List][] object when the target is a javascript srray
+- It behaves like a [Dict][] object when the target is a mapping object
+- It behaves like a [List][] object when the target is an array
 - It behaves like a [Text][] object when the target is a string
-- It behaves like a [Item][] object when the target is a primitive value  
+- It behaves like an [Item][] object when the target is a primitive value  
   
 If the target type changes, the pointer object will adjust its behaviour.
-This is achieved by using a [Proxy][] object.  
+This is achieved by using [Proxy][] objects.  
   
-The .get method caches the returned value, therefore it will always
+The `.get` method caches the returned value, therefore it will always
 return the same pointer when passing the same path.
   
 ### Document.prototype.close() - async function
@@ -149,8 +149,7 @@ as parameter, each time the item value changes.
 This method returns a [Subscription][] object.
   
 ## Dict class
-A `Dict` object represents a JSON object contained in a document.  
-It extends [Item][].
+A `Dict` is an [Item][] object that represents a JSON object contained in a document.
   
 ### Dict.prototype.keys - getter
 Returns an array with all the keys contained in the dictionary.
@@ -163,8 +162,7 @@ It throws an exception if value is not a valid JSON value or if it is null.
 Removes the item mapped to `key`.
   
 ## List class
-A `List` object represents an array object contained in a document.  
-It extends [Item][].
+A `List` is an [Item][] object that represents an array object contained in a document.
   
 ### List.prototype.size - getter
 Returns the number of items in the list.
@@ -172,12 +170,12 @@ Returns the number of items in the list.
 ### List.prototype.set(index, item)
 Changes the item value at the given index.  
 If index is negative, it will be considered as relative to the end of the list.  
-It thows an error if item is not a valid JSON object or if it is null and if index is not a valid number.
+It thows an error if item is not a valid JSON object or if it is null or if index is not a valid number.
   
 ### List.prototype.insert(index, ...items)
-Inserts the given `items` at the given `index`, shifting the existing items.  
+Inserts the given `items` at the given `index`.  
 If index is negative, it will be considered as relative to the end of the list.  
-It thows an error if item is not a valid JSON object or if it is null and if index is not a valid number.
+It thows an error if any new item is not a valid JSON object or if it is null or if index is not a valid number.
   
 ### List.prototype.append(...items)
 Shortcut for `list.insert(list.size, ...items)`
@@ -188,8 +186,7 @@ If index is negative, it will be considered as relative to the end of the list.
 If `count` is omitted, it defaults to 1.
   
 ## Text class
-A `Text` object represents a string contained in a document.  
-It extends [Item][].
+A `Text` is an [Item][] object that represents a string contained in a document.
   
 ### Text.prototype.size - getter
 Returns the length of the string.
@@ -216,7 +213,7 @@ via the `Item.prototype.subscribe` method.
 - `change.removed`: the removed (old value) of the item
 - `change.inserted`: the added (new value) of the item
   
-A change object with botj the `removed` and `inserted` property non null, represents a `set` change.  
+A change object with the `removed` and `inserted` property both non null, represents a `set` change.  
 A change object with null `inserted` property, represents a `remove` change.  
 A change object with null `removed` property, represents an `insert` change.  
   
@@ -230,7 +227,7 @@ Represent a change subscription and it is returned by the `Item.prototype.subscr
 ### Properties
 - `subscription.doc`: is the [Document][] containing the observed [Item][]
 - `subscription.path`: is the [Path][] of the observed [Item][]
-- `subscription.callback`: is the function that gets invoked when the item chsnges
+- `subscription.callback`: is the function that gets invoked when the item changes
   
 ### Subscription.prototype.cancel()
 Cancels the subscription. As a consequence, furute changes to the observed item
@@ -245,6 +242,6 @@ will no longer be notified to `subscription.callback`.
 [Change]: #change-class
 [Subscription]: #subscription-class
 [AbstractBackend]: ./AbstractBackend.md
-[Path]: ./Path.md
+[Path]: ./Path.md#path-class
 [Proxy]: https://developer.mozilla.org/it/docs/Web/JavaScript/Reference/Global_Objects/Proxy
   

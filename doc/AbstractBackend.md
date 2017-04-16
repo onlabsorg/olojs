@@ -4,26 +4,26 @@
 - **License:** MIT
 - **Content:**
     - [class AbstractBackend](#abstractbackend-class)
-    - [class AbstractBackend.Document](#abstractbackend-document-class)
+    - [class AbstractBackend.Document](#abstractbackenddocument-class)
   
 ## AbstractBackend class
 This abstract class describes the interface to a JSON databse.  
   
 ### Constructor
 A constructor requires a `host` name as parameter.  
-You can do your Backend initialization, but super() must be called
+You can do your Backend initialization here, but `super()`` must be called
 because this constructor does some general initializations itself.
   
 ### AbstractBackend.prototype.connect - async virtual method
-The `connect' method implementations should establish a connection
-to the remote database and resolve when the connection is open.  
-They should also reject the promise in case of error.  
+The `connect` method implementations should establish a connection
+to the remote database and resolve when the connection is open. 
+They should also reject in case of error.  
 
 The `connect` method should also login the user to the remote
 backend using the passed implementation-specific `credentials` object.
   
 ### AbstractBackend.prototype.connected - virtual getter
-This `connected` getter implementations should return true if the 
+The `connected` getter implementations should return true if the 
 connection is established.
   
 ### AbstractBackend.prototype.getDocument
@@ -33,9 +33,9 @@ The interface implementations should just implement the `AbstactBackend.Document
 interface as a Backend static property.
   
 ### AbstractBackend.prototype.disconnect - async virtual method
-The `disconnect' method implementations should close the connection
-to the remote database and resolve when the connection is close.  
-They should also reject the promise in case of error.  
+The `disconnect` method implementations should close the connection
+to the remote database and resolve when the connection is closed. 
+They should also reject in case of error.  
   
 ## AbstractBackend.Document class
 This abstract class describes the interface to a JSON databse's document.  
@@ -46,8 +46,8 @@ extending this class.
 - `document.collection` is the name of the backend collection that contains the document
 - `document.id` is the name of the document
   
-The AbstractBackend.Document implementations should not warry about creating
-this properties, because the Abstract classes take care of if. 
+The AbstractBackend.Document implementations should not worry about creating
+this properties, because the Abstract class takes care of if. 
   
 ### Constructor
 This class should not be instantiated directrly: the `AbstractStore.getDocument`
@@ -74,7 +74,8 @@ user has write access to this document.
 ### AbstractBackend.Document.prototype.getItemValue(path) - virtual method
 The `.getItemValue` method implementations should return the value of the
 document item at the given path parameter.  
-The implementation should call `this._assertOpen()` and `this._assertReadable()`  
+  
+The implementation should also call `this._assertOpen()` and `this._assertReadable()`.  
   
 The implementation can trust that `path` is always a [Path][] instance.
   
@@ -84,7 +85,7 @@ item mapped to `key` in the dictionary at `path`.
    
 As a consequence of this change, `this.changeCallback` should be called.
   
-The implementation should call `this._assertOpen()` and `this._assertWritable()`  
+The implementation should call also `this._assertOpen()` and `this._assertWritable()`.  
   
 The implementation can trust that: 
 - `path` is always a [Path][] instance
@@ -97,7 +98,7 @@ dictionary item at `path`.
    
 As a consequence of this change, `this.changeCallback` should be called.
   
-The implementation should call `this._assertOpen()` and `this._assertWritable()`  
+The implementation should also call `this._assertOpen()` and `this._assertWritable()`.  
   
 The implementation can trust that: 
 - `path` is always a [Path][] instance
@@ -109,7 +110,7 @@ item mapped to `index` in the array at `path`.
    
 As a consequence of this change, `this.changeCallback` should be called.
   
-The implementation should call `this._assertOpen()` and `this._assertWritable()`  
+The implementation should also call `this._assertOpen()` and `this._assertWritable()`.  
   
 The implementation can trust that: 
 - `path` is always a [Path][] instance
@@ -117,12 +118,12 @@ The implementation can trust that:
 - `newItem` is a valid JSON value
   
 ### AbstractBackend.Document.prototype.insertListItem(listPath, index, newItem) - virtual method
-The `.insertListItem` method implementations should insert the `newItem` at `index'
+The `.insertListItem` method implementations should insert the `newItem` at `index`
 in the array at `path` and shift the other items.  
    
 As a consequence of this change, `this.changeCallback` should be called.
   
-The implementation should call `this._assertOpen()` and `this._assertWritable()`  
+The implementation should also call `this._assertOpen()` and `this._assertWritable()`.  
   
 The implementation can trust that: 
 - `path` is always a [Path][] instance
@@ -132,11 +133,11 @@ The implementation can trust that:
   
 ### AbstractBackend.Document.prototype.removeListItem(listPath, index) - virtual method
 The `.removeListItem` method implementations should remove the array item 
-`index' from the array at `path` and shift the other items.  
+`index` from the array at `path` and shift the other items.  
    
 As a consequence of this change, `this.changeCallback` should be called.
   
-The implementation should call `this._assertOpen()` and `this._assertWritable()`  
+The implementation should also call `this._assertOpen()` and `this._assertWritable()`.  
   
 The implementation can trust that: 
 - `path` is always a [Path][] instance
@@ -144,12 +145,12 @@ The implementation can trust that:
 - `index` is a valid array index
   
 ### AbstractBackend.Document.prototype.insertTextString(textPath, index, subString) - virtual method
-The `.insertTextString` method implementations should insert the `subString` at `index'
+The `.insertTextString` method implementations should insert the `subString` at `index`
 in the string at `path` and shift the other characters.  
    
 As a consequence of this change, `this.changeCallback` should be called.
   
-The implementation should call `this._assertOpen()` and `this._assertWritable()`  
+The implementation should also call `this._assertOpen()` and `this._assertWritable()`.  
   
 The implementation can trust that: 
 - `path` is always a [Path][] instance
@@ -158,11 +159,11 @@ The implementation can trust that:
   
 ### AbstractBackend.Document.prototype.removeTextString(textPath, index, count) - virtual method
 The `.removeTextString` method implementations should remove `count` characters, 
-starting at `index' from the string at `path`.  
+starting at `index` from the string at `path`.  
    
 As a consequence of this change, `this.changeCallback` should be called.
   
-The implementation should call `this._assertOpen()` and `this._assertWritable()`  
+The implementation should also call `this._assertOpen()` and `this._assertWritable()`.  
   
 The implementation can trust that: 
 - `path` is always a [Path][] instance
@@ -172,7 +173,7 @@ The implementation can trust that:
   
 ### AbstractBackend.Document.prototype.changeCallback(path, removed, inserted)
 The `changedCallback` function should be called every time the backend changes.  
-Also changes made remotely, should result in a call to this functions.    
+Also changes made remotely, should result in a call to this function.    
    
 The implementation doesn't need to define this function, since it will be
 defined by the [Store][] object that uses the backend.  
@@ -181,6 +182,6 @@ defined by the [Store][] object that uses the backend.
 The `.close` method implementations should disconnect from the backend document and
 throw an error in case of failure.  
   
-[Path]: ./Path.md
+[Path]: ./Path.md#path-class
 [Store]: ./Store.md#store-class
   
