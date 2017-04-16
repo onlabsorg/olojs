@@ -1,4 +1,4 @@
-# olojs.backends.abstract module
+# olojs.AbstractBackend module
 - **Version:** 0.1.0
 - **Author:** Marcello Del Buono <m.delbuono@onlabs.org>
 - **License:** MIT
