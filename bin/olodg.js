@@ -1,5 +1,6 @@
 var fs = require('fs');
 
+
 exports.extractDocumentation = function (filePath) {
     const code = fs.readFileSync(filePath, 'utf8');
     const re = /^\s*\/\*{2}([\s\S]+?)\*\/\s*\n/mg;
@@ -18,6 +19,12 @@ exports.extractDocumentation = function (filePath) {
     }
 
     return documentation;
+}
+
+
+exports.generateDocumentation = function (origPath, destPath) {
+    const documentation = exports.extractDocumentation(origPath);
+    fs.writeFileSync(destPath, documentation);
 }
 
 

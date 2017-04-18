@@ -6,7 +6,6 @@ olojs is a javascript library that allows concurrent editing of JSON objects.
   (although only three [backends][] are currently implemented)
 * It implements access control
 * It works only in the browser, but NodeJS support first and Python support later are on the roadmap
-* It is part of the [olo][] project but it can be also used standalone
 * It is in alpha stage and may be buggy
 
 
@@ -147,15 +146,15 @@ You may also be interested in the following projects:
 * [olodb][]: A NodeJS server to be coupled with olojs' OlodbBackend (it is based on [ShareDB][]).
 * [olowc][]: Collection of web-components acting as web interface to the remote data structures provided by olojs.
 * [olopy][]: A Python implementation of olojs.
-* [olo][]: A web application leveraging olojs, [olowc][] and [olodb][] to create a
-  concurrent data browser and editor.
+* [olowa][]: A web application leveraging olojs, [olowc][] and [olodb][] to create a
+  concurrent data browser and editor for the web.
 
 
 ## License
 MIT - Copyright (c) 2017 Marcello Del Buono (m.delbuono@onlabs.org)
 
 
-[olo]: https://github.com/onlabsorg/olo
+[olowa]: https://github.com/onlabsorg/olowa
 [olodb]: https://github.com/onlabsorg/olodb
 [jspm]: http://jspm.io/
 [Proxy]: https://developer.mozilla.org/it/docs/Web/JavaScript/Reference/Global_Objects/Proxy
@@ -169,8 +168,6 @@ MIT - Copyright (c) 2017 Marcello Del Buono (m.delbuono@onlabs.org)
 [Subscription]: ./doc/Store.md#subscription-class
 [Path]: ./doc/Path.md
 [backends]: ./doc/backends.md
-[olodb]: https://github.com/onlabsorg/olodb
 [ShareDB]: https://github.com/share/sharedb
 [olowc]: https://github.com/onlabsorg/olowc
 [olopy]: https://github.com/onlabsorg/olopy
-[olo]: https://github.com/onlabsorg/olo

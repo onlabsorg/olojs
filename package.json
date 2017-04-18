@@ -1,6 +1,6 @@
 {
     "name": "olojs",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "javascript library that allows concurrent editing of JSON objects",
     "keywords": ["olo", "concurrent", "realtime", "ShareDB", "ShareJS", "OT", "Operational Transformation"],
     "homepage": "https://github.com/onlabsorg/olojs#readme",
@@ -18,12 +18,11 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/onlabsorg/olojs.git"
+        "url": "git+https://github.com/onlabsorg/olojs.git"
     },
     "scripts": {
         "test": "node test.js",
-        "docgen": "node bin/olodg.js",
-        "docgen-all": "node bin/docgen.js"
+        "docgen": "node bin/docgen.js"
     },
     "devDependencies": {
         "asyncawait": "^1.0.6",

@@ -13,12 +13,12 @@ router.use(express.static(basePath, {etag:false}));
 const http = require("http");
 const server = http.createServer(router);
 
-const OlodbServer = require("olodb");
+const OlodbServer = require("olodb").Server;
 const olodb = new OlodbServer("memory");
 
-const NONE  = OlodbServer.rights.NONE;
-const READ  = OlodbServer.rights.READ;
-const WRITE = OlodbServer.rights.WRITE;
+const NONE  = require("olodb").rights.NONE;
+const READ  = require("olodb").rights.READ;
+const WRITE = require("olodb").rights.WRITE;
 
 
 
