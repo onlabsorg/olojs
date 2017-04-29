@@ -697,6 +697,19 @@ module.exports = function describeStore (storeName, store) {
 
                     subscription.cancel();
                 });
+                
+                it("should not dispatch if trying to set the key to the current value", () => {
+                    dict = doc.get('dict');
+                    dict.value = {x:10};
+                    
+                    var change = null;
+                    var subscription = dict.subscribe((c) => {change = c});
+                    
+                    dict.set('x', 10);
+                    expect(change).to.be.null;
+                    
+                    subscription.cancel();
+                });
             });
 
             describe(`${storeName}.Document.Dict.prototype.remove(key)`, () => {
@@ -728,6 +741,19 @@ module.exports = function describeStore (storeName, store) {
                     dict.remove('x');
                     expect(change).to.be.null;
 
+                    subscription.cancel();
+                });
+                
+                it("should not dispatch a change if the key doesn't exist", () => {
+                    dict = doc.get('dict');
+                    dict.value = {};
+
+                    var change = null;
+                    var subscription = dict.subscribe((c) => {change = c});
+    
+                    dict.remove('x');
+                    expect(change).to.be.null;
+                    
                     subscription.cancel();
                 });
             });
@@ -804,6 +830,19 @@ module.exports = function describeStore (storeName, store) {
                     expect(change.removed).to.deep.equal(20);
                     expect(change.inserted).to.deep.equal(21);
 
+                    subscription.cancel();
+                });
+
+                it("should not dispatch a change if trying to set the item to the current value", () => {
+                    list = doc.get('list');
+                    list.value = [10, 20, 30];
+                    
+                    var change = null;
+                    var subscription = list.subscribe((c) => {change = c});
+                    
+                    list.set(1, 20);
+                    expect(change).to.be.null;
+                    
                     subscription.cancel();
                 });
             });
