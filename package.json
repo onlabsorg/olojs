@@ -1,44 +1,59 @@
 {
-    "name": "olojs",
-    "version": "0.1.3",
-    "description": "javascript library that allows concurrent editing of JSON objects",
-    "keywords": ["olo", "concurrent", "realtime", "ShareDB", "ShareJS", "OT", "Operational Transformation"],
-    "homepage": "https://github.com/onlabsorg/olojs#readme",
-    "bugs": {
-        "url": "https://github.com/onlabsorg/olojs/issues"
-    },
-    "license": "MIT",
-    "author": "Marcello Del Buono <m.delbuono@onlabs.org> (https://plus.google.com/u/0/+MarcelloDelBuono)",
-    "files": ["bin", "doc", "lib", "test", "test.js"],
-    "main": "lib/index.js",
+  "name": "olojs",
+  "version": "0.1.4",
+  "description": "javascript library that allows concurrent editing of JSON objects",
+  "keywords": [
+    "olo",
+    "concurrent",
+    "realtime",
+    "ShareDB",
+    "ShareJS",
+    "OT",
+    "Operational Transformation"
+  ],
+  "homepage": "https://github.com/onlabsorg/olojs#readme",
+  "bugs": {
+    "url": "https://github.com/onlabsorg/olojs/issues"
+  },
+  "license": "MIT",
+  "author": "Marcello Del Buono <m.delbuono@onlabs.org> (https://plus.google.com/u/0/+MarcelloDelBuono)",
+  "files": [
+    "bin",
+    "doc",
+    "lib",
+    "test",
+    "test.js"
+  ],
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "doc": "doc",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/onlabsorg/olojs.git"
+  },
+  "scripts": {
+    "test": "node test.js",
+    "docgen": "node bin/docgen.js",
+    "pack": "./bin/pack"
+  },
+  "devDependencies": {
+    "asyncawait": "^1.0.6",
+    "express": "^4.15.2",
+    "jspm": "^0.16.52",
+    "olodb": "^0.1.1"
+  },
+  "jspm": {
     "directories": {
-        "lib": "lib",
-        "doc": "doc",
-        "test": "test"
+      "lib": "lib"
     },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/onlabsorg/olojs.git"
+    "dependencies": {
+      "lodash": "npm:lodash@^4.17.4",
+      "sharedb": "npm:sharedb@^1.0.0-beta.7",
+      "uuid": "npm:uuid@^3.0.1"
     },
-    "scripts": {
-        "test": "node test.js",
-        "docgen": "node bin/docgen.js"
-    },
-    "devDependencies": {
-        "asyncawait": "^1.0.6",
-        "express": "^4.15.2",
-        "jspm": "^0.16.52",
-        "olodb": "^0.1.1"
-    },  
-    "jspm": {
-        "directories": {
-            "lib": "lib"
-        },
-        "dependencies": {
-            "lodash": "npm:lodash@^4.17.4",
-            "sharedb": "npm:sharedb@^1.0.0-beta.7",
-            "uuid": "npm:uuid@^3.0.1"
-        },
-        "devDependencies": {}
-    }  
+    "devDependencies": {}
+  }
 }
