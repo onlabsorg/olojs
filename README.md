@@ -44,7 +44,7 @@ defined by the backend implementation.
 
 ### 3. Fetch a document
 ```javascript
-var doc = store.getDocument(collectionName, docId);
+var doc = store.getDocument(docId);
 await doc.open();
 ```
 
@@ -55,6 +55,7 @@ Depending on your permissions, doc can be:
   `WritePermissionError` exception.
 * **non-accessible**: `doc.open()` will throw a `ReadPermissionError` exception
 
+> For an olodb store, the docId must be a string in the from `collection.name`.
 
 ### 4. Read/Edit the document content
 ```javascript

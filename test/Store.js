@@ -39,20 +39,20 @@ module.exports = function describeStore (storeName, store) {
             });
         });
 
-        describe(`${storeName}.prototype.getDocument(collection, id)`, () => {
+        describe(`${storeName}.prototype.getDocument(docId)`, () => {
 
             it("should be a function", () => {
                 expect(store.getDocument).to.be.instanceof(Function);
             });
 
             it("should return an instance of Store.Document", () => {
-                var doc = store.getDocument("writable", "testDoc");
+                var doc = store.getDocument("writable.testDoc");
                 expect(doc).to.be.instanceof(Store.Document);
             });
 
             it("should return the same object when passing the same id", () => {
-                var doc1 = store.getDocument("writable", "testDoc");
-                var doc2 = store.getDocument("writable", "testDoc");
+                var doc1 = store.getDocument("writable.testDoc");
+                var doc2 = store.getDocument("writable.testDoc");
                 expect(doc1).to.equal(doc2);
             });
 
@@ -82,7 +82,7 @@ module.exports = function describeStore (storeName, store) {
 
             before((done) => {
                 async function init () {
-                    doc = store.getDocument("writable", "testDoc");
+                    doc = store.getDocument("writable.testDoc");
                 }
                 init().then(done).catch(done);
             });
@@ -93,15 +93,9 @@ module.exports = function describeStore (storeName, store) {
                 });
             });
 
-            describe(`${storeName}.Document.prototype.collection - getter`, () => {
-                it("should return the collection name", () => {
-                    expect(doc.collection).to.equal("writable");
-                });
-            });
-
             describe(`${storeName}.Document.prototype.id - getter`, () => {
                 it("should return the document name", () => {
-                    expect(doc.id).to.equal("testDoc");
+                    expect(doc.id).to.equal("writable.testDoc");
                 });
             });
 
@@ -216,7 +210,7 @@ module.exports = function describeStore (storeName, store) {
 
             before((done) => {
                 async function init () {
-                    doc = await store.getDocument("readonly", "testDoc");
+                    doc = await store.getDocument("readonly.testDoc");
                     await doc.open();
                 }
                 init().then(done).catch(done);
@@ -236,7 +230,7 @@ module.exports = function describeStore (storeName, store) {
 
             describe(`${storeName}.Document.prototype.open`, () => {
                 it("should throw a WritePermissionError if the document doesn't exist", (done) => {
-                    var doc2 = store.getDocument("readonly", "newDoc");
+                    var doc2 = store.getDocument("readonly.newDoc");
                     doc2.open()
                     .then(() => {
                         done("The open method didn't fire any error.");
@@ -387,7 +381,7 @@ module.exports = function describeStore (storeName, store) {
             var doc;
 
             before(() => {
-                doc = store.getDocument("private", "testDoc");
+                doc = store.getDocument("private.testDoc");
             });
 
             it("should throw a ReadPermissionError when trying to open the document", (done) => {
@@ -432,7 +426,7 @@ module.exports = function describeStore (storeName, store) {
             describe(`${storeName}.Document.Item.prototype.fullPath - getter`, () => {
                 it("should return the full store path of the item", () => {
                     item = doc.get('item');
-                    expect(item.fullPath).to.deep.equal([doc.store.host, doc.collection, doc.id, 'item']);
+                    expect(item.fullPath).to.deep.equal([doc.store.host, doc.id, 'item']);
                 });
             });
 
@@ -697,17 +691,17 @@ module.exports = function describeStore (storeName, store) {
 
                     subscription.cancel();
                 });
-                
+
                 it("should not dispatch if trying to set the key to the current value", () => {
                     dict = doc.get('dict');
                     dict.value = {x:10};
-                    
+
                     var change = null;
                     var subscription = dict.subscribe((c) => {change = c});
-                    
+
                     dict.set('x', 10);
                     expect(change).to.be.null;
-                    
+
                     subscription.cancel();
                 });
             });
@@ -743,17 +737,17 @@ module.exports = function describeStore (storeName, store) {
 
                     subscription.cancel();
                 });
-                
+
                 it("should not dispatch a change if the key doesn't exist", () => {
                     dict = doc.get('dict');
                     dict.value = {};
 
                     var change = null;
                     var subscription = dict.subscribe((c) => {change = c});
-    
+
                     dict.remove('x');
                     expect(change).to.be.null;
-                    
+
                     subscription.cancel();
                 });
             });
@@ -836,13 +830,13 @@ module.exports = function describeStore (storeName, store) {
                 it("should not dispatch a change if trying to set the item to the current value", () => {
                     list = doc.get('list');
                     list.value = [10, 20, 30];
-                    
+
                     var change = null;
                     var subscription = list.subscribe((c) => {change = c});
-                    
+
                     list.set(1, 20);
                     expect(change).to.be.null;
-                    
+
                     subscription.cancel();
                 });
             });

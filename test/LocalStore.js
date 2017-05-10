@@ -1,26 +1,21 @@
 
 localStorage.setItem('testStore', JSON.stringify({
-    writable: {
-        testDoc: {}
+    "writable.testDoc": {},
+    "readonly.testDoc": {
+        dict: {a:10, b:11, c:12},
+        list: [10, 11, 12],
+        text: "abc",
+        item: 10
     },
-    readonly: {
-        testDoc: {
-            dict: {a:10, b:11, c:12},
-            list: [10, 11, 12],
-            text: "abc",
-            item: 10
-        }
-    },
-    private: {
-        testDoc: {}
-    }
+    "private.testDoc": {}
 }));
 
 const Backend = require("olojs/backends/local");
 const backend = new Backend('testStore');
 
 const rights = require("olojs/rights");
-backend.getUserRights = function (collection, id) {
+backend.getUserRights = function (docId) {
+    var collection = docId.split(".")[0];
     if (collection === "writable") return rights.WRITE;
     if (collection === "readonly") return rights.READ;
     if (collection === "private") return rights.NONE;
