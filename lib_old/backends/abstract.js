@@ -24,7 +24,7 @@ class AbstractBackend {
     /**
      *  ### Constructor
      *  A constructor requires a `host` name as parameter.
-     *  You can do your Backend initialization here, but `super()`` must be called
+     *  You can do your Backend initialization here, but `super()` must be called
      *  because this constructor does some general initializations itself.
      */
     constructor (host) {
@@ -125,12 +125,14 @@ AbstractBackend.Document = class {
     get isOpen () {}
 
 
+
     /**
      *  ### AbstractBackend.Document.prototype.readable - virtual getter
      *  The `.readable` getter implementations should return true if the
      *  user has read access to this document.
      */
     get readable () {}
+    canRead (path) {}
 
 
     /**
@@ -139,6 +141,7 @@ AbstractBackend.Document = class {
      *  user has write access to this document.
      */
     get writable () {}
+    canWrite (path) {}
 
 
     /**

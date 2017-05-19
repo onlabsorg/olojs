@@ -1,31 +1,60 @@
 
-const Backend = require("olojs/backends/memory");
-const backend = new Backend("test-store");
+const MemoryStore = require("../lib/MemoryStore");
+const roles = require("../lib/roles");
 
-const rights = require("olojs/rights");
-
-backend.getUserRights = function (docId) {
-    var collection = docId.split(".")[0];
-    if (collection === "writable") return rights.WRITE;
-    if (collection === "readonly") return rights.READ;
-    if (collection === "private") return rights.NONE;
-    return rights.NONE;
+MemoryStore.Document.prototype.__getUserRole = function () {
+    var collection = this.id.split(".")[0];
+    if (collection === "owned") return roles.OWNER;
+    if (collection === "writable") return roles.WRITER;
+    if (collection === "readonly") return roles.READER;
+    if (collection === "private") return roles.NONE;
+    return roles.NONE;    
 }
 
-backend._data = {
-    "writable.testDoc": {},
-    "readonly.testDoc": {
-        dict: {a:10, b:11, c:12},
-        list: [10, 11, 12],
-        text: "abc",
-        item: 10
+const store = new MemoryStore();
+
+store._data = {
+
+    "owned.testDoc": {
+        meta: {},
+        root: {}
     },
-    "private.testDoc": {}
+
+    "writable.testDoc": {
+        meta: {
+            dict: {a:10, b:11, c:12},
+            list: [10, 11, 12],
+            text: "abc",
+            item: 10
+        },
+        root: {
+            dict: {a:10, b:11, c:12},
+            list: [10, 11, 12],
+            text: "abc",
+            item: 10                        
+        }
+    },
+
+    "readonly.testDoc": {
+        meta: {
+            dict: {a:10, b:11, c:12},
+            list: [10, 11, 12],
+            text: "abc",
+            item: 10
+        },
+        root: {
+            dict: {a:10, b:11, c:12},
+            list: [10, 11, 12],
+            text: "abc",
+            item: 10
+        }
+    },
+
+    "private.testDoc": {
+        meta: {},
+        root: {}
+    }
 };
-
-
-const Store = require("olojs/Store");
-const store = new Store(backend);
 
 const describeStore = require("test/Store");
 describeStore("MemoryStore", store);

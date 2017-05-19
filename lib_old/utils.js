@@ -140,8 +140,5 @@ function objectDiff (oldObj, newObj) {
 }
 
 
-utils.noop = function () {}
-
-
 
 module.exports = utils;

@@ -4,14 +4,14 @@ class AccessPermissionError extends Error {}
 
 
 class ReadPermissionError extends AccessPermissionError {
-    constructor (docId, path) {
-        super(`Read permission denied on document path '${docId}/${String(path)}'`);
+    constructor (docId) {
+        super(`Read permission denied on document '${docId}'`);
     }
 }
 
 class WritePermissionError extends AccessPermissionError {
-    constructor (docId, path) {
-        super(`Write permission denied on document path '${docId}/${String(path)}'`);
+    constructor (docId) {
+        super(`Write permission denied on document '${docId}'`);
     }
 }
 

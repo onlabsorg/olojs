@@ -1,12 +1,13 @@
 
-var Store = require("olojs/Store");
-var Path = require("olojs/Path");
-var utils = require("olojs/utils");
-var errors = require("olojs/errors");
+const Store = require("olojs/Store");
+const Path = require("olojs/Path");
+const utils = require("olojs/utils");
+const errors = require("../lib/errors");
+const roles = require("../lib/roles");
 
 
 module.exports = function describeStore (storeName, store) {
-    var doc;
+    var odoc, wdoc, rdoc, pdoc;
 
     describe(storeName, function () {
 
@@ -45,15 +46,21 @@ module.exports = function describeStore (storeName, store) {
                 expect(store.getDocument).to.be.instanceof(Function);
             });
 
-            it("should return an instance of Store.Document", () => {
-                var doc = store.getDocument("writable.testDoc");
-                expect(doc).to.be.instanceof(Store.Document);
+            it("should resolve an instance of Store.Document", (done) => {
+                async function test () {
+                    var doc = await store.getDocument("writable.testDoc");
+                    expect(doc).to.be.instanceof(Store.Document);
+                }
+                test().then(done).catch(done);
             });
 
-            it("should return the same object when passing the same id", () => {
-                var doc1 = store.getDocument("writable.testDoc");
-                var doc2 = store.getDocument("writable.testDoc");
-                expect(doc1).to.equal(doc2);
+            it("should resolve the same object when passing the same id", (done) => {
+                async function test () {
+                    var doc1 = await store.getDocument("writable.testDoc");
+                    var doc2 = await store.getDocument("writable.testDoc");
+                    expect(doc1).to.equal(doc2);
+                }
+                test().then(done).catch(done);
             });
 
             describeDocument();
@@ -78,73 +85,172 @@ module.exports = function describeStore (storeName, store) {
 
     function describeDocument () {
 
-        describe(`${storeName}.Document - Writable`, function () {
+        describe(`${storeName}.Document`, function () {
 
             before((done) => {
                 async function init () {
-                    doc = store.getDocument("writable.testDoc");
+                    odoc = await store.getDocument('owned.testDoc');
+                    wdoc = await store.getDocument('writable.testDoc');
+                    rdoc = await store.getDocument('readonly.testDoc');
+                    pdoc = await store.getDocument('private.testDoc');
                 }
                 init().then(done).catch(done);
             });
 
             describe(`${storeName}.Document.prototype.store - getter`, () => {
                 it("should return the store containing the document", () => {
-                    expect(doc.store).to.equal(store);
+                    expect(odoc.store).to.equal(store);
+                    expect(wdoc.store).to.equal(store);
+                    expect(rdoc.store).to.equal(store);
+                    expect(pdoc.store).to.equal(store);
                 });
             });
 
             describe(`${storeName}.Document.prototype.id - getter`, () => {
                 it("should return the document name", () => {
-                    expect(doc.id).to.equal("writable.testDoc");
+                    expect(odoc.id).to.equal("owned.testDoc");
+                    expect(wdoc.id).to.equal("writable.testDoc");
+                    expect(rdoc.id).to.equal("readonly.testDoc");
+                    expect(pdoc.id).to.equal("private.testDoc");
                 });
             });
 
             describe(`${storeName}.Document.prototype.open()`, () => {
 
                 it("should be a function", () => {
-                    expect(doc.open).to.be.instanceof(Function);
+                    expect(odoc.open).to.be.instanceof(Function);
+                    expect(wdoc.open).to.be.instanceof(Function);
+                    expect(rdoc.open).to.be.instanceof(Function);
+                    expect(pdoc.open).to.be.instanceof(Function);
                 });
 
                 it("should connect to the document backend", (done) => {
                     async function test () {
-                        expect(Boolean(doc.isOpen)).to.be.false;
-                        await doc.open();
-                        expect(doc.isOpen).to.be.true;
+                        expect(odoc.state).to.equal("closed");
+                        await odoc.open();
+                        expect(odoc.state).to.equal("open");
+
+                        expect(wdoc.state).to.equal("closed");
+                        await wdoc.open();
+                        expect(wdoc.state).to.equal("open");
+
+                        expect(rdoc.state).to.equal("closed");
+                        await rdoc.open();
+                        expect(rdoc.state).to.equal("open");
                     }
                     test().then(done).catch(done);
                 });
+
+                it("should throw an error if the user is not at least a READER", (done) => {
+                    async function test () {
+                        expect(pdoc.state).to.equal("closed");
+                        try {
+                            await pdoc.open();
+                            throw new Error("It didn't throw");
+                        }
+                        catch (error) {
+                            expect(error).to.be.instanceof(errors.ReadPermissionError);
+                        }
+                        expect(pdoc.state).to.equal("closed");
+                    }
+                    test().then(done).catch(done);
+                });
+
+                it("should throw an error if the document doesn't exist and the user is not an OWNER", (done) => {
+                    async function test () {
+                        var doc;
+
+                        doc = await store.getDocument('writable.newDocument');
+                        try {
+                            await doc.open();
+                            throw new Error("It didn't throw");
+                        }
+                        catch (error) {
+                            expect(error).to.be.instanceof(errors.WritePermissionError);
+                        }
+                        expect(doc.state).to.equal("closed");
+
+                        doc = await store.getDocument('readonly.newDocument');
+                        try {
+                            await doc.open();
+                            throw new Error("It didn't throw");
+                        }
+                        catch (error) {
+                            expect(error).to.be.instanceof(errors.WritePermissionError);
+                        }
+                        expect(doc.state).to.equal("closed");
+                    }
+                    test().then(done).catch(done);
+                })
             });
 
-            describe(`${storeName}.Document.prototype.readable - getter`, () => {
-                it("should return 'true'", () => {
-                    expect(doc.readable).to.be.true;
+            describe(`${storeName}.Document.prototype.isReadable(path)`, () => {
+
+                it("should return true if the user is at least a READER", () => {
+                    expect(odoc.isReadable("meta/a/b/c")).to.be.true;
+                    expect(odoc.isReadable("root/a/b/c")).to.be.true;
+
+                    expect(wdoc.isReadable("meta/a/b/c")).to.be.true;
+                    expect(wdoc.isReadable("root/a/b/c")).to.be.true;
+
+                    expect(rdoc.isReadable("meta/a/b/c")).to.be.true;
+                    expect(rdoc.isReadable("root/a/b/c")).to.be.true;
+
+                    expect(pdoc.isReadable("meta/a/b/c")).to.be.false;
+                    expect(pdoc.isReadable("root/a/b/c")).to.be.false;
                 });
             });
 
-            describe(`${storeName}.Document.prototype.writable - getter`, () => {
-                it("should returnbe 'true'", () => {
-                    expect(doc.writable).to.be.true;
+            describe(`${storeName}.Document.prototype.isWritable(path)`, () => {
+
+                it("should return true if trying to access meta data and the user is an OWNER", () => {
+                    expect(odoc.isWritable("meta/a/b/c")).to.be.true;
+                    expect(wdoc.isWritable("meta/a/b/c")).to.be.false;
+                    expect(rdoc.isWritable("meta/a/b/c")).to.be.false;
+                    expect(pdoc.isWritable("meta/a/b/c")).to.be.false;
+                });
+
+                it("should return true if trying to access content data and the user is at list a WRITER", () => {
+                    expect(odoc.isWritable("root/a/b/c")).to.be.true;
+                    expect(wdoc.isWritable("root/a/b/c")).to.be.true;
+                    expect(rdoc.isWritable("root/a/b/c")).to.be.false;
+                    expect(pdoc.isWritable("root/a/b/c")).to.be.false;
                 });
             });
 
             describe(`${storeName}.Document.prototype.get(path)`, () => {
 
                 it("should be a function", () => {
-                    expect(doc.get).to.be.instanceof(Function);
+                    expect(odoc.get).to.be.instanceof(Function);
+                    expect(wdoc.get).to.be.instanceof(Function);
+                    expect(rdoc.get).to.be.instanceof(Function);
+                    expect(pdoc.get).to.be.instanceof(Function);
                 });
 
                 it("should return an Item object", () => {
-                    var root = doc.get('root');
-                    expect(root).to.be.instanceof(Store.Document.Item);
+                    expect(odoc.get('root')).to.be.instanceof(Store.Document.Item);
+                    expect(wdoc.get('root')).to.be.instanceof(Store.Document.Item);
+                    expect(rdoc.get('root')).to.be.instanceof(Store.Document.Item);
+
+                    expect(odoc.get('meta')).to.be.instanceof(Store.Document.Item);
+                    expect(wdoc.get('meta')).to.be.instanceof(Store.Document.Item);
+                    expect(rdoc.get('meta')).to.be.instanceof(Store.Document.Item);
+                });
+
+                it("should throw an error if the document is not open", () => {
+                    expect(() => pdoc.get('root')).to.throw(/*errors.DocumentClosedError*/);
                 });
 
                 it("should return the same object for the same path", () => {
-                    var root = doc.get('root');
-                    expect(doc.get('root')).to.equal(root);
+                    expect(odoc.get('root')).to.equal(odoc.get('root'));
+                    expect(wdoc.get('root')).to.equal(wdoc.get('root'));
+                    expect(rdoc.get('root')).to.equal(rdoc.get('root'));
                 });
 
                 it("should return null if the path points to a root anchestor", () => {
-                    expect(doc.get("..")).to.be.null;
+                    expect(odoc.get("..")).to.be.null;
+                    expect(wdoc.get("..")).to.be.null;
+                    expect(rdoc.get("..")).to.be.null;
                 });
 
                 describeItem();
@@ -156,28 +262,49 @@ module.exports = function describeStore (storeName, store) {
             describe(`${storeName}.Document.prototype.close()`, () => {
 
                 it("should be a function", () => {
-                    expect(doc.close).to.be.instanceof(Function);
+                    expect(odoc.close).to.be.instanceof(Function);
+                    expect(wdoc.close).to.be.instanceof(Function);
+                    expect(rdoc.close).to.be.instanceof(Function);
+                    expect(pdoc.close).to.be.instanceof(Function);
+
                 });
 
                 it("should disconnect the document", (done) => {
                     async function test () {
-                        expect(doc.isOpen).to.be.true;
-                        await doc.close();
-                        expect(doc.isOpen).to.be.false;
+                        expect(odoc.state).to.equal("open");
+                        await odoc.close();
+                        expect(odoc.state).to.equal("closed");
+
+                        expect(wdoc.state).to.equal("open");
+                        await wdoc.close();
+                        expect(wdoc.state).to.equal("closed");
+
+                        expect(rdoc.state).to.equal("open");
+                        await rdoc.close();
+                        expect(rdoc.state).to.equal("closed");
+                    }
+                    test().then(done).catch(done);
+                });
+
+                it("should do nothing if the document is already closed", (done) => {
+                    async function test () {
+                        expect(pdoc.state).to.equal("closed");
+                        await pdoc.close();
+                        expect(pdoc.state).to.equal("closed");
                     }
                     test().then(done).catch(done);
                 });
 
                 it("should clear the cache", (done) => {
                     async function test () {
-                        await doc.open();
-                        var item = doc.get('item');
-                        expect(doc.get('item')).to.equal(item);
-                        await doc.close();
+                        await odoc.open();
+                        var item = odoc.get('item');
+                        expect(odoc.get('item')).to.equal(item);
+                        await odoc.close();
 
-                        await doc.open();
-                        expect(doc.get('item')).to.not.equal(item);
-                        await doc.close();
+                        await odoc.open();
+                        expect(odoc.get('item')).to.not.equal(item);
+                        await odoc.close();
                     }
                     test().then(done).catch(done);
                 });
@@ -185,219 +312,23 @@ module.exports = function describeStore (storeName, store) {
                 it("should cancel all the change subscriptions", (done) => {
                     async function test () {
                         var change;
-
-                        await doc.open();
-                        var item = doc.get('item');
+                        await odoc.open();
+                        var item = odoc.get('item');
                         item.value = 10;
                         var subscription = item.subscribe((c) => {change = c});
                         item.value = 11;
                         expect(change).to.be.instanceof(Store.Document.Change);
-                        await doc.close();
+                        await odoc.close();
 
-                        await doc.open();
-                        var item = doc.get('item');
+                        await odoc.open();
+                        var item = odoc.get('item');
                         change = null;
                         item.value = 12;
                         expect(change).to.be.null;
-                        await doc.close();
+                        await odoc.close();
                     }
                     test().then(done).catch(done);
                 });
-            });
-        });
-
-        describe(`${storeName}.Document - ReadOnly`, function () {
-
-            before((done) => {
-                async function init () {
-                    doc = await store.getDocument("readonly.testDoc");
-                    await doc.open();
-                }
-                init().then(done).catch(done);
-            });
-
-            describe(`${storeName}.Document.prototype.readable - getter`, () => {
-                it("should return 'true'", () => {
-                    expect(doc.readable).to.be.true;
-                });
-            });
-
-            describe(`${storeName}.Document.prototype.writable - getter`, () => {
-                it("should returnbe 'false'", () => {
-                    expect(doc.writable).to.be.false;
-                });
-            });
-
-            describe(`${storeName}.Document.prototype.open`, () => {
-                it("should throw a WritePermissionError if the document doesn't exist", (done) => {
-                    var doc2 = store.getDocument("readonly.newDoc");
-                    doc2.open()
-                    .then(() => {
-                        done("The open method didn't fire any error.");
-                    })
-                    .catch((err) => {
-                        expect(err).to.be.instanceof(errors.WritePermissionError);
-                        done();
-                    });
-                });
-            });
-
-            describe(`${storeName}.Document.prototype.get`, () => {
-                it("should be allowed", () => {
-                    var item = doc.get('item');
-                    expect(item).to.be.instanceof(Store.Document.Item);
-                });
-            });
-
-            describe(`${storeName}.Document.Dict`, () => {
-                var dict;
-
-                before(() => {
-                    dict = doc.get('dict');
-                });
-
-                it("should allow read operations", () => {
-                    expect(dict.value).to.deep.equal({a:10, b:11, c:12});
-                    expect(dict.get('a').value).to.equal(10);
-                    expect(dict.keys.sort()).to.deep.equal(['a','b','c']);
-                });
-
-                it("should throw a WritePermissionError when invoking 'set'", () => {
-                    expect(() => dict.set('a', 100)).to.throw(errors.WritePermissionError);
-                    expect(dict.value).to.deep.equal({a:10, b:11, c:12});
-                });
-
-                it("should throw a WritePermissionError when invoking 'remove'", () => {
-                    expect(() => dict.remove('a')).to.throw(errors.WritePermissionError);
-                    expect(dict.value).to.deep.equal({a:10, b:11, c:12});
-                });
-
-                it("should allow subscriptions", () => {
-                    expect(() => dict.subscribe(()=>{}).cancel()).to.not.throw();
-                });
-            });
-
-            describe(`${storeName}.Document.List`, () => {
-                var list;
-
-                before(() => {
-                    list = doc.get('list');
-                });
-
-                it("should allow read operations", () => {
-                    expect(list.value).to.deep.equal([10, 11, 12]);
-                    expect(list.get(1).value).to.equal(11);
-                    expect(list.size).to.equal(3);
-                });
-
-                it("should throw a WritePermissionError when invoking 'set'", () => {
-                    expect(() => list.set(1, 110)).to.throw(errors.WritePermissionError);
-                    expect(list.value).to.deep.equal([10, 11, 12]);
-                });
-
-                it("should throw a WritePermissionError when invoking 'insert'", () => {
-                    expect(() => list.insert(1, 110)).to.throw(errors.WritePermissionError);
-                    expect(list.value).to.deep.equal([10, 11, 12]);
-                });
-
-                it("should throw a WritePermissionError when invoking 'append'", () => {
-                    expect(() => list.append(13)).to.throw(errors.WritePermissionError);
-                    expect(list.value).to.deep.equal([10, 11, 12]);
-                });
-
-                it("should throw a WritePermissionError when invoking 'remove'", () => {
-                    expect(() => list.remove(1)).to.throw(errors.WritePermissionError);
-                    expect(list.value).to.deep.equal([10, 11, 12]);
-                });
-
-                it("should allow subscriptions", () => {
-                    expect(() => list.subscribe(()=>{}).cancel()).to.not.throw();
-                });
-            });
-
-            describe(`${storeName}.Document.Text`, () => {
-                var text;
-
-                before(() => {
-                    text = doc.get('text');
-                });
-
-                it("should allow read operations", () => {
-                    expect(text.value).to.equal("abc");
-                    expect(text.size).to.equal(3);
-                });
-
-                it("should throw a WritePermissionError when invoking 'insert'", () => {
-                    expect(() => text.insert(1,"xxx")).to.throw(errors.WritePermissionError);
-                    expect(text.value).to.equal("abc");
-                });
-
-                it("should throw a WritePermissionError when invoking 'append'", () => {
-                    expect(() => text.append("xxx")).to.throw(errors.WritePermissionError);
-                    expect(text.value).to.equal("abc");
-                });
-
-                it("should throw a WritePermissionError when invoking 'remove'", () => {
-                    expect(() => text.remove(1)).to.throw(errors.WritePermissionError);
-                    expect(text.value).to.equal("abc");
-                });
-
-                it("should allow subscriptions", () => {
-                    expect(() => text.subscribe(()=>{}).cancel()).to.not.throw();
-                });
-            });
-
-            describe(`${storeName}.Document.Item`, () => {
-                var item;
-
-                before(() => {
-                    item = doc.get('item');
-                });
-
-                it("should allow read operations", () => {
-                    expect(item.value).to.equal(10);
-                    expect(item.get('x')).to.be.instanceof(Store.Document.Item);
-                });
-
-                it("should throw a WritePermissionError when trying to set the value", () => {
-                    expect(() => {item.value = 11}).to.throw(errors.WritePermissionError);
-                    expect(item.value).to.equal(10);
-                });
-
-                it("should allow subscriptions", () => {
-                    expect(() => item.subscribe(()=>{}).cancel()).to.not.throw();
-                });
-            });
-
-            after((done) => {
-                async function teardown () {
-                    await doc.close();
-                }
-                teardown().then(done).catch(done);
-            });
-        });
-
-        describe(`${storeName}.Document - Private`, function () {
-            var doc;
-
-            before(() => {
-                doc = store.getDocument("private.testDoc");
-            });
-
-            it("should throw a ReadPermissionError when trying to open the document", (done) => {
-                doc.open()
-                .then(() => {
-                    done("The open method didn't fire any error.");
-                })
-                .catch((err) => {
-                    expect(err).to.be.instanceof(errors.ReadPermissionError);
-                    expect(doc.isOpen).to.be.false;
-                    done();
-                });
-            });
-
-            it("should throw a DocumentClosedError when trying to access the document content", () => {
-                expect(() => doc.get('item').value).to.throw(errors.DocumentClosedError);
             });
         });
     }
@@ -409,7 +340,7 @@ module.exports = function describeStore (storeName, store) {
 
             describe(`${storeName}.Document.Item.prototype.path - getter`, () => {
                 it("should return the path the item points to", () => {
-                    item = doc.get('path/to/item');
+                    item = odoc.get('path/to/item');
                     var path = item.path;
                     expect(path).to.be.instanceof(Path);
                     expect(path).to.deep.equal(['path','to','item']);
@@ -418,27 +349,28 @@ module.exports = function describeStore (storeName, store) {
 
             describe(`${storeName}.Document.Item.prototype.doc - getter`, () => {
                 it("should return the parent document", () => {
-                    item = doc.get('item');
-                    expect(item.doc).to.equal(doc);
+                    item = odoc.get('item');
+                    expect(item.doc).to.equal(odoc);
                 });
             });
 
             describe(`${storeName}.Document.Item.prototype.fullPath - getter`, () => {
                 it("should return the full store path of the item", () => {
-                    item = doc.get('item');
-                    expect(item.fullPath).to.deep.equal([doc.store.host, doc.id, 'item']);
+                    item = odoc.get('item');
+                    expect(item.fullPath).to.be.instanceof(Path);
+                    expect(item.fullPath).to.deep.equal([odoc.id, 'item']);
                 });
             });
 
             describe(`${storeName}.Document.Item.prototype.get(subPath)`, () => {
 
                 it("should be a function", () => {
-                    var item = doc.get('a/b/c');
+                    var item = odoc.get('a/b/c');
                     expect(item.get).to.be.instanceof(Function);
                 });
 
                 it("should return an item given a relative path", () => {
-                    var item = doc.get('a/b/c');
+                    var item = odoc.get('a/b/c');
 
                     var subItem = item.get('n/m');
                     expect(subItem).to.be.instanceof(Store.Document.Item);
@@ -449,7 +381,7 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should return null if the trying to retrieve a root anchestor", () => {
-                    var item = doc.get('a');
+                    var item = odoc.get('a');
                     var subItem = item.get('../..');
                     expect(subItem).to.be.null;
                 });
@@ -458,7 +390,7 @@ module.exports = function describeStore (storeName, store) {
             describe(`${storeName}.Document.Item.prototype.value - getter/setter`, () => {
 
                 it("should get/set the item value", () => {
-                    item = doc.get('item');
+                    item = odoc.get('item');
 
                     var newValue = {
                         dict: {a:1, b:2, c:3},
@@ -467,7 +399,6 @@ module.exports = function describeStore (storeName, store) {
                         numb: 10,
                         bool: true
                     };
-
                     item.value = newValue;
 
                     expect(item.value).to.deep.equal(newValue);
@@ -489,7 +420,7 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should get/set a deep copy of the value", () => {
-                    item = doc.get('item');
+                    item = odoc.get('item');
 
                     var newValue = {a:1, b:2, c:3};
 
@@ -507,7 +438,7 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should work also with the root item", () => {
-                    var root = doc.get();
+                    var root = odoc.get();
 
                     root.value = {a:1, b:2, c:3};
                     expect(root.value).to.deep.equal({a:1, b:2, c:3});
@@ -517,22 +448,33 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should throw an error if trying to assign a non-dict to the root item", () => {
-                    var root = doc.get();
+                    var root = odoc.get();
                     expect(() => {root.value = 10}).to.throw(Error);
                 });
 
                 it("should throw an error if trying to assign to a parent-less item", () => {
-                    var item = doc.get('item');
+                    var item = odoc.get('item');
                     item.value = "abc";
 
                     var subItem = item.get('x/y');
                     expect(() => {subItem.value = 10}).to.throw(Error);
                 });
+
+                it("should throw an error if the document path is not writable", () => {
+                    expect(() => {wdoc.get('meta/x').value = 10}).to.throw(errors.WritePermissionError);
+                    expect(() => {wdoc.get('root/x').value = 10}).to.not.throw();
+
+                    expect(() => {rdoc.get('meta/x').value = 10}).to.throw(errors.WritePermissionError);
+                    expect(() => {rdoc.get('root/x').value = 10}).to.throw(errors.WritePermissionError);
+
+                    expect(() => {wdoc.get('').value = {}}).to.throw(errors.WritePermissionError);
+                    expect(() => {rdoc.get('').value = {}}).to.throw(errors.WritePermissionError);
+                });
             });
 
             describe(`${storeName}.Document.Item.prototype.type - getter`, () => {
                 it("should return the type of this item", () => {
-                    item = doc.get('item');
+                    item = odoc.get('item');
                     item.value = {
                         dict: {a:1, b:2, c:3},
                         list: [10, 20, 30],
@@ -560,18 +502,18 @@ module.exports = function describeStore (storeName, store) {
                 var item, subscription, change;
 
                 it("should be a function", () => {
-                    item = doc.get('item');
+                    item = odoc.get('item');
                     expect(item.subscribe).to.be.instanceof(Function);
                 });
 
                 it("should return a subscription object", () => {
-                    item = doc.get('item');
+                    item = odoc.get('item');
                     subscription = item.subscribe((c) => {change = c});
                     expect(subscription).to.be.instanceof(Store.Document.Subscription);
                 });
 
                 it("should call the callback when the item value changes", () => {
-                    item = doc.get('item');
+                    item = odoc.get('item');
                     item.value = 10;
                     change = null;
                     item.value = 11;
@@ -582,7 +524,7 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should stop notifying the callback when the subscription is cancelled", () => {
-                    item = doc.get('item');
+                    item = odoc.get('item');
                     item.value = 10;
                     change = null;
                     item.value = 11;
@@ -596,7 +538,7 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should call the callback when a sub-item value changes", () => {
-                    item = doc.get('item');
+                    item = odoc.get('item');
                     item.value = {x: {y: {z:10}}};
                     var z = item.get("x/y/z");
 
@@ -613,7 +555,7 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should call the callback when the item value changes due to parent value change", () => {
-                    item = doc.get('item');
+                    item = odoc.get('item');
                     item.value = {x: {y: {z:10}}};
                     var z = item.get("x/y/z");
 
@@ -642,8 +584,9 @@ module.exports = function describeStore (storeName, store) {
             });
 
             describe(`${storeName}.Document.Dict.prototype.keys - getter`, () => {
+
                 it("should return an array with the dict keys", () => {
-                    dict = doc.get('dict');
+                    dict = odoc.get('dict');
                     dict.value = {a:1, b:2, c:3};
                     expect(dict.keys.sort()).to.deep.equal(['a','b','c']);
                 });
@@ -656,7 +599,7 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should set the value of the key", () => {
-                    dict = doc.get('dict');
+                    dict = odoc.get('dict');
                     dict.value = {a:1};
                     dict.set('a', 10);
                     dict.set('b', 20);
@@ -664,15 +607,23 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should throw an error if the value is not valid", () => {
-                    dict = doc.get('dict');
+                    dict = odoc.get('dict');
                     dict.value = {};
                     expect(() => {dict.set('foo', function () {})}).to.throw(Error);
                     expect(() => {dict.set('foo', null)}).to.throw(Error);
                     expect(() => {dict.set('foo', undefined)}).to.throw(Error);
                 });
 
+                it("should throw an error if the document path is not writable", () => {
+                    expect(() => wdoc.get('meta').set('x', 10)).to.throw(errors.WritePermissionError);
+                    expect(() => wdoc.get('root').set('x', 10)).to.not.throw();
+
+                    expect(() => rdoc.get('meta').set('x', 10)).to.throw(errors.WritePermissionError);
+                    expect(() => rdoc.get('root').set('x', 10)).to.throw(errors.WritePermissionError);
+                });
+
                 it("should dispatch the change event to the subscribed callbacks", () => {
-                    dict = doc.get('dict');
+                    dict = odoc.get('dict');
                     dict.value = {};
 
                     var change;
@@ -693,7 +644,7 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should not dispatch if trying to set the key to the current value", () => {
-                    dict = doc.get('dict');
+                    dict = odoc.get('dict');
                     dict.value = {x:10};
 
                     var change = null;
@@ -713,14 +664,22 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should delete the key", () => {
-                    dict = doc.get('dict');
+                    dict = odoc.get('dict');
                     dict.value = {x:10, y:20};
                     dict.remove('x');
                     expect(dict.value).to.deep.equal({y:20});
                 });
 
+                it("should throw an error if the document path is not writable", () => {
+                    expect(() => wdoc.get('meta').remove('x')).to.throw(errors.WritePermissionError);
+                    expect(() => wdoc.get('root').remove('x')).to.not.throw();
+
+                    expect(() => rdoc.get('meta').remove('x')).to.throw(errors.WritePermissionError);
+                    expect(() => rdoc.get('root').remove('x')).to.throw(errors.WritePermissionError);
+                });
+
                 it("should dispatch the change event to the subscribed callbacks", () => {
-                    dict = doc.get('dict');
+                    dict = odoc.get('dict');
                     dict.value = {x:10, y:20};
 
                     var change;
@@ -739,7 +698,7 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should not dispatch a change if the key doesn't exist", () => {
-                    dict = doc.get('dict');
+                    dict = odoc.get('dict');
                     dict.value = {};
 
                     var change = null;
@@ -765,7 +724,7 @@ module.exports = function describeStore (storeName, store) {
 
             describe(`${storeName}.Document.List.prototype.size - getter`, () => {
                 it("should return the number of items in the array", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30];
                     expect(list.size).to.equal(3);
                 });
@@ -778,42 +737,50 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should set the value of the item at the given index", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30];
                     list.set(1, 21);
                     expect(list.value).to.deep.equal([10, 21, 30]);
                 });
 
                 it("should interpret negative indexes as relative to the end", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30];
                     list.set(-1, 31);
                     expect(list.value).to.deep.equal([10, 20, 31]);
                 });
 
                 it("should throw an error if index is out of range", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [];
                     expect(() => {list.set(100, 1)}).to.throw(Error);
                     expect(() => {list.set(-100, 1)}).to.throw(Error);
                 });
 
                 it("should throw an error if index is not a number", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [];
                     expect(() => {list.set('x', 1)}).to.throw(Error);
                 });
 
                 it("should throw an error if the new item value is not valid", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [];
                     expect(() => {list.set('x', function () {})}).to.throw(Error);
                     expect(() => {list.set('x', null)}).to.throw(Error);
                     expect(() => {list.set('x', undefined)}).to.throw(Error);
                 });
 
+                it("should throw an error if the document path is not writable", () => {
+                    expect(() => wdoc.get('meta/list').set(0, 10)).to.throw(errors.WritePermissionError);
+                    expect(() => wdoc.get('root/list').set(0, 10)).to.not.throw();
+
+                    expect(() => rdoc.get('meta/list').set(0, 10)).to.throw(errors.WritePermissionError);
+                    expect(() => rdoc.get('root/list').set(0, 10)).to.throw(errors.WritePermissionError);
+                });
+
                 it("should dispatch the change event to the subscribed callbacks", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30];
 
                     var change;
@@ -828,7 +795,7 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should not dispatch a change if trying to set the item to the current value", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30];
 
                     var change = null;
@@ -848,21 +815,21 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should insert the given items at the given index", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30];
                     list.insert(1, 11, 12);
                     expect(list.value).to.deep.equal([10, 11, 12, 20, 30]);
                 });
 
                 it("should interpret negative indexes as relative to the end", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30];
                     list.insert(-1, 21, 22);
                     expect(list.value).to.deep.equal([10, 20, 21, 22, 30]);
                 });
 
                 it("should throw an error if index is out of range", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30];
                     expect(() => {list.insert(100, 1)}).to.throw(Error);
                     expect(() => {list.insert(-100, 1)}).to.throw(Error);
@@ -870,22 +837,30 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should throw an error if index is not a number", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30];
                     expect(() => {list.insert('x', 1)}).to.throw(Error);
                     expect(list.value).to.deep.equal([10, 20, 30]);
                 });
 
                 it("should throw an error if any new item is not a valid value", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30];
                     function foo () {list.insert(1, 11, function () {})};
                     expect(foo).to.throw(Error);
                     expect(list.value).to.deep.equal([10, 20, 30]);
                 });
 
+                it("should throw an error if the document path is not writable", () => {
+                    expect(() => wdoc.get('meta/list').insert(0, 10)).to.throw(errors.WritePermissionError);
+                    expect(() => wdoc.get('root/list').insert(0, 10)).to.not.throw();
+
+                    expect(() => rdoc.get('meta/list').insert(0, 10)).to.throw(errors.WritePermissionError);
+                    expect(() => rdoc.get('root/list').insert(0, 10)).to.throw(errors.WritePermissionError);
+                });
+
                 it("should dispatch the change event to the subscribed callbacks", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30];
 
                     var change;
@@ -907,21 +882,29 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should add the given items at the end of the array", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30];
                     list.append(40, 50);
                     expect(list.value).to.deep.equal([10, 20, 30, 40, 50]);
                 });
 
                 it("should throw an error if any new item is not a valid value", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30];
                     expect(() => {list.append(40, function () {})}).to.throw(Error);
                     expect(list.value).to.deep.equal([10, 20, 30]);
                 });
 
+                it("should throw an error if the document path is not writable", () => {
+                    expect(() => wdoc.get('meta/list').append(10)).to.throw(errors.WritePermissionError);
+                    expect(() => wdoc.get('root/list').append(10)).to.not.throw();
+
+                    expect(() => rdoc.get('meta/list').append(10)).to.throw(errors.WritePermissionError);
+                    expect(() => rdoc.get('root/list').append(10)).to.throw(errors.WritePermissionError);
+                });
+
                 it("should dispatch the change event to the subscribed callbacks", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30];
 
                     var change;
@@ -943,35 +926,35 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should remove `count` items starting at `index`", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 11, 12, 13, 14];
                     list.remove(1, 3);
                     expect(list.value).to.deep.equal([10, 14]);
                 });
 
                 it("should default to `count=1` if omitted", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30];
                     list.remove(1);
                     expect(list.value).to.deep.equal([10, 30]);
                 });
 
                 it("should interpret negative indexes as relative to the end", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30, 40, 50];
                     list.remove(-3, 2);
                     expect(list.value).to.deep.equal([10, 20, 50]);
                 });
 
                 it("should remove up to the end of the list if count overflows", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30, 40, 50];
                     list.remove(3, 100);
                     expect(list.value).to.deep.equal([10, 20, 30]);
                 });
 
                 it("should throw an error if index is out of range", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30];
                     expect(() => {list.remove(100)}).to.throw(Error);
                     expect(() => {list.remove(-100)}).to.throw(Error);
@@ -979,22 +962,30 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should throw an error if index is not a number", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30];
                     expect(() => {list.remove('x')}).to.throw(Error);
                     expect(list.value).to.deep.equal([10, 20, 30]);
                 });
 
                 it("should throw an error if `count` is negative or not a number", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30];
                     expect(() => {list.remove(1, -1)}).to.throw(Error);
                     expect(() => {list.remove(1, 'x')}).to.throw(Error);
                     expect(list.value).to.deep.equal([10, 20, 30]);
                 });
 
+                it("should throw an error if the document path is not writable", () => {
+                    expect(() => wdoc.get('meta/list').remove(0)).to.throw(errors.WritePermissionError);
+                    expect(() => wdoc.get('root/list').remove(0)).to.not.throw();
+
+                    expect(() => rdoc.get('meta/list').remove(0)).to.throw(errors.WritePermissionError);
+                    expect(() => rdoc.get('root/list').remove(0)).to.throw(errors.WritePermissionError);
+                });
+
                 it("should dispatch the change event to the subscribed callbacks", () => {
-                    list = doc.get('list');
+                    list = odoc.get('list');
                     list.value = [10, 20, 30, 40, 50];
 
                     var change;
@@ -1022,7 +1013,7 @@ module.exports = function describeStore (storeName, store) {
 
             describe(`${storeName}.Document.Text.prototype.size - getter`, () => {
                 it("should return the number of characters in the text", () => {
-                    text = doc.get('text');
+                    text = odoc.get('text');
 
                     text.value = "abc";
                     expect(text.size).to.equal(3);
@@ -1039,21 +1030,21 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should insert the given string at the given index", () => {
-                    text = doc.get('text');
+                    text = odoc.get('text');
                     text.value = "abc";
                     text.insert(1, "xxx");
                     expect(text.value).to.equal("axxxbc");
                 });
 
                 it("should interpret negative indexes as relative to the end", () => {
-                    text = doc.get('text');
+                    text = odoc.get('text');
                     text.value = "abc";
                     text.insert(-1, "xxx");
                     expect(text.value).to.equal("abxxxc");
                 });
 
                 it("should throw an error if index is out of range", () => {
-                    text = doc.get('text');
+                    text = odoc.get('text');
                     text.value = "abc";
                     expect(() => {text.insert(100, "xxx")}).to.throw(Error);
                     expect(() => {text.insert(-100, "xxx")}).to.throw(Error);
@@ -1061,14 +1052,22 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should throw an error if index is not a number", () => {
-                    text = doc.get('text');
+                    text = odoc.get('text');
                     text.value = "abc";
                     expect(() => {text.insert('x', "xxx")}).to.throw(Error);
                     expect(text.value).to.equal("abc");
                 });
 
+                it("should throw an error if the document path is not writable", () => {
+                    expect(() => wdoc.get('meta/text').insert(0, 'xxx')).to.throw(errors.WritePermissionError);
+                    expect(() => wdoc.get('root/text').insert(0, 'xxx')).to.not.throw();
+
+                    expect(() => rdoc.get('meta/text').insert(0, 'xxx')).to.throw(errors.WritePermissionError);
+                    expect(() => rdoc.get('root/text').insert(0, 'xxx')).to.throw(errors.WritePermissionError);
+                });
+
                 it("should dispatch the change event to the subscribed callbacks", () => {
-                    text = doc.get('text');
+                    text = odoc.get('text');
                     text.value = "abc";
 
                     var change;
@@ -1090,14 +1089,22 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should add the given string at the end of the text", () => {
-                    text = doc.get('text');
+                    text = odoc.get('text');
                     text.value = "abc";
                     text.append("xxx");
                     expect(text.value).to.equal("abcxxx");
                 });
 
+                it("should throw an error if the document path is not writable", () => {
+                    expect(() => wdoc.get('meta/text').append('xxx')).to.throw(errors.WritePermissionError);
+                    expect(() => wdoc.get('root/text').append('xxx')).to.not.throw();
+
+                    expect(() => rdoc.get('meta/text').append('xxx')).to.throw(errors.WritePermissionError);
+                    expect(() => rdoc.get('root/text').append('xxx')).to.throw(errors.WritePermissionError);
+                });
+
                 it("should dispatch the change event to the subscribed callbacks", () => {
-                    text = doc.get('text');
+                    text = odoc.get('text');
                     text.value = "abc";
 
                     var change;
@@ -1119,35 +1126,35 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should remove `count` characters starting at `index`", () => {
-                    text = doc.get('text');
+                    text = odoc.get('text');
                     text.value = "abcdef";
                     text.remove(1,3);
                     expect(text.value).to.equal("aef");
                 });
 
                 it("should default to `count=1` if omitted", () => {
-                    text = doc.get('text');
+                    text = odoc.get('text');
                     text.value = "abcdef";
                     text.remove(2);
                     expect(text.value).to.equal("abdef");
                 });
 
                 it("should interpret negative indexes as relative to the end", () => {
-                    text = doc.get('text');
+                    text = odoc.get('text');
                     text.value = "abcdef";
                     text.remove(-3, 2);
                     expect(text.value).to.equal("abcf");
                 });
 
                 it("should remove up to the end of the list if count overflows", () => {
-                    text = doc.get('text');
+                    text = odoc.get('text');
                     text.value = "abcdef";
                     text.remove(3, 100);
                     expect(text.value).to.equal("abc");
                 });
 
                 it("should throw an error if index is out of range", () => {
-                    text = doc.get('text');
+                    text = odoc.get('text');
                     text.value = "abc";
                     expect(() => {text.remove(100)}).to.throw(Error);
                     expect(() => {text.remove(-100)}).to.throw(Error);
@@ -1155,15 +1162,23 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should throw an error if index is negative or not a number", () => {
-                    text = doc.get('text');
+                    text = odoc.get('text');
                     text.value = "abc";
                     expect(() => {text.remove(1, "x")}).to.throw(Error);
                     expect(() => {text.remove(1, -1)}).to.throw(Error);
                     expect(text.value).to.equal("abc");
                 });
 
+                it("should throw an error if the document path is not writable", () => {
+                    expect(() => wdoc.get('meta/text').remove(0)).to.throw(errors.WritePermissionError);
+                    expect(() => wdoc.get('root/text').remove(0)).to.not.throw();
+
+                    expect(() => rdoc.get('meta/text').remove(0)).to.throw(errors.WritePermissionError);
+                    expect(() => rdoc.get('root/text').remove(0)).to.throw(errors.WritePermissionError);
+                });
+
                 it("should dispatch the change event to the subscribed callbacks", () => {
-                    text = doc.get('text');
+                    text = odoc.get('text');
                     text.value = "abcdef";
 
                     var change;

@@ -16,9 +16,7 @@ const server = http.createServer(router);
 const OlodbServer = require("olodb").Server;
 const olodb = new OlodbServer("memory");
 
-const NONE  = require("olodb").rights.NONE;
-const READ  = require("olodb").rights.READ;
-const WRITE = require("olodb").rights.WRITE;
+const roles = require("./lib/roles");
 
 
 
@@ -27,14 +25,15 @@ olodb.auth = function (userId) {
 }
 
 
-olodb.getUserRights = Async(function (userName, collection, docId) {
+olodb.getUserRole = Async(function (userName, collection, docId) {
 
     switch (userName) {
 
         case "TestUser":
-            if (collection === "writable") return WRITE;
-            if (collection === "readonly") return READ;
-            if (collection === "private") return NONE;
+            if (collection === "owned") return roles.OWNER;
+            if (collection === "writable") return roles.WRITER;
+            if (collection === "readonly") return roles.READER;
+            if (collection === "private") return roles.NONE;
 
         default:
             return NONE;
@@ -45,14 +44,46 @@ olodb.getUserRights = Async(function (userName, collection, docId) {
 
 olodb.listen(server).then(() => {
     console.log(`Test olodb server listening on port ${port}!`);
-    olodb.createDocument("writable", "testDoc", {});
-    olodb.createDocument("readonly", "testDoc", {
-        dict: {a:10, b:11, c:12},
-        list: [10, 11, 12],
-        text: "abc",
-        item: 10
+    
+    olodb.createDocument("owned", "testDoc", {
+        meta: {},
+        root: {}
     });
-    olodb.createDocument("private", "testDoc", {});
+    
+    olodb.createDocument("writable", "testDoc", {
+        meta: {
+            dict: {a:10, b:11, c:12},
+            list: [10, 11, 12],
+            text: "abc",
+            item: 10
+        },
+        root: {
+            dict: {a:10, b:11, c:12},
+            list: [10, 11, 12],
+            text: "abc",
+            item: 10                        
+        }
+    });
+    
+    olodb.createDocument("readonly", "testDoc", {
+        meta: {
+            dict: {a:10, b:11, c:12},
+            list: [10, 11, 12],
+            text: "abc",
+            item: 10
+        },
+        root: {
+            dict: {a:10, b:11, c:12},
+            list: [10, 11, 12],
+            text: "abc",
+            item: 10
+        }
+    });
+    
+    olodb.createDocument("private", "testDoc", {
+        meta: {},
+        root: {}
+    });
     
     console.log();
     console.log("To run a complete test in the browser: http://localhost:8010/test/index.html");
