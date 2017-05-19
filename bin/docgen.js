@@ -11,4 +11,3 @@ function generate (orig, dest) {
 
 generate("lib/Path.js", "doc/Path.md");
 generate("lib/Store.js", "doc/Store.md");
-generate("lib/backends/abstract.js", "doc/AbstractBackend.md");

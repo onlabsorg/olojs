@@ -3,10 +3,10 @@
 olojs is a javascript library that allows concurrent editing of JSON objects.
 
 * It is designed to be extensible and work with different types of backends
-  (although only three [backends][] are currently implemented)
+  (although only three backends are currently implemented)
 * It implements access control
 * It works only in the browser, but NodeJS support first and Python support later are on the roadmap
-* It is in alpha stage and may be buggy
+* It is in alpha stage, therefore it may be buggy and the API may change
 
 
 ## Getting started in 6 steps
@@ -22,18 +22,15 @@ Requirements:
 
 ### 2. Connect to a backend
 ```javascript
-const OlodbBackend = require("olojs/backends/olodb");
-const backend = new OlodbBackend("www.onlabs.org");
-
-const Store = require("olojs/Store");
-const store = new Store(backend);
+const Store = require("olojs/OlodbStore");
+const store = new Store("wss://localhost:8010");
 
 await store.connect(credentials);
 ```
 
 [olodb][] is not the only possible backend: other two types of backend are
-currently implemented and custom backends can be also created.
-[Read more about backends][backends].
+currently implemented and custom backends can be also created by implementing
+the [Store][] interface.
 
 The `store` object represents a connection to an [olodb][] backend and allows you to
 concurrently modify the remote data as explained below.
@@ -48,14 +45,20 @@ var doc = store.getDocument(docId);
 await doc.open();
 ```
 
-Depending on your permissions, doc can be:
-
-* **writable**: you can change its content.
-* **read-only**: you can only read its content. Trying to write will result in a
-  `WritePermissionError` exception.
-* **non-accessible**: `doc.open()` will throw a `ReadPermissionError` exception
-
 > For an olodb store, the docId must be a string in the from `collection.name`.
+
+The user can have one of the following roles:
+
+| Role         | meta data  |    body    |
+|--------------|:----------:|:----------:|
+| roles.OWNER  |     rw     |     rw     |
+| roles.WRITER |     ro     |     rw     |
+| roles.READER |     ro     |     ro     |
+| roles.NONE   |     -      |     -      |
+
+> All the top-level keys of a document are meta-data, with the exception of
+> the `root` key that contains the document body.
+
 
 ### 4. Read/Edit the document content
 ```javascript
