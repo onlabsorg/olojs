@@ -55,5 +55,8 @@
       "uuid": "npm:uuid@^3.0.1"
     },
     "devDependencies": {}
+  },
+  "dependencies": {
+    "olodb": "^0.1.6"
   }
 }
