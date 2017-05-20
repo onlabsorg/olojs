@@ -132,7 +132,7 @@ await store.disconnect();
 
 * [OlodbStore](./doc/OlodbStore.md) : ShareDB store
 * [MemoryStore](./doc/MemoryStore.md) : In-memory store
-* [LocalStore](./doc/MemoryStore.md) : LocalStorage Store
+* [LocalStore](./doc/LocalStore.md) : LocalStorage Store
 
 ## API
 
