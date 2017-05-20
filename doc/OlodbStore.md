@@ -4,7 +4,7 @@
 - **License:** MIT
   
 ## OlodbStore class
-Implements the [Store](./Store) interface for a [ShareDB](https://github.com/share/sharedb)
+Implements the [Store](./Store.md) interface for a [ShareDB](https://github.com/share/sharedb)
 backend.
   
 ### new OlodbStore(url) - constructor

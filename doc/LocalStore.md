@@ -4,7 +4,7 @@
 - **License:** MIT
   
 ## LocalStore class
-Implements the [Store](./Store) interface for a [localStorage](https://developer.mozilla.org/it/docs/Web/API/Window/localStorage)
+Implements the [Store](./Store.md) interface for a [localStorage](https://developer.mozilla.org/it/docs/Web/API/Window/localStorage)
 backend.
   
 ### new LocalStore(name) - constructor
