@@ -11,3 +11,6 @@ function generate (orig, dest) {
 
 generate("lib/Path.js", "doc/Path.md");
 generate("lib/Store.js", "doc/Store.md");
+generate("lib/OlodbStore.js", "doc/OlodbStore.md");
+generate("lib/MemoryStore.js", "doc/MemoryStore.md");
+generate("lib/LocalStore.js", "doc/LocalStore.md");

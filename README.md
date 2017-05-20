@@ -111,7 +111,7 @@ the remote database and with all the other users in real time.
 
 ### 5. Subscribe to changes
 ```javascript
-var subscription = doc.get('d').subscribe((change) => {...});
+var subscription = doc.get('d').subscribe( (change) => {...} );
 // ...
 subscription.cancel();
 ```
@@ -128,18 +128,21 @@ await doc.close();
 await store.disconnect();
 ```
 
+## Store implementations
 
-## Documentation
+* [OlodbStore](./doc/OlodbStore) : ShareDB store
+* [MemoryStore](./doc/MemoryStore) : In-memory store
+* [LocalStore](./doc/MemoryStore) : LocalStorage Store
 
-* API's
-    * [Store][] object: represents a data store
-    * [Document][] object: represents one of the documents in the data store
-    * [Item][] object: represents an item of a document
-    * [Dict][] object: a particular `Item` object representing a key-value mapping
-    * [List][] object: a particular `Item` object representing an array of items
-    * [Text][] object: a particular `Item` object representing a string
-    * [Change][] object: represents a change occurred in a document
-* [How to use the available and how to create your own.][backends]
+## API
+
+* [Store][] object: represents a data store
+* [Document][] object: represents one of the documents in the data store
+* [Item][] object: represents an item of a document
+* [Dict][] object: a particular `Item` object representing a key-value mapping
+* [List][] object: a particular `Item` object representing an array of items
+* [Text][] object: a particular `Item` object representing a string
+* [Change][] object: represents a change occurred in a document
 
 
 ## Related projects
@@ -147,7 +150,7 @@ await store.disconnect();
 You may also be interested in the following projects:
 
 * [ShareDB][]: A database frontend for concurrent editing systems on which the OlodbBackend is based
-* [olodb][]: A NodeJS server to be coupled with olojs' OlodbBackend (it is based on [ShareDB][]).
+* [olodb][]: A NodeJS server to be coupled with olojs' OlodbStore (it is based on [ShareDB][]).
 * [olowc][]: Collection of web-components acting as web interface to the remote data structures provided by olojs.
 * [olopy][]: A Python implementation of olojs.
 * [olowa][]: A web application leveraging olojs, [olowc][] and [olodb][] to create a
@@ -171,7 +174,6 @@ MIT - Copyright (c) 2017 Marcello Del Buono (m.delbuono@onlabs.org)
 [Change]: ./doc/Store.md#change-class
 [Subscription]: ./doc/Store.md#subscription-class
 [Path]: ./doc/Path.md
-[backends]: ./doc/backends.md
 [ShareDB]: https://github.com/share/sharedb
 [olowc]: https://github.com/onlabsorg/olowc
 [olopy]: https://github.com/onlabsorg/olopy
