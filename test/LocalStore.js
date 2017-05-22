@@ -2,12 +2,12 @@
 localStorage.setItem('testStore', JSON.stringify({
 
     "owned.testDoc": {
-        meta: {},
+        __meta__: {},
         root: {}
     },
 
     "writable.testDoc": {
-        meta: {
+        __meta__: {
             dict: {a:10, b:11, c:12},
             list: [10, 11, 12],
             text: "abc",
@@ -22,7 +22,7 @@ localStorage.setItem('testStore', JSON.stringify({
     },
 
     "readonly.testDoc": {
-        meta: {
+        __meta__: {
             dict: {a:10, b:11, c:12},
             list: [10, 11, 12],
             text: "abc",
@@ -37,7 +37,7 @@ localStorage.setItem('testStore', JSON.stringify({
     },
 
     "private.testDoc": {
-        meta: {},
+        __meta__: {},
         root: {}
     }
 }));

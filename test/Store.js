@@ -187,27 +187,27 @@ module.exports = function describeStore (storeName, store) {
             describe(`${storeName}.Document.prototype.isReadable(path)`, () => {
 
                 it("should return true if the user is at least a READER", () => {
-                    expect(odoc.isReadable("meta/a/b/c")).to.be.true;
+                    expect(odoc.isReadable("__meta__/a/b/c")).to.be.true;
                     expect(odoc.isReadable("root/a/b/c")).to.be.true;
 
-                    expect(wdoc.isReadable("meta/a/b/c")).to.be.true;
+                    expect(wdoc.isReadable("__meta__/a/b/c")).to.be.true;
                     expect(wdoc.isReadable("root/a/b/c")).to.be.true;
 
-                    expect(rdoc.isReadable("meta/a/b/c")).to.be.true;
+                    expect(rdoc.isReadable("__meta__/a/b/c")).to.be.true;
                     expect(rdoc.isReadable("root/a/b/c")).to.be.true;
 
-                    expect(pdoc.isReadable("meta/a/b/c")).to.be.false;
+                    expect(pdoc.isReadable("__meta__/a/b/c")).to.be.false;
                     expect(pdoc.isReadable("root/a/b/c")).to.be.false;
                 });
             });
 
             describe(`${storeName}.Document.prototype.isWritable(path)`, () => {
 
-                it("should return true if trying to access meta data and the user is an OWNER", () => {
-                    expect(odoc.isWritable("meta/a/b/c")).to.be.true;
-                    expect(wdoc.isWritable("meta/a/b/c")).to.be.false;
-                    expect(rdoc.isWritable("meta/a/b/c")).to.be.false;
-                    expect(pdoc.isWritable("meta/a/b/c")).to.be.false;
+                it("should return true if trying to access __meta__ data and the user is an OWNER", () => {
+                    expect(odoc.isWritable("__meta__/a/b/c")).to.be.true;
+                    expect(wdoc.isWritable("__meta__/a/b/c")).to.be.false;
+                    expect(rdoc.isWritable("__meta__/a/b/c")).to.be.false;
+                    expect(pdoc.isWritable("__meta__/a/b/c")).to.be.false;
                 });
 
                 it("should return true if trying to access content data and the user is at list a WRITER", () => {
@@ -232,9 +232,9 @@ module.exports = function describeStore (storeName, store) {
                     expect(wdoc.get('root')).to.be.instanceof(Store.Document.Item);
                     expect(rdoc.get('root')).to.be.instanceof(Store.Document.Item);
 
-                    expect(odoc.get('meta')).to.be.instanceof(Store.Document.Item);
-                    expect(wdoc.get('meta')).to.be.instanceof(Store.Document.Item);
-                    expect(rdoc.get('meta')).to.be.instanceof(Store.Document.Item);
+                    expect(odoc.get('__meta__')).to.be.instanceof(Store.Document.Item);
+                    expect(wdoc.get('__meta__')).to.be.instanceof(Store.Document.Item);
+                    expect(rdoc.get('__meta__')).to.be.instanceof(Store.Document.Item);
                 });
 
                 it("should throw an error if the document is not open", () => {
@@ -461,10 +461,10 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should throw an error if the document path is not writable", () => {
-                    expect(() => {wdoc.get('meta/x').value = 10}).to.throw(errors.WritePermissionError);
+                    expect(() => {wdoc.get('__meta__/x').value = 10}).to.throw(errors.WritePermissionError);
                     expect(() => {wdoc.get('root/x').value = 10}).to.not.throw();
 
-                    expect(() => {rdoc.get('meta/x').value = 10}).to.throw(errors.WritePermissionError);
+                    expect(() => {rdoc.get('__meta__/x').value = 10}).to.throw(errors.WritePermissionError);
                     expect(() => {rdoc.get('root/x').value = 10}).to.throw(errors.WritePermissionError);
 
                     expect(() => {wdoc.get('').value = {}}).to.throw(errors.WritePermissionError);
@@ -615,10 +615,10 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should throw an error if the document path is not writable", () => {
-                    expect(() => wdoc.get('meta').set('x', 10)).to.throw(errors.WritePermissionError);
+                    expect(() => wdoc.get('__meta__').set('x', 10)).to.throw(errors.WritePermissionError);
                     expect(() => wdoc.get('root').set('x', 10)).to.not.throw();
 
-                    expect(() => rdoc.get('meta').set('x', 10)).to.throw(errors.WritePermissionError);
+                    expect(() => rdoc.get('__meta__').set('x', 10)).to.throw(errors.WritePermissionError);
                     expect(() => rdoc.get('root').set('x', 10)).to.throw(errors.WritePermissionError);
                 });
 
@@ -671,10 +671,10 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should throw an error if the document path is not writable", () => {
-                    expect(() => wdoc.get('meta').remove('x')).to.throw(errors.WritePermissionError);
+                    expect(() => wdoc.get('__meta__').remove('x')).to.throw(errors.WritePermissionError);
                     expect(() => wdoc.get('root').remove('x')).to.not.throw();
 
-                    expect(() => rdoc.get('meta').remove('x')).to.throw(errors.WritePermissionError);
+                    expect(() => rdoc.get('__meta__').remove('x')).to.throw(errors.WritePermissionError);
                     expect(() => rdoc.get('root').remove('x')).to.throw(errors.WritePermissionError);
                 });
 
@@ -772,10 +772,10 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should throw an error if the document path is not writable", () => {
-                    expect(() => wdoc.get('meta/list').set(0, 10)).to.throw(errors.WritePermissionError);
+                    expect(() => wdoc.get('__meta__/list').set(0, 10)).to.throw(errors.WritePermissionError);
                     expect(() => wdoc.get('root/list').set(0, 10)).to.not.throw();
 
-                    expect(() => rdoc.get('meta/list').set(0, 10)).to.throw(errors.WritePermissionError);
+                    expect(() => rdoc.get('__meta__/list').set(0, 10)).to.throw(errors.WritePermissionError);
                     expect(() => rdoc.get('root/list').set(0, 10)).to.throw(errors.WritePermissionError);
                 });
 
@@ -852,10 +852,10 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should throw an error if the document path is not writable", () => {
-                    expect(() => wdoc.get('meta/list').insert(0, 10)).to.throw(errors.WritePermissionError);
+                    expect(() => wdoc.get('__meta__/list').insert(0, 10)).to.throw(errors.WritePermissionError);
                     expect(() => wdoc.get('root/list').insert(0, 10)).to.not.throw();
 
-                    expect(() => rdoc.get('meta/list').insert(0, 10)).to.throw(errors.WritePermissionError);
+                    expect(() => rdoc.get('__meta__/list').insert(0, 10)).to.throw(errors.WritePermissionError);
                     expect(() => rdoc.get('root/list').insert(0, 10)).to.throw(errors.WritePermissionError);
                 });
 
@@ -896,10 +896,10 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should throw an error if the document path is not writable", () => {
-                    expect(() => wdoc.get('meta/list').append(10)).to.throw(errors.WritePermissionError);
+                    expect(() => wdoc.get('__meta__/list').append(10)).to.throw(errors.WritePermissionError);
                     expect(() => wdoc.get('root/list').append(10)).to.not.throw();
 
-                    expect(() => rdoc.get('meta/list').append(10)).to.throw(errors.WritePermissionError);
+                    expect(() => rdoc.get('__meta__/list').append(10)).to.throw(errors.WritePermissionError);
                     expect(() => rdoc.get('root/list').append(10)).to.throw(errors.WritePermissionError);
                 });
 
@@ -977,10 +977,10 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should throw an error if the document path is not writable", () => {
-                    expect(() => wdoc.get('meta/list').remove(0)).to.throw(errors.WritePermissionError);
+                    expect(() => wdoc.get('__meta__/list').remove(0)).to.throw(errors.WritePermissionError);
                     expect(() => wdoc.get('root/list').remove(0)).to.not.throw();
 
-                    expect(() => rdoc.get('meta/list').remove(0)).to.throw(errors.WritePermissionError);
+                    expect(() => rdoc.get('__meta__/list').remove(0)).to.throw(errors.WritePermissionError);
                     expect(() => rdoc.get('root/list').remove(0)).to.throw(errors.WritePermissionError);
                 });
 
@@ -1059,10 +1059,10 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should throw an error if the document path is not writable", () => {
-                    expect(() => wdoc.get('meta/text').insert(0, 'xxx')).to.throw(errors.WritePermissionError);
+                    expect(() => wdoc.get('__meta__/text').insert(0, 'xxx')).to.throw(errors.WritePermissionError);
                     expect(() => wdoc.get('root/text').insert(0, 'xxx')).to.not.throw();
 
-                    expect(() => rdoc.get('meta/text').insert(0, 'xxx')).to.throw(errors.WritePermissionError);
+                    expect(() => rdoc.get('__meta__/text').insert(0, 'xxx')).to.throw(errors.WritePermissionError);
                     expect(() => rdoc.get('root/text').insert(0, 'xxx')).to.throw(errors.WritePermissionError);
                 });
 
@@ -1096,10 +1096,10 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should throw an error if the document path is not writable", () => {
-                    expect(() => wdoc.get('meta/text').append('xxx')).to.throw(errors.WritePermissionError);
+                    expect(() => wdoc.get('__meta__/text').append('xxx')).to.throw(errors.WritePermissionError);
                     expect(() => wdoc.get('root/text').append('xxx')).to.not.throw();
 
-                    expect(() => rdoc.get('meta/text').append('xxx')).to.throw(errors.WritePermissionError);
+                    expect(() => rdoc.get('__meta__/text').append('xxx')).to.throw(errors.WritePermissionError);
                     expect(() => rdoc.get('root/text').append('xxx')).to.throw(errors.WritePermissionError);
                 });
 
@@ -1170,10 +1170,10 @@ module.exports = function describeStore (storeName, store) {
                 });
 
                 it("should throw an error if the document path is not writable", () => {
-                    expect(() => wdoc.get('meta/text').remove(0)).to.throw(errors.WritePermissionError);
+                    expect(() => wdoc.get('__meta__/text').remove(0)).to.throw(errors.WritePermissionError);
                     expect(() => wdoc.get('root/text').remove(0)).to.not.throw();
 
-                    expect(() => rdoc.get('meta/text').remove(0)).to.throw(errors.WritePermissionError);
+                    expect(() => rdoc.get('__meta__/text').remove(0)).to.throw(errors.WritePermissionError);
                     expect(() => rdoc.get('root/text').remove(0)).to.throw(errors.WritePermissionError);
                 });
 

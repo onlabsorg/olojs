@@ -16,12 +16,12 @@ const store = new MemoryStore();
 store._data = {
 
     "owned.testDoc": {
-        meta: {},
+        __meta__: {},
         root: {}
     },
 
     "writable.testDoc": {
-        meta: {
+        __meta__: {
             dict: {a:10, b:11, c:12},
             list: [10, 11, 12],
             text: "abc",
@@ -36,7 +36,7 @@ store._data = {
     },
 
     "readonly.testDoc": {
-        meta: {
+        __meta__: {
             dict: {a:10, b:11, c:12},
             list: [10, 11, 12],
             text: "abc",
@@ -51,7 +51,7 @@ store._data = {
     },
 
     "private.testDoc": {
-        meta: {},
+        __meta__: {},
         root: {}
     }
 };

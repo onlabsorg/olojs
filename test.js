@@ -46,12 +46,12 @@ olodb.listen(server).then(() => {
     console.log(`Test olodb server listening on port ${port}!`);
     
     olodb.createDocument("owned", "testDoc", {
-        meta: {},
+        __meta__: {},
         root: {}
     });
     
     olodb.createDocument("writable", "testDoc", {
-        meta: {
+        __meta__: {
             dict: {a:10, b:11, c:12},
             list: [10, 11, 12],
             text: "abc",
@@ -66,7 +66,7 @@ olodb.listen(server).then(() => {
     });
     
     olodb.createDocument("readonly", "testDoc", {
-        meta: {
+        __meta__: {
             dict: {a:10, b:11, c:12},
             list: [10, 11, 12],
             text: "abc",
@@ -81,7 +81,7 @@ olodb.listen(server).then(() => {
     });
     
     olodb.createDocument("private", "testDoc", {
-        meta: {},
+        __meta__: {},
         root: {}
     });
     
