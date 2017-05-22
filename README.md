@@ -56,8 +56,8 @@ The user can have one of the following roles:
 | roles.READER |     ro     |     ro     |
 | roles.NONE   |     -      |     -      |
 
-> All the top-level keys of a document are meta-data, with the exception of
-> the `root` key that contains the document body.
+> By default, the meta data are the data under the root key `__meta__`.
+> This behavior can be changed by overriding the methods `Store.Document.prototype._isMeta`.
 
 
 ### 4. Read/Edit the document content
