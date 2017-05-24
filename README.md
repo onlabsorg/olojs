@@ -5,7 +5,7 @@ olojs is a javascript library that allows concurrent editing of JSON objects.
 * It is designed to be extensible and work with different types of backends
   (although only three backends are currently implemented)
 * It implements access control
-* It works only in the browser, but NodeJS support first and Python support later are on the roadmap
+* It works in NodeJS and the browser, but Python support are on the roadmap
 * It is in alpha stage, therefore it may be buggy and the API may change
 
 
@@ -22,21 +22,21 @@ Requirements:
 
 ### 2. Connect to a backend
 ```javascript
-const Store = require("olojs/OlodbStore");
-const store = new Store("wss://localhost:8010");
+const Store = require("olojs/MemoryStore");
+const store = new Store(credentials);
 
-await store.connect(credentials);
+await store.connect();
 ```
 
-[olodb][] is not the only possible backend: other two types of backend are
+MemoryStore is not the only possible backend: other two types of backend are
 currently implemented and custom backends can be also created by implementing
 the [Store][] interface.
 
-The `store` object represents a connection to an [olodb][] backend and allows you to
+The `store` object represents a connection to an in-memory backend and allows you to
 concurrently modify the remote data as explained below.
 
 The `credentials` object identifies the user for access control: its content is
-defined by the backend implementation.
+defined by the backend implementation (not required by MemoryBackend).
 
 
 ### 3. Fetch a document
@@ -44,21 +44,6 @@ defined by the backend implementation.
 var doc = store.getDocument(docId);
 await doc.open();
 ```
-
-> For an olodb store, the docId must be a string in the from `collection.name`.
-
-The user can have one of the following roles:
-
-| Role         | meta data  |    body    |
-|--------------|:----------:|:----------:|
-| roles.OWNER  |     rw     |     rw     |
-| roles.WRITER |     ro     |     rw     |
-| roles.READER |     ro     |     ro     |
-| roles.NONE   |     -      |     -      |
-
-> By default, the meta data are the data under the root key `__meta__`.
-> This behavior can be changed by overriding the methods `Store.Document.prototype._isMeta`.
-
 
 ### 4. Read/Edit the document content
 ```javascript
@@ -105,9 +90,6 @@ The `.get` method returns a pointer to the document path (a [Proxy][] object).
 Depending on the value of the target value, the pointer can appear as one of the following
 data types: [Item][], [Text][], [Dict][] or [List][].
 
-Every change made to the local copy of the document gets synchronized with
-the remote database and with all the other users in real time.
-
 
 ### 5. Subscribe to changes
 ```javascript
@@ -119,20 +101,12 @@ subscription.cancel();
 Every time the document item `d` changes, the callback gets called with
 a [Change][] object as parameter.  
 
-Both changes made locally by you and remotely by other users are notified.
-
 
 ### 6. Close
 ```javascript
 await doc.close();
 await store.disconnect();
 ```
-
-## Store implementations
-
-* [OlodbStore](./doc/OlodbStore.md) : ShareDB store
-* [MemoryStore](./doc/MemoryStore.md) : In-memory store
-* [LocalStore](./doc/LocalStore.md) : LocalStorage Store
 
 ## API
 

@@ -5,11 +5,7 @@
   "keywords": [
     "olo",
     "concurrent",
-    "realtime",
-    "ShareDB",
-    "ShareJS",
-    "OT",
-    "Operational Transformation"
+    "realtime"
   ],
   "homepage": "https://github.com/onlabsorg/olojs#readme",
   "bugs": {
@@ -40,23 +36,24 @@
     "pack": "./bin/pack"
   },
   "devDependencies": {
-    "asyncawait": "^1.0.6",
-    "express": "^4.15.2",
-    "jspm": "^0.16.52",
-    "olodb": "^0.1.1"
+    "chai": "^3.5.0",
+    "jspm": "^0.16.52"
   },
   "jspm": {
     "directories": {
       "lib": "lib"
     },
     "dependencies": {
+      "co": "npm:co@^4.6.0",
       "lodash": "npm:lodash@^4.17.4",
-      "sharedb": "npm:sharedb@^1.0.0-beta.7",
       "uuid": "npm:uuid@^3.0.1"
     },
-    "devDependencies": {}
+    "devDependencies": {
+      "chai": "npm:chai@^3.5.0"
+    }
   },
   "dependencies": {
-    "olodb": "^0.1.6"
+    "co": "^4.6.0",
+    "lodash": "^4.17.4"
   }
 }
