@@ -20,7 +20,7 @@
     "test",
     "test.js"
   ],
-  "main": "lib/index.js",
+  "main": "index.js",
   "directories": {
     "lib": "lib",
     "doc": "doc",
