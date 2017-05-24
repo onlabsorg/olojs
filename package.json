@@ -1,6 +1,6 @@
 {
   "name": "olojs",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "javascript library that allows concurrent editing of JSON objects",
   "keywords": [
     "olo",

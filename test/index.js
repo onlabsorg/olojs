@@ -1,5 +1,4 @@
+require("./Path");
 require("./MemoryStore");
-require("./LocalStore");
-require("./OlodbStore");
 
 
