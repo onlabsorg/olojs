@@ -1,5 +1,5 @@
 
-const test = require("../lib/test");
+const test = require("./Store");
 
 const MemoryStore = require("../lib/MemoryStore");
 const store = new MemoryStore();
