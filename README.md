@@ -5,7 +5,7 @@ olojs is a javascript library that allows concurrent editing of JSON objects.
 * It is designed to be extensible and work with different types of backends
   (although only three backends are currently implemented)
 * It implements access control
-* It works in NodeJS and the browser, but Python support are on the roadmap
+* It works in NodeJS and the browser and Python support is on the roadmap
 * It is in alpha stage, therefore it may be buggy and the API may change
 
 
@@ -14,25 +14,21 @@ olojs is a javascript library that allows concurrent editing of JSON objects.
 
 ### 1. Install the library
 ```
-jspm install olojs=github:onlabsorg/olojs
+npm install olojs
 ```
 Requirements:
-* [jspm][] for package management
 * A browser supporting ES6 and [Proxy objects][Proxy]
 
 ### 2. Connect to a backend
 ```javascript
-const Store = require("olojs/MemoryStore");
-const store = new Store(credentials);
-
-await store.connect();
+const olojs = require("olojs");
+const store = new olojs.MemoryStore();
+await store.connect(credentials);
 ```
 
-MemoryStore is not the only possible backend: other two types of backend are
-currently implemented and custom backends can be also created by implementing
-the [Store][] interface.
+MemoryStore is the only backend implemented in `olojs`, but other backends can be created by implementing the [Store][] interface.
 
-The `store` object represents a connection to an in-memory backend and allows you to
+The `store` object represents a connection to an backend and allows you to
 concurrently modify the remote data as explained below.
 
 The `credentials` object identifies the user for access control: its content is
@@ -87,8 +83,7 @@ var u = doc.get('d/u');
 ```
 
 The `.get` method returns a pointer to the document path (a [Proxy][] object).
-Depending on the value of the target value, the pointer can appear as one of the following
-data types: [Item][], [Text][], [Dict][] or [List][].
+Depending on the value of the target value, the pointer can appear as one of the following data types: [Item][], [Text][], [Dict][] or [List][].
 
 
 ### 5. Subscribe to changes
@@ -123,7 +118,6 @@ await store.disconnect();
 
 You may also be interested in the following projects:
 
-* [ShareDB][]: A database frontend for concurrent editing systems on which the OlodbBackend is based
 * [olodb][]: A NodeJS server to be coupled with olojs' OlodbStore (it is based on [ShareDB][]).
 * [olowc][]: Collection of web-components acting as web interface to the remote data structures provided by olojs.
 * [olopy][]: A Python implementation of olojs.
@@ -137,7 +131,6 @@ MIT - Copyright (c) 2017 Marcello Del Buono (m.delbuono@onlabs.org)
 
 [olowa]: https://github.com/onlabsorg/olowa
 [olodb]: https://github.com/onlabsorg/olodb
-[jspm]: http://jspm.io/
 [Proxy]: https://developer.mozilla.org/it/docs/Web/JavaScript/Reference/Global_Objects/Proxy
 [Store]: ./doc/Store.md#store-class
 [Document]: ./doc/Store.md#document-class
