@@ -9,13 +9,15 @@ const roles = require("../lib/roles");
 
 
 
-exports.getUserRole = function () {    
-    const collection = this.id.split(".")[0];
-    if (collection === "owned") return roles.OWNER;
-    if (collection === "writable") return roles.WRITER;
-    if (collection === "readonly") return roles.READER;
-    if (collection === "private") return roles.NONE;
-    return roles.NONE;
+exports.getUserRole = function (docId) {   
+    return co(function* () {
+        const collection = docId.split(".")[0];
+        if (collection === "owned") return roles.OWNER;
+        if (collection === "writable") return roles.WRITER;
+        if (collection === "readonly") return roles.READER;
+        if (collection === "private") return roles.NONE;
+        return roles.NONE;
+    }); 
 }
 
 
@@ -100,12 +102,10 @@ exports.describeStore = function (storeName, store) {
                 expect(store.connect).to.be.instanceof(Function);
             });
 
-            it("should resolve a User object when the connection to the backend is made", (done) => {
+            it("should resolve when the connection to the backend is made", (done) => {
                 store.connect("TestUser")
-                .then((user) => {
-                    expect(user).to.be.instanceof(Store.User);
-                    expect(user).to.equal(store.user);
-                    expect(user.id).to.equal("TestUser");
+                .then(() => {
+                    expect(store.userId).to.equal("TestUser");
                     expect(store.connected).to.be.true;
                     done();
                 })
@@ -114,10 +114,8 @@ exports.describeStore = function (storeName, store) {
 
             it("should fail silently if the store is already connected", (done) => {
                 store.connect("TestUser")
-                .then((user) => {
-                    expect(user).to.be.instanceof(Store.User);
-                    expect(user).to.equal(store.user);
-                    expect(user.id).to.equal("TestUser");
+                .then(() => {
+                    expect(store.userId).to.equal("TestUser");
                     expect(store.connected).to.be.true;
                     done();
                 })
@@ -161,7 +159,7 @@ exports.describeStore = function (storeName, store) {
                 const test = co.wrap(function* () {
                     yield store.disconnect();
                     expect(store.connected).to.be.false;
-                    expect(store.user).to.be.null;
+                    expect(store.userId).to.be.undefined;
                 });
                 test().then(done).catch(done);
             });
@@ -517,6 +515,21 @@ exports.describeStore = function (storeName, store) {
                     expect(item.get('xxxx').type).to.equal("none");
                 });
             });
+            
+            describe(`${storeName}.Document.Item.prototype.readonly - getter`, () => {
+                
+                it("should return true if the item cannot be modified", () => {
+                    expect(odoc.get('meta').readonly).to.be.false;
+                    expect(odoc.get('data').readonly).to.be.false;
+                    
+                    expect(wdoc.get('meta').readonly).to.be.true;
+                    expect(wdoc.get('data').readonly).to.be.false;
+                    
+                    expect(rdoc.get('meta').readonly).to.be.true;
+                    expect(rdoc.get('data').readonly).to.be.true;
+                });
+            });
+            
 
             describe(`${storeName}.Document.Item.prototype.subscribe(callback)`, () => {
                 var item, subscription, change;

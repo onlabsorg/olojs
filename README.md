@@ -28,7 +28,7 @@ await store.connect(credentials);
 
 MemoryStore is the only backend implemented in `olojs`, but other backends can be created by implementing the [Store][] interface.
 
-The `store` object represents a connection to an backend and allows you to
+The `store` object represents a connection to a backend and allows you to
 concurrently modify the remote data as explained below.
 
 The `credentials` object identifies the user for access control: its content is
@@ -118,7 +118,7 @@ await store.disconnect();
 
 You may also be interested in the following projects:
 
-* [olodb][]: A NodeJS server to be coupled with olojs' OlodbStore (it is based on [ShareDB][]).
+* [olodb][]: A Store client and server implementation based on [ShareDB][].
 * [olowc][]: Collection of web-components acting as web interface to the remote data structures provided by olojs.
 * [olopy][]: A Python implementation of olojs.
 * [olowa][]: A web application leveraging olojs, [olowc][] and [olodb][] to create a
