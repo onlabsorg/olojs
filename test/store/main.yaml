@@ -1,0 +1,11 @@
+a:
+  - item0
+  - item1
+  - item2
+b: true
+d:
+  x: 11
+  'y': 12
+  z: 13
+sub1: !<!link> 'http://localhost:8010/olostore/sub1.yaml'
+'n': 14
