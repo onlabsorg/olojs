@@ -1,3 +1,0 @@
-
-require("./ObservableDict");
-require("./ObservableList");

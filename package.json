@@ -1,6 +1,6 @@
 {
   "name": "olojs",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "javascript library that allows concurrent editing of JSON objects",
   "keywords": [
     "olo",
@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "jspm": "^0.16.53"
+    "jspm": "^0.16.52"
   },
   "jspm": {
     "directories": {
@@ -44,21 +44,16 @@
       "test": "test"
     },
     "dependencies": {
-      "events": "github:jspm/nodelibs-events@^0.2.2",
-      "js-yaml": "npm:js-yaml@^3.9.1",
+      "co": "npm:co@^4.6.0",
       "lodash": "npm:lodash@^4.17.4",
-      "url": "github:jspm/nodelibs-url@^0.1.0",
-      "uuid": "npm:uuid@^3.1.0"
+      "uuid": "npm:uuid@^3.0.1"
     },
     "devDependencies": {
       "chai": "npm:chai@^3.5.0"
     }
   },
   "dependencies": {
-    "body-parser": "^1.18.0",
-    "express": "^4.15.4",
-    "js-yaml": "^3.9.1",
-    "lodash": "^4.17.4",
-    "node-fetch": "^1.7.2"
+    "co": "^4.6.0",
+    "lodash": "^4.17.4"
   }
 }
