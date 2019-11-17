@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+case "$1" in
+
+    "all")
+        mocha test/expression.js
+        mocha test/globals.js
+        mocha test/dom.js
+        mocha test/hub.js
+        mocha test/memory-store.js
+        ;;
+
+    "expression")
+        mocha test/expression.js
+        ;;
+        
+    "globals")
+        mocha test/globals.js
+        ;;
+            
+    "dom")
+        mocha test/dom.js
+        ;;    
+
+    "hub")
+        mocha test/hub.js
+        ;;
+        
+    "mstore")
+        mocha test/memory-store.js
+        ;;
+
+    *)
+        echo "Syntax:"
+        echo "> npm test -- expression"
+        echo "> npm test -- globals"
+        echo "> npm test -- dom"
+        echo "> npm test -- environment"
+        echo "> npm test -- mstore"
+        echo "> npm test -- hub"
+        echo "> npm test -- all"
+        echo ""
+        ;;
+
+esac

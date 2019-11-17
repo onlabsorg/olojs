@@ -1,59 +1,20 @@
 {
-  "name": "olojs",
-  "version": "0.3.2",
+  "name": "@onlabsorg/olojs",
+  "version": "0.4.0",
   "description": "javascript library that allows concurrent editing of JSON objects",
-  "keywords": [
-    "olo",
-    "concurrent",
-    "realtime"
-  ],
   "homepage": "https://github.com/onlabsorg/olojs#readme",
   "bugs": {
     "url": "https://github.com/onlabsorg/olojs/issues"
   },
   "license": "MIT",
   "author": "Marcello Del Buono <m.delbuono@onlabs.org> (https://plus.google.com/u/0/+MarcelloDelBuono)",
-  "files": [
-    "bin",
-    "doc",
-    "lib",
-    "test",
-    "test.js"
-  ],
   "main": "index.js",
-  "directories": {
-    "doc": "doc",
-    "test": "test"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/onlabsorg/olojs.git"
   },
-  "scripts": {
-    "test": "node test.js",
-    "docgen": "node bin/docgen.js",
-    "pack": "./bin/pack"
-  },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "jspm": "^0.16.52"
+    "chai": "^4.2.0"
   },
-  "jspm": {
-    "directories": {
-      "doc": "doc",
-      "test": "test"
-    },
-    "dependencies": {
-      "co": "npm:co@^4.6.0",
-      "lodash": "npm:lodash@^4.17.4",
-      "uuid": "npm:uuid@^3.0.1"
-    },
-    "devDependencies": {
-      "chai": "npm:chai@^3.5.0"
-    }
-  },
-  "dependencies": {
-    "co": "^4.6.0",
-    "lodash": "^4.17.4"
-  }
+  "dependencies": {}
 }

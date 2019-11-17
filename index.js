@@ -1,10 +1,7 @@
+exports.Expression = require("./lib/expression");
+exports.Document = require("./lib/document");
+exports.Store = require("./lib/store");
+exports.Hub = require("./lib/hub");
 
-exports.Path = require("./lib/Path");
-
+exports.URI = require("./lib/uri");
 exports.errors = require("./lib/errors");
-
-exports.roles = require("./lib/roles");
-
-exports.Store = require("./lib/Store");
-
-exports.MemoryStore = require("./lib/MemoryStore");
