@@ -1,7 +1,9 @@
-exports.Expression = require("./lib/expression");
-exports.Document = require("./lib/document");
-exports.Store = require("./lib/store");
-exports.Hub = require("./lib/hub");
 
-exports.URI = require("./lib/uri");
-exports.errors = require("./lib/errors");
+const Router = require("./lib/router");
+const olojs = new Router();
+
+olojs.expression = require("./lib/expression");
+olojs.DocId = require("./lib/doc-id");
+olojs.document = require("./lib/document");
+
+module.exports = olojs;
