@@ -1,9 +1,8 @@
 
-const Router = require("./lib/router");
-const olojs = new Router();
+const Hub = require("./lib/hub");
+const olojs = new Hub();
 
-olojs.expression = require("./lib/expression");
-olojs.DocId = require("./lib/doc-id");
+olojs.expression = require("./lib/expression"),
 olojs.document = require("./lib/document");
 
 module.exports = olojs;

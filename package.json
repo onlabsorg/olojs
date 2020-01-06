@@ -14,8 +14,12 @@
     "url": "git+https://github.com/onlabsorg/olojs.git"
   },
   "scripts": {
-    "render": "node ./bin/render.js"
+    "render": "node ./bin/render.js",
+    "test": "./bin/test"
   },
+  "bin": {
+    "olojs": "./bin/olojs"
+  },  
   "devDependencies": {
     "chai": "^4.2.0",
     "isomorphic-fetch": "^2.2.1",

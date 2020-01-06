@@ -26,7 +26,7 @@ async function createStore (content) {
             mkdirp.sync(ppath.dir+"/");
         }
         return new Promise((resolve, reject) => {
-            fs.writeFile(fullPath+".olo", content, {encoding:'utf8'}, (err) => {
+            fs.writeFile(fullPath, content, {encoding:'utf8'}, (err) => {
                 if (err) reject(err);
                 else resolve();
             });            

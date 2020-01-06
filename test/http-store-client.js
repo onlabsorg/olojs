@@ -1,4 +1,4 @@
-// Run test:
+``// Run test:
 // $ node test/http-store-server
 // $ mocha test/http-store-client
 
@@ -62,18 +62,6 @@ describe("HTTPStore", () => {
             var doc1 = await store.read("/path/to/doc1");
             expect(doc1).to.equal("doc1 body");
         });
-
-        it("should throw an error when trying to delete a resource", async () => {
-            try {
-                await store.delete("/path/to/doc1");
-                throw new DidNotThrow();
-            } catch (error) {
-                expect(error).to.not.be.instanceof(DidNotThrow);
-                expect(error.message).to.equal("Write access denied to http://localhost:8888/store/path/to/doc1");
-            }
-            var doc1 = await store.read("/path/to/doc1");
-            expect(doc1).to.equal("doc1 body");
-        });
     });
 
     describe("access control: private", () => {
@@ -97,16 +85,6 @@ describe("HTTPStore", () => {
         it("should throw an error when trying to write a resource", async () => {
             try {
                 await store.write("/path/to/doc1", "doc1 new body");
-                throw new DidNotThrow();
-            } catch (error) {
-                expect(error).to.not.be.instanceof(DidNotThrow);
-                expect(error.message).to.equal("Write access denied to http://localhost:8888/store/path/to/doc1");
-            }
-        });
-
-        it("should throw an error when trying to delete a resource", async () => {
-            try {
-                await store.delete("/path/to/doc1");
                 throw new DidNotThrow();
             } catch (error) {
                 expect(error).to.not.be.instanceof(DidNotThrow);

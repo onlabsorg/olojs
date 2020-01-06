@@ -2,41 +2,60 @@
 
 case "$1" in
 
-    "all")
-        mocha test/expression.js
-        mocha test/globals.js
-        mocha test/dom.js
-        mocha test/hub.js
-        mocha test/memory-store.js
-        ;;
-
     "expression")
         mocha test/expression.js
         ;;
         
-    "globals")
-        mocha test/globals.js
+    "document")
+        mocha test/document.js
         ;;
-            
-    "dom")
-        mocha test/dom.js
-        ;;    
+
+    "memory-store")
+        mocha test/memory-store.js
+        ;;
+
+    "fs-store")
+        mocha test/fs-store.js
+        ;;
+
+    "http-store")
+        node ./test/http-store-server.js &
+        server_pid=$!
+        mocha ./test/http-store-client.js
+        kill -KILL $server_pid
+        wait
+        ;;
 
     "hub")
         mocha test/hub.js
         ;;
+
+    "all")
+        npm test -- expression
+        read -n1 -r -p "Press any key to continue..." key
         
-    "mstore")
-        mocha test/memory-store.js
+        npm test -- document
+        read -n1 -r -p "Press any key to continue..." key
+        
+        npm test -- memory-store
+        read -n1 -r -p "Press any key to continue..." key
+        
+        npm test -- fs-store
+        read -n1 -r -p "Press any key to continue..." key
+        
+        npm test -- http-store
+        read -n1 -r -p "Press any key to continue..." key
+        
+        npm test -- hub
         ;;
 
     *)
         echo "Syntax:"
         echo "> npm test -- expression"
-        echo "> npm test -- globals"
-        echo "> npm test -- dom"
-        echo "> npm test -- environment"
-        echo "> npm test -- mstore"
+        echo "> npm test -- document"
+        echo "> npm test -- memory-store"
+        echo "> npm test -- fs-store"
+        echo "> npm test -- http-store"
         echo "> npm test -- hub"
         echo "> npm test -- all"
         echo ""

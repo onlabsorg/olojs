@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-../bin/render.js ./render/index
+../bin/olojs.js render ./render/index

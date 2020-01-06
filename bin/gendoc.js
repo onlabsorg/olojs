@@ -1,4 +1,4 @@
-const docgen = require("docgen");
+const docgen = require("./docgen");
 const path = require("path");
 
 const sourcePath = name => path.join(__dirname, `../lib/`, `${name}.js`);
