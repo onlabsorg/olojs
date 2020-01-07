@@ -177,6 +177,20 @@ describe("expression", () => {
         });
     });
     
+    describe("TRUE constant", () => {
+        it("should return true", async () => {
+            var ctx = createContext();
+            expect(await evaluate("TRUE", ctx)).to.equal(true);
+        });
+    });
+    
+    describe("FALSE constant", () => {
+        it("should return false", async () => {
+            var ctx = createContext();
+            expect(await evaluate("FALSE", ctx)).to.equal(false);
+        });
+    });
+    
     describe("labelling operation: `name: expression`", () => {
         
         it("should return the expression value", async () => {
@@ -737,93 +751,101 @@ describe("expression", () => {
     
     // LOGIC OPERATORS
     
-    describe("X or Y", () => {
+    describe("X | Y", () => {
     
-        it("should return true only if any of `bool X` or `bool Y` is true", async () => {
+        it("should return X if `bool X` is true", async () => {
             var ctx = createContext({T:true, F:false});
     
             // true or true
-            expect(await evaluate("T or T", ctx)).to.be.true;
-            expect(await evaluate("T or 10", ctx)).to.be.true;
-            expect(await evaluate("10 or T", ctx)).to.be.true;
-            expect(await evaluate("10 or 10", ctx)).to.be.true;
+            expect(await evaluate("T | T", ctx)).to.equal(true);
+            expect(await evaluate("T | 10", ctx)).to.equal(true);
+            expect(await evaluate("10 | T", ctx)).to.equal(10);
+            expect(await evaluate("10 | 10", ctx)).to.equal(10);
     
             // true or false
-            expect(await evaluate("T or F", ctx)).to.be.true;
-            expect(await evaluate("T or 0", ctx)).to.be.true;
-            expect(await evaluate("10 or F", ctx)).to.be.true;
-            expect(await evaluate("10 or 0", ctx)).to.be.true;
+            expect(await evaluate("T | F", ctx)).to.equal(true);
+            expect(await evaluate("T | 0", ctx)).to.equal(true);
+            expect(await evaluate("10 | F", ctx)).to.equal(10);
+            expect(await evaluate("10 | 0", ctx)).to.equal(10);    
+        })
+
+        it("should return Y if `bool X` is false", async () => {
+            var ctx = createContext({T:true, F:false});
     
             // false or true
-            expect(await evaluate("F or T", ctx)).to.be.true;
-            expect(await evaluate("F or 10", ctx)).to.be.true;
-            expect(await evaluate("0 or T", ctx)).to.be.true;
-            expect(await evaluate("0 or 10", ctx)).to.be.true;
+            expect(await evaluate("F | T", ctx)).to.equal(true);
+            expect(await evaluate("F | 10", ctx)).to.equal(10);
+            expect(await evaluate("0 | T", ctx)).to.equal(true);
+            expect(await evaluate("0 | 10", ctx)).to.equal(10);
     
             // false or false
-            expect(await evaluate("F or F", ctx)).to.be.false;
-            expect(await evaluate("F or 0", ctx)).to.be.false;
-            expect(await evaluate("0 or F", ctx)).to.be.false;
-            expect(await evaluate("0 or 0", ctx)).to.be.false;
+            expect(await evaluate("F | F", ctx)).to.equal(false);
+            expect(await evaluate("F | 0", ctx)).to.equal(0);
+            expect(await evaluate("0 | F", ctx)).to.equal(false);
+            expect(await evaluate("0 | 0", ctx)).to.equal(0);
         })
     });
     
-    describe("X and Y", () => {
+    describe("X & Y", () => {
     
-        it("should return true only if both of `bool X` and `bool Y` are true", async () => {
+        it("should return Y if `bool X` is true", async () => {
             var ctx = createContext({T:true, F:false});
     
-            // true and true
-            expect(await evaluate("T and T", ctx)).to.be.true;
-            expect(await evaluate("T and 10", ctx)).to.be.true;
-            expect(await evaluate("10 and T", ctx)).to.be.true;
-            expect(await evaluate("10 and 10", ctx)).to.be.true;
+            // true or true
+            expect(await evaluate("T & T", ctx)).to.equal(true);
+            expect(await evaluate("T & 10", ctx)).to.equal(10);
+            expect(await evaluate("10 & T", ctx)).to.equal(true);
+            expect(await evaluate("10 & 10", ctx)).to.equal(10);
     
-            // true and false
-            expect(await evaluate("T and F", ctx)).to.be.false;
-            expect(await evaluate("T and 0", ctx)).to.be.false;
-            expect(await evaluate("10 and F", ctx)).to.be.false;
-            expect(await evaluate("10 and 0", ctx)).to.be.false;
+            // true or false
+            expect(await evaluate("T & F", ctx)).to.equal(false);
+            expect(await evaluate("T & 0", ctx)).to.equal(0);
+            expect(await evaluate("10 & F", ctx)).to.equal(false);
+            expect(await evaluate("10 & 0", ctx)).to.equal(0);    
+        })
+
+        it("should return X if `bool X` is false", async () => {
+            var ctx = createContext({T:true, F:false});
     
-            // false and true
-            expect(await evaluate("F and T", ctx)).to.be.false;
-            expect(await evaluate("F and 10", ctx)).to.be.false;
-            expect(await evaluate("0 and T", ctx)).to.be.false;
-            expect(await evaluate("0 and 10", ctx)).to.be.false;
+            // false or true
+            expect(await evaluate("F & T", ctx)).to.equal(false);
+            expect(await evaluate("F & 10", ctx)).to.equal(false);
+            expect(await evaluate("0 & T", ctx)).to.equal(0);
+            expect(await evaluate("0 & 10", ctx)).to.equal(0);
     
-            // false and false
-            expect(await evaluate("F and F", ctx)).to.be.false;
-            expect(await evaluate("F and 0", ctx)).to.be.false;
-            expect(await evaluate("0 and F", ctx)).to.be.false;
-            expect(await evaluate("0 and 0", ctx)).to.be.false;
+            // false or false
+            expect(await evaluate("F & F", ctx)).to.equal(false);
+            expect(await evaluate("F & 0", ctx)).to.equal(false);
+            expect(await evaluate("0 & F", ctx)).to.equal(0);
+            expect(await evaluate("0 & 0", ctx)).to.equal(0);
         })
     });
     
-    describe("X if Y", () => {
+    describe("X ? Y", () => {
     
-        it("should return X is `bool Y` is true, or else null", async () => {
+        it("should return Y is `bool X` is true", async () => {
             var ctx = createContext({T:true, F:false});
-            expect(await evaluate("[1,2,3] if T", ctx)).to.deep.equal([1,2,3]);
-            expect(await evaluate("[1,2,3] if 10", ctx)).to.deep.equal([1,2,3]);
+            expect(await evaluate("T ? [1,2,3]", ctx)).to.deep.equal([1,2,3]);
+            expect(await evaluate("10 ? [1,2,3]", ctx)).to.deep.equal([1,2,3]);
         });
         
-        it("should return null if `bool Y` is false", async () => {
+        it("should return null if `bool X` is false", async () => {
             var ctx = createContext({T:true, F:false});
-            expect(await evaluate("[1,2,3] if F", ctx)).to.be.null;
-            expect(await evaluate("[1,2,3] if 0", ctx)).to.be.null;
+            expect(await evaluate("F ? [1,2,3]", ctx)).to.be.null;
+            expect(await evaluate("0 ? [1,2,3]", ctx)).to.be.null;
         });
     });    
     
-    describe("X else Y", () => {
+    describe("X ; Y", () => {
     
         it("should return X if it is not `null`", async () => {
             var ctx = createContext({T:true, F:false});
-            expect(await evaluate("[1,2,3] else [3,4,5]", ctx)).to.deep.equal([1,2,3]);
+            expect(await evaluate("[1,2,3] ; [3,4,5]", ctx)).to.deep.equal([1,2,3]);
         });
 
         it("should return Y if X is `null`", async () => {
             var ctx = createContext({T:true, F:false});
-            expect(await evaluate("() else [3,4,5]", ctx)).to.deep.equal([3,4,5]);
+            expect(await evaluate("() ; [3,4,5]", ctx)).to.deep.equal([3,4,5]);
         });
     });    
     
@@ -2443,34 +2465,34 @@ describe("expression", () => {
             expect(Array.from(retval)).to.deep.equal([ctx.f,2]);
         });
         
-        it("should execure `else` operations before function definitions (`->`)", async () => {
+        it("should execure `;` operations before function definitions (`->`)", async () => {
             var ctx = createContext({T:true, F:false});                        
-            expect(await evaluate("f = (x) -> x else 1", ctx)).to.equal(null);
+            expect(await evaluate("f = (x) -> x ; 1", ctx)).to.equal(null);
             expect(await ctx.f(3)).to.equal(3);
             expect(await ctx.f()).to.equal(1);
         });
         
-        it("should execure `if` operations before function `elese` operations", async () => {
+        it("should execure `?` operations before `;` operations", async () => {
             var ctx = createContext({T:true, F:false});                        
-            expect(await evaluate("f = (x,y) -> 1 if x else 2 if y else 3", ctx)).to.equal(null);
+            expect(await evaluate("f = (x,y) -> x ? 1 ; y ? 2 ; 3", ctx)).to.equal(null);
             expect(await ctx.f(true, false)).to.equal(1);
             expect(await ctx.f(true, true)).to.equal(1);
             expect(await ctx.f(false, true)).to.equal(2);
             expect(await ctx.f(false, false)).to.equal(3);            
         });
 
-        it("should execute logic operations (`and` and `or`) before `if` and `else` operations", async () => {
+        it("should execute logic operations (`&` and `|`) before `?` and `;` operations", async () => {
             var ctx = createContext({T:true, F:false});            
-            expect(await evaluate("f = (x,y) -> 1 if x and y else 2 if x or y else 3", ctx)).to.equal(null);
+            expect(await evaluate("f = (x,y) -> x & y ? 1 ; x | y ? 2 ; 3", ctx)).to.equal(null);
             expect(await ctx.f(true, true)).to.equal(1);
             expect(await ctx.f(true, false)).to.equal(2);
             expect(await ctx.f(false, true)).to.equal(2);
             expect(await ctx.f(false, false)).to.equal(3);            
         });
 
-        it("should execute comparison operations (`==`,`!=`,`<`,`<=`,`>=`,`>`) before logic operations (`and` and `or`)", async () => {
+        it("should execute comparison operations (`==`,`!=`,`<`,`<=`,`>=`,`>`) before logic operations (`&` and `|`)", async () => {
             var ctx = createContext({T:true, F:false});            
-            expect(await evaluate("f = x -> 'null' if x==0 else 'small' if 0.01<=x and x<0.1 else 'big' if 1000>x and x>=100 else 'huge' ", ctx)).to.equal(null);
+            expect(await evaluate("f = x -> x==0 ? 'null' ; 0.01<=x & x<0.1 ? 'small' ; 1000>x & x>=100 ? 'big' ; 'huge' ", ctx)).to.equal(null);
             expect(await ctx.f(0)).to.equal('null');
             expect(await ctx.f(0.01)).to.equal('small');
             expect(await ctx.f(0.09)).to.equal('small');
@@ -2481,7 +2503,7 @@ describe("expression", () => {
         
         it("should execute sum (`+`) and subtraction (`-`) operations before comparison operations (`==`,`!=`,`<`,`<=`,`>=`,`>`)", async () => {
             var ctx = createContext({T:true, F:false});            
-            expect(await evaluate("1+1<4 and 8-3==5",ctx)).to.equal(true);
+            expect(await evaluate("1+1<4 & 8-3==5",ctx)).to.equal(true);
         });
 
         it("should execute product (`*`) division (`/`) and modulo (`%`) operations before sum and subtraction operations (`+` and `-`)", async () => {
