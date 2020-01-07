@@ -478,4 +478,13 @@ map: f -> {mf: (x,xs) -> xs ; (f x, mf xs)}.mf
 
 
 ## Comments
-<!--TODO: define comments in the parser-->
+Everything following a `#` symbol, up to the end of the line, is a comment and 
+therefore ignored.
+
+For example, the foloowing expression will just render to `2`.
+
+```
+# this is a coment
+1+1 # this is another comment
+# yet another comment
+```

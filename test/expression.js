@@ -568,6 +568,25 @@ describe("expression", () => {
         });
     });
     
+    describe("comments", () => {
+        
+        it("should ignore the text following the `#` character up to the end of the line or of the expression", async () => {
+            var ctx = createContext();
+            var expression = `
+                # this is a comment
+                12.345 # this is another comment
+                # this is the last comment`
+            expect(await evaluate(expression, ctx)).to.equal(12.345);
+        });
+        
+        it("should not parse `#` characters in a string as comments", async () => {
+            var ctx = createContext();
+            expect(await evaluate("`this # is a string`", ctx)).to.equal("this # is a string");
+            expect(await evaluate("'this # is a string'", ctx)).to.equal("this # is a string");
+            expect(await evaluate(`"this # is a string"`, ctx)).to.equal("this # is a string");
+        });
+    });
+    
     
     // BUILT-IN FUNCTIONS
     
