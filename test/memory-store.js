@@ -1,9 +1,9 @@
 const expect = require("chai").expect;
 const MemoryStore = require("../lib/stores/memory-store");
 
-async function createStore (content) {
+async function createStore (content, globals) {
     const map = new Map();
-    const store = new MemoryStore();
+    const store = new MemoryStore(globals);
     for (let path in content) {
         store._map.set(path, content[path]);
     }

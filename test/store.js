@@ -16,6 +16,10 @@ module.exports = function test (storeName, createStore) {
             "/path/to/container2/doc5"  : "doc5 body",
             "/path/TO/doc6"             : "doc6 body",
             "/a/b/c/doc7"               : "doc7 body"
+        }, {
+            globalName1: "global value 1",
+            globalName2: "global value 2",
+            globalName3: "global value 3",
         });
     });
     
@@ -49,9 +53,9 @@ module.exports = function test (storeName, createStore) {
             expect(doc).to.be.instanceof(Store.Document);
         });
         
-        describe("context = doc.createContext(globals)", () => {
+        describe("context = doc.createContext(presets)", () => {
             
-            it("should create an expression context containing the names defined in `globals`", async () => {
+            it("should create an expression context containing the names defined in `presets`", async () => {
                 var doc = await store.load("/path/to/doc1");
                 var ctx = doc.createContext({a:1, b:2});                
                 expect(await expression.evaluate("a+b", ctx)).to.equal(3);
@@ -69,8 +73,16 @@ module.exports = function test (storeName, createStore) {
                 await store.write("/path/to/doc8", `<%n = "doc8"%>`)
                 await store.write("/path/to/doc9", `<%n = "doc9"%>`)
                 var doc1 = await store.load("/path/to/doc8");
-                var ctx = doc1.createContext();                
+                var ctx = doc1.createContext();
                 expect(await expression.evaluate("(import('./doc9')).n", ctx)).to.equal("doc9");
+            });
+            
+            it("should create an expression context containing the store globals", async () => {
+                var doc = await store.load("/path/to/doc1");
+                var ctx = doc.createContext();      
+                expect(ctx.globalName1).to.equal("global value 1");
+                expect(ctx.globalName2).to.equal("global value 2");
+                expect(ctx.globalName3).to.equal("global value 3");
             });
         });
         

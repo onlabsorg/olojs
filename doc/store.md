@@ -13,7 +13,7 @@ as an object with the following interface:
   * **document.id**: object representation of the document path (id.path is a
     string containing the path, id.resolve(subPath) resolves relative paths,
     String(id) returns id.path)
-  * **document.createContext(globals)**: creates a document context, adding the
+  * **document.createContext(presets)**: creates a document context, adding the
     `import` function and an `id` namespace to it.
   * **async document.render(context)**: renders the document template to a
     Content object
@@ -26,7 +26,7 @@ The memory store is a predefined store that lives in memory.
 
 ```js
 const MemoryStore = require("olojs/lib/stores/memory-store");
-const store = new MemoryStore();
+const store = new MemoryStore(globals);
 ```
 
 
@@ -37,7 +37,7 @@ The fs store is a predefined store that lives in the file-system.
 ```js
 const FSStore = require("olojs/lib/stores/fs-store");
 const rootPath = "~/my-olojs-store";
-const store = new FSStore(rootPath);
+const store = new FSStore(rootPath, globals);
 ```
 
 
@@ -62,7 +62,7 @@ On the client side:
 ```js
 const HTTPStoreClient = require("olojs/lib/stores/http-store-server");
 const auth = ""; // this is the HTTP Authorization header to pass with each request
-const store = new HTTPStoreClient(hostURL, {auth});
+const store = new HTTPStoreClient(hostURL, {auth}, globals);
 ```
 
 
@@ -76,7 +76,7 @@ const Store = require("olojs/lib/store");
 class MyStore extends Store {
     
     constructor (...args) {
-        super();
+        super(globals);
         // initialize your store
     }
     

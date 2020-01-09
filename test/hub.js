@@ -169,7 +169,25 @@ describe("Hub", () => {
                 expect(await expression.evaluate("import('../to_doc2').p", ctx)).to.equal("/path/to_doc2");
                 expect(await expression.evaluate("import('../../../../../doc2').p", ctx)).to.equal("/doc2");
                 expect(await expression.evaluate("import('/doc2').p", ctx)).to.equal("/doc2");
-            });            
+            });  
+            
+            it("should contain the doc store globals", async () => {
+                var hub = new Hub();
+                hub.mount("http://store1", Object.assign(new Store({globalName:"store1 global value"}), {
+                    read : docPath => `Store1 document with path ${docPath}`,
+                    write: (docPath, source) => `Store1 document with path ${docPath}, changed to "${source}"`
+                }));
+                hub.mount("http://store2", Object.assign(new Store({globalName:"store2 global value"}), {
+                    read : docPath => `Store2 document with path ${docPath}`,
+                    write: (docPath, source) => `Store2 document with path ${docPath}, changed to "${source}"`
+                }));
+                
+                var doc1 = await hub.load("http://store1/path/to/doc");                
+                expect(doc1.createContext().globalName).to.equal("store1 global value");
+
+                var doc2 = await hub.load("http://store2/path/to/doc");                
+                expect(doc2.createContext().globalName).to.equal("store2 global value");
+            });          
         });
     });
 });

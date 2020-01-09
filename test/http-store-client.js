@@ -15,7 +15,7 @@ const ROOT_PATH = `${__dirname}/fs-store`;
 const HTTPStoreClient = require("../lib/stores/http-store-client");
 const STORE_URL = `http://localhost:8888/store/`;
 
-async function createStore (content) {
+async function createStore (content, globals) {
     const backend = new FSStore(ROOT_PATH);
     
     // clear the store
@@ -33,7 +33,7 @@ async function createStore (content) {
         await backend.write(path, content[path]);
     }
     
-    return new HTTPStoreClient(STORE_URL, {auth:"Bearer Writer"});
+    return new HTTPStoreClient(STORE_URL, {auth:"Bearer Writer"}, globals);
 }
 
 class DidNotThrow extends Error {}

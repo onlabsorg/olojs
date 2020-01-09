@@ -7,7 +7,7 @@ var ROOT_PATH = `${__dirname}/fs-store`;
 var FSStore = require("../lib/stores/fs-store");
 
 
-async function createStore (content) {
+async function createStore (content, globals) {
     
     // clear the store
     await new Promise((resolve, reject) => {
@@ -39,7 +39,7 @@ async function createStore (content) {
         await createDoc(fullPath, content[path]);
     }
     
-    return new FSStore(ROOT_PATH);
+    return new FSStore(ROOT_PATH, globals);
 }
 
 describe("FSStore", () => {
