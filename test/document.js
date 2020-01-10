@@ -53,14 +53,25 @@ describe("document", () => {
             var context = expression.createContext();
             var dcon = await document.render(source, context);
             expect(dcon[Symbol.iterator]).to.be.a("function");
-            expect(Array.from(dcon).sort()).to.deep.equal(['a','b']);
+            expect(Array.from(dcon).sort()).to.deep.equal(['__str__', 'a','b']);
         });
         
         it("should contain a `.size` property with the number of names in the namespaca", async () => {
             var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
             var context = expression.createContext();
             var dcon = await document.render(source, context);
-            expect(dcon.size).to.equal(2);
+            expect(dcon.size).to.equal(3);
+        });
+        
+        it("should contain a `.toNamespace` method that returns a swan namespace", async () => {
+            var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
+            var context = expression.createContext();
+            var dcon = await document.render(source, context);
+            expect(dcon.toNamespace()).to.deep.equal({
+                a: 10,
+                b: 20,
+                __str__: "a + b = 30"
+            });
         });
     });        
 });
