@@ -1,77 +1,71 @@
 
 var expect = require("chai").expect;
 var expression = require("../lib/expression");
-var stripIndent = require("strip-indent");
 
-var document = require("../lib/document");
+var Document = require("../lib/document");
 
 
-describe("document", () => {
+describe("Document", () => {
     
-    describe("document.parse(source) - function", () => {
-        
-        it("should return a functions that takes a context as argument and return a Content object", async () => {
+    describe("Document.parse(source) - function", () => {
+        it("should return a functions that takes a context as argument and return the document local namespace", async () => {
             var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
-            var render = document.parse(source);
+            var render = Document.parse(source);
             expect(render).to.be.a("function");
 
             var context = expression.createContext();
-            var dcon = await render(context);
-            expect(dcon).to.be.instanceof(document.Content)
+            var docNS = await render(context);
+            expect(docNS).to.deep.equal({a:10, b:20, __str__:"a + b = 30"})
         });
     });
     
-    describe("document.render(source, context) - async function", () => {
+    describe("doc = new Document(source, locals, globals)", () => {
         
-        it("should return a Content object", async () => {
-            var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
-            var context = expression.createContext();
-            var dcon = await document.render(source, context);
-            expect(dcon).to.be.instanceof(document.Content)
-        });
-    });    
-    
-    describe("document.Content instance", () => {
-        
-        it("should stringify to the rendered template text", async () => {
-            var source = `<%a=10%><%b=a+10%>a + b = <%a+b%><%('!','!')%>`;
-            var context = expression.createContext();
-            var dcon = await document.render(source, context);
-            expect(String(dcon)).to.equal("a + b = 30!!");
+        it("should return a document instance `doc.source`, `doc.locals` and `doc.globals` properties", () => {
+            var s="sss", l={}, g={};
+            var doc = new Document(s, l, g);
+            expect(doc.source).to.equal(s);
+            expect(doc.locals).to.equal(l);
+            expect(doc.globals).to.equal(g);
         });
         
-        it("should give access to the namespace values vid the .get(name) method", async () => {
-            var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
-            var context = expression.createContext();
-            var dcon = await document.render(source, context);
-            expect(dcon.get('a')).to.equal(10);
-            expect(dcon.get('b')).to.equal(20);
-        });
-
-        it("should yield the namespace names when addressed as iterator", async () => {
-            var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
-            var context = expression.createContext();
-            var dcon = await document.render(source, context);
-            expect(dcon[Symbol.iterator]).to.be.a("function");
-            expect(Array.from(dcon).sort()).to.deep.equal(['__str__', 'a','b']);
-        });
-        
-        it("should contain a `.size` property with the number of names in the namespaca", async () => {
-            var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
-            var context = expression.createContext();
-            var dcon = await document.render(source, context);
-            expect(dcon.size).to.equal(3);
-        });
-        
-        it("should contain a `.toNamespace` method that returns a swan namespace", async () => {
-            var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
-            var context = expression.createContext();
-            var dcon = await document.render(source, context);
-            expect(dcon.toNamespace()).to.deep.equal({
-                a: 10,
-                b: 20,
-                __str__: "a + b = 30"
+        describe("docNS = await doc.evaluate(params)", () => {
+            
+            it("should return the document local namespace, evaluated in the expression context created with doc.globals, doc.locals and params", async () => {
+                var g = {n1:10};
+                var l = {n2:20};
+                var p = {n3:30};
+                var s = "<% n4=2*n3 %>n1 + n2 = <% n1+n2 %>";
+                var doc = new Document(s, l, g);
+                var docNS = await doc.evaluate(p);
+                expect(docNS).to.deep.equal({
+                    n2: 20,
+                    n3: 30,
+                    n4: 60,
+                    __str__: "n1 + n2 = 30"
+                });
             });
         });
-    });        
+        
+        describe("docNS = await doc.render(params)", () => {
+            
+            it("should return the document rendered text: replacing the inline expressions with their result", async () => {
+                var g = {n1:10};
+                var l = {n2:20};
+                var p = {n3:30};
+                var s = "<% n4=2*n3 %>n1 + n2 = <% n1+n2 %>";
+                var doc = new Document(s, l, g);
+                expect(await doc.render(p)).to.equal("n1 + n2 = 30");
+            });
+
+            it("should return return the result of `context.__render__(text)` if it exists", async () => {
+                var g = {n1:10, __render__: text => "decorated: " + text};
+                var l = {n2:20};
+                var p = {n3:30};
+                var s = "<% n4=2*n3 %>n1 + n2 = <% n1+n2 %>";
+                var doc = new Document(s, l, g);
+                expect(await doc.render(p)).to.equal("decorated: n1 + n2 = 30");
+            });
+        });        
+    });
 });

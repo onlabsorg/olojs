@@ -1,8 +1,3 @@
-
-const Hub = require("./lib/hub");
-const olojs = new Hub();
-
-olojs.expression = require("./lib/expression"),
-olojs.document = require("./lib/document");
-
-module.exports = olojs;
+exports.expression = require("./lib/expression");
+exports.document = require("./lib/document");
+exports.Environment = require("./lib/environment");

@@ -1,0 +1,9 @@
+
+
+✔ Environment: sort routes once for all in the constructor @done(2020-01-15)
+☐ expression: make the lists 0-based
+☐ http-server: caricare client files (html, css e js) una volta per tutte all'inizio dello script
+✔ create `require` global function @done(2020-01-15)
+☐ add rendering parameters in CLI and browser environment
+☐ allow importing with implicit .olo extension
+☐ modify relative path resolution to make . match the last directory and not the file name

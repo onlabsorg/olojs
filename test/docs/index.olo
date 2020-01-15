@@ -1,0 +1,10 @@
+<% __render__ = require("markdown") %>
+
+<h1>Test olodocument</h1>
+<p>Hello there, this is an olo-document. 2 * 3 = <% 2*3 %></p>
+
+## Import test
+Imported: `<% import("/docs/doc1.olo").path %>`
+
+## Require test
+Required: `<% require("test").name %>`

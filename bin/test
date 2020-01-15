@@ -10,24 +10,8 @@ case "$1" in
         mocha test/document.js
         ;;
 
-    "memory-store")
-        mocha test/memory-store.js
-        ;;
-
-    "fs-store")
-        mocha test/fs-store.js
-        ;;
-
-    "http-store")
-        node ./test/http-store-server.js &
-        server_pid=$!
-        mocha ./test/http-store-client.js
-        kill -KILL $server_pid
-        wait
-        ;;
-
-    "hub")
-        mocha test/hub.js
+    "environment")
+        mocha test/environment.js
         ;;
 
     "all")
@@ -37,26 +21,14 @@ case "$1" in
         npm test -- document
         read -n1 -r -p "Press any key to continue..." key
         
-        npm test -- memory-store
-        read -n1 -r -p "Press any key to continue..." key
-        
-        npm test -- fs-store
-        read -n1 -r -p "Press any key to continue..." key
-        
-        npm test -- http-store
-        read -n1 -r -p "Press any key to continue..." key
-        
-        npm test -- hub
+        npm test -- environment
         ;;
 
     *)
         echo "Syntax:"
         echo "> npm test -- expression"
         echo "> npm test -- document"
-        echo "> npm test -- memory-store"
-        echo "> npm test -- fs-store"
-        echo "> npm test -- http-store"
-        echo "> npm test -- hub"
+        echo "> npm test -- environment"
         echo "> npm test -- all"
         echo ""
         ;;
