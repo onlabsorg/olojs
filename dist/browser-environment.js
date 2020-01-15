@@ -86,6 +86,17 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./lib sync recursive ^\\.\\/stdlib.*$":
+/*!*********************************!*\
+  !*** ./lib sync ^\.\/stdlib.*$ ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("var map = {\n\t\"./stdlib/html\": \"./lib/stdlib/html.js\",\n\t\"./stdlib/html.js\": \"./lib/stdlib/html.js\",\n\t\"./stdlib/markdown\": \"./lib/stdlib/markdown.js\",\n\t\"./stdlib/markdown.js\": \"./lib/stdlib/markdown.js\",\n\t\"./stdlib/test\": \"./lib/stdlib/test.js\",\n\t\"./stdlib/test.js\": \"./lib/stdlib/test.js\"\n};\n\n\nfunction webpackContext(req) {\n\tvar id = webpackContextResolve(req);\n\treturn __webpack_require__(id);\n}\nfunction webpackContextResolve(req) {\n\tif(!__webpack_require__.o(map, req)) {\n\t\tvar e = new Error(\"Cannot find module '\" + req + \"'\");\n\t\te.code = 'MODULE_NOT_FOUND';\n\t\tthrow e;\n\t}\n\treturn map[req];\n}\nwebpackContext.keys = function webpackContextKeys() {\n\treturn Object.keys(map);\n};\nwebpackContext.resolve = webpackContextResolve;\nmodule.exports = webpackContext;\nwebpackContext.id = \"./lib sync recursive ^\\\\.\\\\/stdlib.*$\";\n\n//# sourceURL=webpack:///./lib_sync_^\\.\\/stdlib.*$?");
+
+/***/ }),
+
 /***/ "./lib/document.js":
 /*!*************************!*\
   !*** ./lib/document.js ***!
@@ -93,7 +104,7 @@
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("\nconst expression = __webpack_require__(/*! ./expression */ \"./lib/expression.js\");\n\nclass Document {\n    \n    constructor (source, locals={}, globals={}) {\n        this.source = source;\n        this.locals = Object(locals);\n        this.globals = Object(globals);\n    }\n    \n    get source () {\n        return this._source;\n    }\n    \n    set source (value) {\n        const source = String(value);\n        this._eval = this.constructor.parse(source);\n        this._source = source;\n    }\n    \n    async evaluate (params={}) {\n        const context = expression.createContext(this.globals);\n        Object.assign(context, this.locals, params);\n        return await this._eval(context);\n    }\n    \n    async render (params={}) {\n        const docNS = await this.evaluate(params);\n        return await expression.stringify(docNS);\n    }\n    \n    static parse (source) {\n        source = String(source);\n        const parsedExpressions = [];\n        var parsedSource = source;\n        parsedSource = parsedSource.replace(/<%([\\s\\S]+?)%>/g, (match, expressionSource) => {  \n            let i = parsedExpressions.length;\n            parsedExpressions.push( expression.parse(expressionSource) );\n            return `<%${i}%>`;\n        }); \n        \n        return async (context) => {\n            const doc = {};\n            \n            var text = parsedSource;\n            for (let i=0; i<parsedExpressions.length; i++) {\n                let evaluateExpression = parsedExpressions[i];\n                let value = await evaluateExpression(context);                \n                text = text.replace(`<%${i}%>`, expression.stringify(value));\n            }\n            \n            const namespace = Object.assign({}, context);\n            namespace.__str__ = await __render__(text, context);\n\n            return namespace;                                    \n        };               \n    }\n}\n\nasync function __render__ (text, context) {\n    \n    if (typeof context.__render__ === \"function\") {\n        let renderedText = await context.__render__(text);\n        return await expression.stringify(renderedText);\n    }\n    \n    if (typeof context.__render__ === \"object\" && context.__render__ !== null && typeof context.__render__.__apply__ === \"function\") {\n        let renderedText = await context.__render__.__apply__(text);\n        return await expression.stringify(renderedText);\n    }\n        \n    return text;\n}\n\nmodule.exports = Document;\n\n\n//# sourceURL=webpack:///./lib/document.js?");
+eval("\nconst expression = __webpack_require__(/*! ./expression */ \"./lib/expression.js\");\n\nclass Document {\n    \n    constructor (source, locals={}, globals={}) {\n        this.source = source;\n        this.locals = Object(locals);\n        this.globals = Object(globals);\n    }\n    \n    get source () {\n        return this._source;\n    }\n    \n    set source (value) {\n        const source = String(value);\n        this._eval = this.constructor.parse(source);\n        this._source = source;\n    }\n    \n    async evaluate (params={}) {\n        const context = expression.createContext(this.globals);\n        Object.assign(context, this.locals, params);\n        return await this._eval(context);\n    }\n    \n    async render (presets={}) {\n        const docNS = await this.evaluate(presets);\n        return await expression.stringify(docNS);\n    }\n    \n    static parse (source) {\n        source = String(source);\n        const parsedExpressions = [];\n        var parsedSource = source;\n        parsedSource = parsedSource.replace(/<%([\\s\\S]+?)%>/g, (match, expressionSource) => {  \n            let i = parsedExpressions.length;\n            parsedExpressions.push( expression.parse(expressionSource) );\n            return `<%${i}%>`;\n        }); \n        \n        return async (context) => {\n            const doc = {};\n            \n            var text = parsedSource;\n            for (let i=0; i<parsedExpressions.length; i++) {\n                let evaluateExpression = parsedExpressions[i];\n                let value = await evaluateExpression(context);                \n                text = text.replace(`<%${i}%>`, expression.stringify(value));\n            }\n            \n            const namespace = Object.assign({}, context);\n            namespace.__str__ = await __render__(text, context);\n\n            return namespace;                                    \n        };               \n    }\n}\n\nasync function __render__ (text, context) {\n    \n    if (typeof context.__render__ === \"function\") {\n        let renderedText = await context.__render__(text);\n        return await expression.stringify(renderedText);\n    }\n    \n    if (typeof context.__render__ === \"object\" && context.__render__ !== null && typeof context.__render__.__apply__ === \"function\") {\n        let renderedText = await context.__render__.__apply__(text);\n        return await expression.stringify(renderedText);\n    }\n        \n    return text;\n}\n\nmodule.exports = Document;\n\n\n//# sourceURL=webpack:///./lib/document.js?");
 
 /***/ }),
 
@@ -104,7 +115,7 @@ eval("\nconst expression = __webpack_require__(/*! ./expression */ \"./lib/expre
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("const Path = __webpack_require__(/*! path */ \"./node_modules/path-browserify/index.js\");\nconst expression = __webpack_require__(/*! ./expression */ \"./lib/expression.js\");\nconst Document = __webpack_require__(/*! ./document */ \"./lib/document.js\");\nconst globals = __webpack_require__(/*! ./globals */ \"./lib/globals.js\");\n\n\nclass Environment {\n    \n    constructor (config) {\n        this.globals = Object.assign({$env:this}, globals, Object(config.globals));\n        \n        this.loaders = new Map();\n        const paths = Object.keys(config.loaders).sort().reverse();\n        for (let path of paths) {\n            let loader = config.loaders[path]\n            if (typeof loader === \"function\") {\n                if (path.slice(-1) !== \"/\") path += \"/\";\n                this.loaders.set(path, loader);\n            }            \n        }\n    }\n    \n    _matchLoader (docPath) {\n        for (let [path, loader] of this.loaders.entries()) {\n            if (docPath.indexOf(path) === 0) {\n                let subPath = this.constructor.resolvePath(\"/\", docPath.slice(path.length));\n                return [subPath, loader];\n            }\n        }        \n        return [\"\", null];\n    }\n    \n    async fetch (...paths) {\n        const docPath = this.constructor.resolvePath(...paths);\n        const [subPath, load] = this._matchLoader(Path.resolve(\"/\",docPath));\n        if (load === null) throw new Error(`Loader not defined for path ${docPath}`);\n        return await load(subPath);\n    }\n    \n    async load (...paths) {\n        const docPath = this.constructor.resolvePath(...paths);\n        const source = await this.fetch(docPath);\n        const locals = {\n            path: docPath,\n        }\n        return new this.constructor.Document(source, locals, this.globals);\n    }\n    \n    async require (path) {\n        return __webpack_require__(\"./lib/stdlib sync recursive ^\\\\.\\\\/.*$\")(\"./\" + path);\n    }\n\n    static resolvePath (...paths) {\n        return Path.resolve(\"/\", ...paths);\n    }\n    \n    static get Document () {\n        return Document;\n    }\n}\n\n\nmodule.exports = Environment;\n\n\n//# sourceURL=webpack:///./lib/environment.js?");
+eval("const Path = __webpack_require__(/*! path */ \"./node_modules/path-browserify/index.js\");\nconst expression = __webpack_require__(/*! ./expression */ \"./lib/expression.js\");\nconst Document = __webpack_require__(/*! ./document */ \"./lib/document.js\");\n\n\nclass Environment {\n    \n    constructor (config) {\n        this.globals = Object.assign({$env:this}, Object(config.globals), {\n            import: async function (path, args={}) {\n                if (path.slice(0,5) === \"/bin/\" && path.length > 4) {\n                    return await this.$env.importBin(path.slice(4));\n                }    \n                const docPath = resolveRelativePath(this.path, path);\n                const doc = await this.$env.load(docPath);\n                return await doc.evaluate({args: args});\n            }\n        });\n        \n        this.loaders = new Map();\n        const paths = Object.keys(config.loaders).sort().reverse();\n        for (let path of paths) {\n            let loader = config.loaders[path]\n            if (typeof loader === \"function\") {\n                if (path.slice(-1) !== \"/\") path += \"/\";\n                this.loaders.set(path, loader);\n            }            \n        }\n    }\n    \n    _matchLoader (docPath) {\n        for (let [path, loader] of this.loaders.entries()) {\n            if (docPath.indexOf(path) === 0) {\n                let subPath = Path.resolve(\"/\", docPath.slice(path.length));\n                return [subPath, loader];\n            }\n        }        \n        return [\"\", null];\n    }\n    \n    async fetch (path) {\n        const docPath = Path.resolve(\"/\", path);\n        const [subPath, load] = this._matchLoader(Path.resolve(\"/\",docPath));\n        if (load === null) throw new Error(`Loader not defined for path ${docPath}`);\n        return await load(subPath);\n    }\n    \n    async load (path) {\n        const docPath = Path.resolve(\"/\", path);\n        const source = await this.fetch(docPath);\n        const locals = {\n            path: docPath,\n        }\n        return new this.constructor.Document(source, locals, this.globals);\n    }\n    \n    async importBin (path) {\n        return __webpack_require__(\"./lib sync recursive ^\\\\.\\\\/stdlib.*$\")(\"./stdlib\" + Path.resolve(\"/\", path));        \n    }\n    \n    async require (path) {\n        return await this.importBin(path);\n    }\n\n    static get Document () {\n        return Document;\n    }\n}\n\n\nfunction resolveRelativePath (basePath, subPath) {\n    if (subPath[0] === \"/\") return subPath;\n    const lastSlashPos = basePath.lastIndexOf(\"/\");\n    if (lastSlashPos === -1) return Path.resolve(\"/\", subPath);\n    return Path.resolve(\"/\", basePath.slice(0,lastSlashPos), subPath);\n}\n\n\nmodule.exports = Environment;\n\n\n//# sourceURL=webpack:///./lib/environment.js?");
 
 /***/ }),
 
@@ -141,17 +152,6 @@ eval("const Lexer = __webpack_require__(/*! ./lexer */ \"./lib/expression/lexer.
 
 /***/ }),
 
-/***/ "./lib/globals.js":
-/*!************************!*\
-  !*** ./lib/globals.js ***!
-  \************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-eval("\nexports[\"import\"] = async function (path, args) {\n    const doc = await this.$env.load(this.path, path);\n    return await doc.evaluate({args: args});\n}\n\nexports[\"require\"] = async function (path) {\n    return await this.$env.require(path);\n}\n\n\n//# sourceURL=webpack:///./lib/globals.js?");
-
-/***/ }),
-
 /***/ "./lib/loaders/http-loader.js":
 /*!************************************!*\
   !*** ./lib/loaders/http-loader.js ***!
@@ -163,14 +163,14 @@ eval("\n\nfunction Loader (host) {\n    while (host.slice(-1) === \"/\") host = 
 
 /***/ }),
 
-/***/ "./lib/stdlib sync recursive ^\\.\\/.*$":
-/*!**********************************!*\
-  !*** ./lib/stdlib sync ^\.\/.*$ ***!
-  \**********************************/
+/***/ "./lib/stdlib/html.js":
+/*!****************************!*\
+  !*** ./lib/stdlib/html.js ***!
+  \****************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("var map = {\n\t\"./markdown\": \"./lib/stdlib/markdown.js\",\n\t\"./markdown.js\": \"./lib/stdlib/markdown.js\",\n\t\"./test\": \"./lib/stdlib/test.js\",\n\t\"./test.js\": \"./lib/stdlib/test.js\"\n};\n\n\nfunction webpackContext(req) {\n\tvar id = webpackContextResolve(req);\n\treturn __webpack_require__(id);\n}\nfunction webpackContextResolve(req) {\n\tif(!__webpack_require__.o(map, req)) {\n\t\tvar e = new Error(\"Cannot find module '\" + req + \"'\");\n\t\te.code = 'MODULE_NOT_FOUND';\n\t\tthrow e;\n\t}\n\treturn map[req];\n}\nwebpackContext.keys = function webpackContextKeys() {\n\treturn Object.keys(map);\n};\nwebpackContext.resolve = webpackContextResolve;\nmodule.exports = webpackContext;\nwebpackContext.id = \"./lib/stdlib sync recursive ^\\\\.\\\\/.*$\";\n\n//# sourceURL=webpack:///./lib/stdlib_sync_^\\.\\/.*$?");
+eval("\nconst expression = __webpack_require__(/*! ../expression */ \"./lib/expression.js\");\n\nasync function createElement (tagName, attributes={}, ...childElements) {\n    var html = `<${tagName}`;\n    for (let attrName in attributes) {\n        let attrValue = await expression.stringify(attributes[attrName]);\n        html += ` ${attrName}=\"${attrValue}\"`\n    }\n    html += \">\";\n    for (let childElement of childElements) {\n        if (Array.isArray(childElement)) {\n            html += await createElement(childElement[0], childElement[1], ...childElements.slice(2));\n        } else {\n            html += await expression.stringify(childElement);\n        }\n    }\n    html += `</${tagName}>`;\n    return html;\n}\n\nexports.__apply__ = createElement;\n\n\n//# sourceURL=webpack:///./lib/stdlib/html.js?");
 
 /***/ }),
 
@@ -193,6 +193,17 @@ eval("const marked = __webpack_require__(/*! marked */ \"./node_modules/marked/s
 /***/ (function(module, exports) {
 
 eval("\nexports.name = \"stdlib test module\";\n\n\n//# sourceURL=webpack:///./lib/stdlib/test.js?");
+
+/***/ }),
+
+/***/ "./lib/tools/parameters-parser.js":
+/*!****************************************!*\
+  !*** ./lib/tools/parameters-parser.js ***!
+  \****************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("\n\n\n\nmodule.exports = function (...keyValuePairs) {\n    const args = {};\n    for (let keyValuePair of keyValuePairs) {\n        let [name, value] = keyValuePair.split(\"=\");\n        let number = Number(value);\n        if (number === NaN) {\n            args[name.trim()] = value.trim();\n        } else {\n            args[name.trim()] = number;\n        }\n    }\n    return args;\n}\n\n\n//# sourceURL=webpack:///./lib/tools/parameters-parser.js?");
 
 /***/ }),
 
@@ -346,7 +357,7 @@ eval("// shim for using process in browser\nvar process = module.exports = {};\n
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("const Environment = __webpack_require__(/*! ../lib/environment */ \"./lib/environment.js\");\nconst HTTPLoader = __webpack_require__(/*! ../lib/loaders/http-loader */ \"./lib/loaders/http-loader.js\");\nconst DOMPurify = __webpack_require__(/*! dompurify */ \"./node_modules/dompurify/dist/purify.js\");    \nconst stdlib = __webpack_require__(/*! ./stdlib */ \"./src/stdlib.js\");\n\n\n\nclass BrowserEnvironment extends Environment {\n    \n    constructor (origin) {\n        super({\n            loaders: {\n                \"/\": HTTPLoader(origin)\n            }\n        })\n    }\n    \n    async require (path) {\n        return await stdlib[path]();\n    }\n    \n    static get Document () {\n        return BrowserDocument;\n    }\n}\n\nclass BrowserDocument extends Environment.Document {\n    \n    async render (params) {\n        const rawHTML = await super.render(params);\n        return DOMPurify.sanitize(rawHTML);\n    }\n}\n\n\n\nconst olonv = module.exports = window.olonv = new BrowserEnvironment(location.origin);\n\n\n//# sourceURL=webpack:///./src/browser-environment.js?");
+eval("const Environment = __webpack_require__(/*! ../lib/environment */ \"./lib/environment.js\");\nconst HTTPLoader = __webpack_require__(/*! ../lib/loaders/http-loader */ \"./lib/loaders/http-loader.js\");\nconst DOMPurify = __webpack_require__(/*! dompurify */ \"./node_modules/dompurify/dist/purify.js\");    \nconst parseParams = __webpack_require__(/*! ../lib/tools/parameters-parser */ \"./lib/tools/parameters-parser.js\");\nconst stdlib = __webpack_require__(/*! ./stdlib */ \"./src/stdlib.js\");\n\n\n\nclass BrowserEnvironment extends Environment {\n    \n    constructor (origin) {\n        super({\n            loaders: {\n                \"/\": HTTPLoader(origin)\n            }\n        })\n    }\n    \n    async importBin (path) {\n        \n        console.log(stdlib);\n        console.log(path);\n        console.log(stdlib[path]);\n        return await stdlib[path]();\n    }\n    \n    static get Document () {\n        return BrowserDocument;\n    }\n}\n\nclass BrowserDocument extends Environment.Document {\n    \n    async render (queryString) {\n        const argv = parseParams(...queryString.slice(1).split(\"&\"));\n        const rawHTML = await super.render({argv});\n        return DOMPurify.sanitize(rawHTML);\n    }\n}\n\n\n\nconst olonv = module.exports = window.olonv = new BrowserEnvironment(location.origin);\n\n\n//# sourceURL=webpack:///./src/browser-environment.js?");
 
 /***/ }),
 
@@ -357,7 +368,7 @@ eval("const Environment = __webpack_require__(/*! ../lib/environment */ \"./lib/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("\nexports[\"markdown\"] = () => Promise.resolve(/*! import() */).then(__webpack_require__.t.bind(null, /*! ../lib/stdlib/markdown */ \"./lib/stdlib/markdown.js\", 7));\nexports[\"test\"] =     () => Promise.resolve(/*! import() */).then(__webpack_require__.t.bind(null, /*! ../lib/stdlib/test */ \"./lib/stdlib/test.js\", 7));\n\n\n//# sourceURL=webpack:///./src/stdlib.js?");
+eval("\nexports[\"/markdown\"] = () => Promise.resolve(/*! import() */).then(__webpack_require__.t.bind(null, /*! ../lib/stdlib/markdown */ \"./lib/stdlib/markdown.js\", 7));\nexports[\"/html\"] =     () => Promise.resolve(/*! import() */).then(__webpack_require__.t.bind(null, /*! ../lib/stdlib/html */ \"./lib/stdlib/html.js\", 7));\n\n\n//# sourceURL=webpack:///./src/stdlib.js?");
 
 /***/ })
 

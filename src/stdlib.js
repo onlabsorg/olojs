@@ -1,3 +1,3 @@
 
-exports["markdown"] = () => import(/* webpackChunkName: "markdown" */ "../lib/stdlib/markdown");
-exports["test"] =     () => import(/* webpackChunkName: "test" */     "../lib/stdlib/test");
+exports["/markdown"] = () => import(/* webpackChunkName: "markdown" */ "../lib/stdlib/markdown");
+exports["/html"] =     () => import(/* webpackChunkName: "html" */     "../lib/stdlib/html");

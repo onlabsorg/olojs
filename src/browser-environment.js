@@ -1,6 +1,7 @@
 const Environment = require("../lib/environment");
 const HTTPLoader = require("../lib/loaders/http-loader");
 const DOMPurify = require("dompurify");    
+const parseParams = require("../lib/tools/parameters-parser");
 const stdlib = require("./stdlib");
 
 
@@ -15,7 +16,11 @@ class BrowserEnvironment extends Environment {
         })
     }
     
-    async require (path) {
+    async importBin (path) {
+        
+        console.log(stdlib);
+        console.log(path);
+        console.log(stdlib[path]);
         return await stdlib[path]();
     }
     
@@ -26,8 +31,9 @@ class BrowserEnvironment extends Environment {
 
 class BrowserDocument extends Environment.Document {
     
-    async render (params) {
-        const rawHTML = await super.render(params);
+    async render (queryString) {
+        const argv = parseParams(...queryString.slice(1).split("&"));
+        const rawHTML = await super.render({argv});
         return DOMPurify.sanitize(rawHTML);
     }
 }

@@ -1,10 +1,14 @@
-<% __render__ = require("markdown") %>
+<% __render__ = import("/bin/markdown") %>
 
 <h1>Test olodocument</h1>
 <p>Hello there, this is an olo-document. 2 * 3 = <% 2*3 %></p>
 
 ## Import test
-Imported: `<% import("/docs/doc1.olo").path %>`
+Imported: `<% import("./doc1").path %>`
 
-## Require test
-Required: `<% require("test").name %>`
+## Arguments
+argv.x = <% argv.x %>
+
+## HTML Library
+<% html = import("/bin/html") %>
+<% html("a", {href="http://www.google.com"}, "Google") %>

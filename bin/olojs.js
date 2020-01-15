@@ -16,10 +16,12 @@ function getVersion () {
     return npmPackage.version;    
 }
 
-async function render (rootPath, path) {
+async function render (rootPath, path, ...args) {
+    const parseParams = require("../lib/tools/parameters-parser");    
     const env = getEnvironment(rootPath);
     const doc = await env.load(path);
-    const text = await doc.render();
+    const argv = parseParams(...args);
+    const text = await doc.render({argv});
     console.log(text);    
 }
 
@@ -53,9 +55,9 @@ olojs.command("init")
     .description("Initialize the olojs environment")
     .action(() => init(process.cwd()));
 
-olojs.command("render <path>")
+olojs.command("render <path> [args...]")
      .description("Fetch and render an olodocument")
-     .action(path => render(process.cwd(), path));
+     .action((path, args) => render(process.cwd(), path, ...args));
 
 olojs.command("serve [port]")
      .description("Serve the olojs environment via HTTP")
