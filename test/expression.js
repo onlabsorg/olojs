@@ -371,12 +371,12 @@ describe("expression", () => {
             
             it("shoudl return the character at Y if Y is an integer", async () => {
                 var ctx = createContext();
-                expect(await evaluate("'abcdef' 2", ctx)).to.equal('b');                    
+                expect(await evaluate("'abcdef' 2", ctx)).to.equal('c');                    
             });
             
             it("should consider only the integer part of Y if Y is a decimal number", async () => {
                 var ctx = createContext();
-                expect(await evaluate("'abcdef' 2.3", ctx)).to.equal('b');                                        
+                expect(await evaluate("'abcdef' 2.3", ctx)).to.equal('c');                                        
             });
 
             it("should consider negative indexes as relative to the string end", async () => {
@@ -401,12 +401,12 @@ describe("expression", () => {
             
             it("shoudl return the item at index Y if Y is an integer", async () => {
                 var ctx = createContext();
-                expect(await evaluate("['a','b','c','d','e','f'] 2", ctx)).to.equal('b');                    
+                expect(await evaluate("['a','b','c','d','e','f'] 2", ctx)).to.equal('c');                    
             });
             
             it("should consider only the integer part of Y if it is a decimal number", async () => {
                 var ctx = createContext();
-                expect(await evaluate("['a','b','c','d','e','f'] 2.3", ctx)).to.equal('b');                                        
+                expect(await evaluate("['a','b','c','d','e','f'] 2.3", ctx)).to.equal('c');                                        
             });
 
             it("should consider a negative indexe Y as relative to the list end", async () => {
@@ -501,7 +501,7 @@ describe("expression", () => {
                 
                 var retval = await evaluate("(x2,x3,x4) 2", ctx);
                 expect(retval).to.be.instanceof(Tuple);
-                expect(Array.from(retval)).to.deep.equal([4,6,200]);
+                expect(Array.from(retval)).to.deep.equal([4,6,300]);
             });
             
             it("should throw an exception if any of the items of X throw an exception", async () => {
