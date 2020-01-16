@@ -12,3 +12,7 @@ argv.x = <% argv.x %>
 ## HTML Library
 <% html = import("/bin/html") %>
 <% html("a", {href="http://www.google.com"}, "Google") %>
+
+## Rectangle
+<% rectangle = import("./rectangle") %>
+<% rectangle.draw((argv.rx;10),(argv.ry;20)) %>

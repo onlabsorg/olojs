@@ -17,10 +17,6 @@ class BrowserEnvironment extends Environment {
     }
     
     async importBin (path) {
-        
-        console.log(stdlib);
-        console.log(path);
-        console.log(stdlib[path]);
         return await stdlib[path]();
     }
     
