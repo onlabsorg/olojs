@@ -1,9 +1,46 @@
 
 
-✔ Environment: sort routes once for all in the constructor @done(2020-01-15)
-✔ expression: make the lists 0-based @done(2020-01-15)
-☐ http-server: caricare client files (html, css e js) una volta per tutte all'inizio dello script
-✔ create `require` global function @done(2020-01-15)
-✔ add rendering parameters in CLI and browser environment @done(2020-01-16)
-✔ allow importing with implicit .olo extension @done(2020-01-15)
-✔ modify relative path resolution to make . match the last directory and not the file name @done(2020-01-15)
+Documentation:
+    ✔ write documentation for config.md @done(2020-01-18) @project(Documentation)
+    ✔ write documentation for stdlib.md  @done(2020-01-18) @project(Documentation)
+    ✔ review documentation @done(2020-01-18) @project(Documentation)
+    ☐ commit
+
+Static globals:
+    ☐ Temporarly remove custom globals because it is not possible to serve them via HTTP.    
+    ☐ Commit
+
+Rename config:
+    ☐ Rename olojs.config.js to olojs-config.js    
+    ☐ Commit
+    
+Load via HTTP:
+    ☐ Implement support for paths starting with `http://` or `https://` in `environment.fetch`
+    ☐ Test fetching, loading and importing documents via HTTP
+    ☐ Check if the documentation is still up to date
+    ☐ Commit
+    
+HTTP Client files:
+    ☐ http-server: caricare client files (html, css e js) una volta per tutte all'inizio dello script 
+    ☐ impostare un meccanismo che consenta di caricare files ogni volta in development mode
+    ☐ Commit
+    
+Push:
+    ✔ Update version @done(2020-01-17) @project(Push)
+    ☐ Cleanup unused files
+    ☐ Hide docgen from bin to uncommittable folder
+    ☐ npm publish --access=public
+    ☐ Install olojs globally and test if it works
+
+Docgen:
+    ☐ implement docgen command
+    ☐ comment environment.js, document.js and expression.js
+    ☐ generate API documentation
+    ☐ link the documentation in README.md
+    ☐ Commit
+
+CLI Test:
+    ☐ Automate CLI testing
+    ☐ Commit
+    
+    

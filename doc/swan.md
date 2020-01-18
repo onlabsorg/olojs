@@ -173,9 +173,9 @@ at position X. To understand this behavior, think at a list as a function that
 maps natural numbers to values.
 
 Examples:
-* `['a','b','c'] 1` will return `'a'`
-* `['a','b','c'] (2)` will return `'b'`
-* `['a','b','c'](3)` will return `'c'`
+* `['a','b','c'] 0` will return `'a'`
+* `['a','b','c'] (1)` will return `'b'`
+* `['a','b','c'](2)` will return `'c'`
 
 If X is a negative number, it will be interpreted as relative to the end of the
 list:
