@@ -18,13 +18,13 @@ Load via HTTP:
     ✔ Implement support for paths starting with `http://` or `https://` in `environment.fetch` @done(2020-01-19) @project(Load via HTTP)
     ✔ Test fetching, loading and importing documents via HTTP @done(2020-01-19) @project(Load via HTTP)
     ✔ Check if the documentation is still up to date @done(2020-01-19) @project(Load via HTTP)
-    ☐ Commit
+    ✔ Commit @done(2020-01-19) @project(Load via HTTP)
     
 HTTP Server:
-    ☐ http-server: caricare client files (html, css e js) una volta per tutte all'inizio dello script 
-    ☐ impostare un meccanismo che consenta di caricare files ogni volta in development mode
-    ☐ Find a way to identify olo-documents requests and pass on other files requests
-    ☐ Update documentation
+    ✔ http-server: caricare client files (html, css e js) una volta per tutte all'inizio dello script  @done(2020-01-19) @project(HTTP Server)
+    ✔ impostare un meccanismo che consenta di caricare files ogni volta in development mode @done(2020-01-19) @project(HTTP Server)
+    ✔ Find a way to identify olo-documents requests and pass on other files requests @done(2020-01-19) @project(HTTP Server)
+    ✔ Update documentation @done(2020-01-19) @project(HTTP Server)
     ☐ Commit
 
 CLI Test:

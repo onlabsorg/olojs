@@ -170,7 +170,7 @@ eval("const Path = __webpack_require__(/*! path */ \"./node_modules/path-browser
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("__webpack_require__(/*! isomorphic-fetch */ \"./node_modules/isomorphic-fetch/fetch-npm-browserify.js\");\n\nfunction Loader (host) {\n    while (host.slice(-1) === \"/\") host = host.slice(0,-1);\n    return async (path) => {\n        if (path[0] !== \"/\") path = \"/\" + path;\n        const url = host + path;\n        return await Loader.fetch(url);\n    }\n}\n\nLoader.fetch = async function (url) {\n    const response = await fetch(url);\n    if (response.status === 200) {\n        return await response.text();\n    } else {\n        let message = await response.text();\n        throw new Error(message);\n    }    \n}\n\nmodule.exports = Loader;\n\n\n//# sourceURL=webpack:///./lib/loaders/http-loader.js?");
+eval("__webpack_require__(/*! isomorphic-fetch */ \"./node_modules/isomorphic-fetch/fetch-npm-browserify.js\");\n\nfunction Loader (host) {\n    while (host.slice(-1) === \"/\") host = host.slice(0,-1);\n    return async (path) => {\n        if (path[0] !== \"/\") path = \"/\" + path;\n        const url = host + path;\n        return await Loader.fetch(url);\n    }\n}\n\nLoader.fetch = async function (url) {\n    const response = await fetch(url, {\n        method: 'get',\n        headers: {\n            'Content-Type': 'text/olo'\n        },\n    });\n    if (response.status === 200) {\n        return await response.text();\n    } else {\n        let message = await response.text();\n        throw new Error(message);\n    }    \n}\n\nmodule.exports = Loader;\n\n\n//# sourceURL=webpack:///./lib/loaders/http-loader.js?");
 
 /***/ }),
 
