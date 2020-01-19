@@ -25,7 +25,7 @@ HTTP Server:
     ✔ impostare un meccanismo che consenta di caricare files ogni volta in development mode @done(2020-01-19) @project(HTTP Server)
     ✔ Find a way to identify olo-documents requests and pass on other files requests @done(2020-01-19) @project(HTTP Server)
     ✔ Update documentation @done(2020-01-19) @project(HTTP Server)
-    ☐ Commit
+    ✔ Commit @done(2020-01-19) @project(HTTP Server)
 
 CLI Test:
     ☐ Automate CLI testing
