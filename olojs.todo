@@ -7,12 +7,12 @@ Documentation:
     ✔ commit @done(2020-01-18) @project(Documentation)
 
 Static globals:
-    ☐ Temporarly remove custom globals because it is not possible to serve them via HTTP.    
+    ✔ Temporarly remove custom globals because it is not possible to serve them via HTTP.     @done(2020-01-19) @project(Static globals)
     ☐ Commit
 
 Rename config:
-    ☐ Rename olojs.config.js to olojs-config.js    
-    ☐ Commit
+    ✔ Rename olojs.config.js to olojs-config.js     @done(2020-01-19) @project(Rename config)
+    ✔ Commit @done(2020-01-19) @project(Rename config)
     
 Load via HTTP:
     ☐ Implement support for paths starting with `http://` or `https://` in `environment.fetch`
@@ -20,9 +20,15 @@ Load via HTTP:
     ☐ Check if the documentation is still up to date
     ☐ Commit
     
-HTTP Client files:
+HTTP Server:
     ☐ http-server: caricare client files (html, css e js) una volta per tutte all'inizio dello script 
     ☐ impostare un meccanismo che consenta di caricare files ogni volta in development mode
+    ☐ Find a way to identify olo-documents requests and pass on other files requests
+    ☐ Update documentation
+    ☐ Commit
+
+CLI Test:
+    ☐ Automate CLI testing
     ☐ Commit
     
 Push:
@@ -39,8 +45,5 @@ Docgen:
     ☐ link the documentation in README.md
     ☐ Commit
 
-CLI Test:
-    ☐ Automate CLI testing
-    ☐ Commit
     
     
