@@ -4,7 +4,7 @@ Documentation:
     ✔ write documentation for config.md @done(2020-01-18) @project(Documentation)
     ✔ write documentation for stdlib.md  @done(2020-01-18) @project(Documentation)
     ✔ review documentation @done(2020-01-18) @project(Documentation)
-    ☐ commit
+    ✔ commit @done(2020-01-18) @project(Documentation)
 
 Static globals:
     ☐ Temporarly remove custom globals because it is not possible to serve them via HTTP.    

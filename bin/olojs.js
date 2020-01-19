@@ -6,7 +6,7 @@ const cmd = require("commander");
 
 function getEnvironment (rootPath) {
     const Environment = require("../lib/environment");
-    const configPath = Path.resolve(rootPath, "./olo.config.js");
+    const configPath = Path.resolve(rootPath, "./olojs-config.js");
     const config = require(configPath);
     return new Environment(config);    
 }
@@ -26,7 +26,7 @@ async function render (rootPath, path, ...args) {
 }
 
 async function init (rootPath) {
-    const configPath = Path.resolve(rootPath, "./olo.config.js");
+    const configPath = Path.resolve(rootPath, "./olojs-config.js");
     if (!fs.existsSync(configPath)) {
         let configFile = fs.readFileSync(Path.resolve(__dirname, "../lib/environments/config-template.js"), "utf8");
         fs.writeFileSync(configPath, configFile, "utf8");
