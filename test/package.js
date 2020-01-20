@@ -41,13 +41,6 @@ describe("package = new Package(rootPath)", () => {
                 expect(e.message).to.equal("Package already initialized");
             }
         });
-        
-        after(() => {
-            var package = new Package(rootPath);
-            var configFile = fs.readFileSync(package.configPath, "utf8");
-            configFile = configFile.replace("@onlabsorg/olojs", "../..");
-            fs.writeFileSync(package.configPath, configFile, "utf8");            
-        });
     });
     
     describe("package.render(path) - async function", () => {

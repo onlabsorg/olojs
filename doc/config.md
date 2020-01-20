@@ -45,7 +45,7 @@ config file is created:
 ```js
 exports.loaders = {};
 
-const FileLoader = require("@onlabsorg/olojs/lib/loaders/file-loader");
+const FileLoader = require(__olojspath + "/lib/loaders/file-loader");
 exports.loaders["/"] = FileLoader(__dirname);
 ```
 

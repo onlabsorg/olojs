@@ -1,4 +1,4 @@
 exports.loaders = {};
 
-const FileLoader = require("../../lib/loaders/file-loader");
+const FileLoader = require(__olojspath + "/lib/loaders/file-loader");
 exports.loaders["/"] = FileLoader(__dirname);
