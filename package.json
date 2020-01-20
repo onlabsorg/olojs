@@ -1,6 +1,6 @@
 {
   "name": "@onlabsorg/olojs",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "javascript library that allows concurrent editing of JSON objects",
   "homepage": "https://github.com/onlabsorg/olojs#readme",
   "bugs": {
@@ -23,7 +23,6 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "marked": "^0.8.0",
     "rimraf": "^3.0.0",
     "strip-indent": "^3.0.0",
     "webpack": "^4.41.5",
@@ -35,8 +34,6 @@
     "dompurify": "^2.0.7",
     "express": "^4.17.1",
     "isomorphic-fetch": "^2.2.1",
-    "mkdirp": "^0.5.1",
-    "query-parse": "^2.0.0",
-    "uri-js": "^4.2.2"
+    "marked": "^0.8.0"
   }
 }
