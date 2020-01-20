@@ -58,4 +58,4 @@ typings/
 
 # development files
 dev/
-.todo
+*.todo

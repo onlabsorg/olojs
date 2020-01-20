@@ -1,7 +1,7 @@
 const Environment = require("../lib/environment");
 const HTTPLoader = require("../lib/loaders/http-loader");
 const DOMPurify = require("dompurify");    
-const parseParams = require("../lib/package/parameters-parser");
+const parseParams = require("../lib/tools/parameters-parser");
 const stdlib = require("./stdlib");
 
 
