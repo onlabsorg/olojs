@@ -40,8 +40,8 @@ npm install -g @onlabsorg/olojs
 Once you have it installed, the `olojs` command line interface (CLI) will be
 available in your system. The CLI commands available are:
 
-* `olojs init` initializes a local [environment](./doc/environment.md) by creating
-  a `olojs-config.js` configuration file that you can eventually customize
+* `olojs init` initializes a local environment by creating an `olojs-config.js` 
+  configuration file that you can eventually customize
 * `olojs render <path-to-doc> [args ...]` renders the olo-document
   located at the given path, with the given (optional) parameters
 * `olojs serve [port]` starts an HTTP server based on the local environment. It
@@ -106,7 +106,7 @@ uses its content.
 
 <% doc1 = import("./doc1") %>
 The x variable defined in doc1 is equal to <% doc1.x %>, while the y variable 
-defined in doc2 is equal to <% doc1.y %>. Their product is <% x*y %>.
+defined in doc2 is equal to <% doc1.y %>. Their product is <% doc1.x * doc1.y %>.
 
 Here below I show you the rendered content of doc1:
 ------------------
@@ -177,7 +177,7 @@ This is a parametric document. You passed-in the following parameters:
 
 From your project folder you can start an HTTP server by typing `olojs serve 8010` 
 that, in response to `HTTP GET PATH` requests, sends the olo-document located
-at `PATH` withing your environment.
+at `PATH` within your environment.
 
 Once you start serving your olojs environment, on your local host you can render 
 the document `/path/to/doc1` in your browser by entering the URL
