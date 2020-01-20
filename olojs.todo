@@ -27,17 +27,21 @@ HTTP Server:
     ✔ Update documentation @done(2020-01-19) @project(HTTP Server)
     ✔ Commit @done(2020-01-19) @project(HTTP Server)
 
-CLI Test:
-    ☐ Automate CLI testing
+Package class:
+    ☐ Implement the CLI functionalitites ina Package class
+    ☐ Automate Package test
+    ☐ Test CLI
     ☐ Commit
     
 Publish v0.5.0:
     ✔ Update version @done(2020-01-17) @project(Push)
-    ☐ Cleanup unused files
-    ☐ Hide docgen from bin to uncommittable folder
+    ✔ Cleanup unused files @done(2020-01-19) @project(Publish v0.5.0)
+    ✔ Hide docgen from bin to uncommittable folder @done(2020-01-19) @project(Publish v0.5.0)
+    ☐ npm run build
+    ☐ git push
     ☐ npm publish --access=public
-    ☐ build with webpack
-    ☐ Install olojs globally and test if it works
+    ☐ Install olojs globally and test it
+    ☐ Review documentation on github
 
 Docgen:
     ☐ implement docgen command

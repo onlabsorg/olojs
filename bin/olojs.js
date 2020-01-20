@@ -1,66 +1,46 @@
 #!/usr/bin/env node
 
 const Path = require("path");
-const fs = require("fs");``
-const cmd = require("commander");
+const fs = require("fs");
 
-function getEnvironment (rootPath) {
-    const Environment = require("../lib/environment");
-    const configPath = Path.resolve(rootPath, "./olojs-config.js");
-    const config = require(configPath);
-    return new Environment(config);    
-}
+const Package = require("../lib/package");
+const package = new Package(process.cwd());
 
 function getVersion () {
     const npmPackage = JSON.parse( fs.readFileSync(`${__dirname}/../package.json`, 'utf8') );
     return npmPackage.version;    
 }
 
-async function render (rootPath, path, ...args) {
-    const parseParams = require("../lib/tools/parameters-parser");    
-    const env = getEnvironment(rootPath);
-    const doc = await env.load(path);
-    const argv = parseParams(...args);
-    const text = await doc.render({argv});
-    console.log(text);    
-}
+const commander = require("commander");
+const cli = new commander.Command();
 
-async function init (rootPath) {
-    const configPath = Path.resolve(rootPath, "./olojs-config.js");
-    if (!fs.existsSync(configPath)) {
-        let configFile = fs.readFileSync(Path.resolve(__dirname, "../lib/environments/config-template.js"), "utf8");
-        fs.writeFileSync(configPath, configFile, "utf8");
-    }
-    console.log("Olojs environment initialized correctly.")
-}
+cli.version(getVersion());
 
-async function serve (rootPath, port=8010) {
-    const HTTPServer = require("../lib/http-server/server");
-    const express = require("express");
-    const app = express();
-    const env = getEnvironment(process.cwd());
-    app.use("/", HTTPServer(env));
-    app.use( express.static(process.cwd()) );
-    app.listen(port, () => {
-        console.log(`olo-viewer test server listening on port ${port}`);
-    });        
-}
-
-
-const olojs = new cmd.Command();
-
-olojs.version(getVersion());
-
-olojs.command("init")
+cli.command("init")
     .description("Initialize the olojs environment")
-    .action(() => init(process.cwd()));
+    .action(async () => {
+        try {
+            await package.init();
+            console.log("Package successfully initialized");
+        } catch (e) {
+            console.log("Initialization failed");
+        }
+    });
 
-olojs.command("render <path> [args...]")
+cli.command("render <path> [args...]")
      .description("Fetch and render an olodocument")
-     .action((path, args) => render(process.cwd(), path, ...args));
+     .action(async (path, args) => {
+         const parseParams = require("../lib/tools/parameters-parser");
+         const argv = parseParams(...args);
+         const renderedDoc = await package.render(path, argv);
+         console.log(renderedDoc);
+     });
 
-olojs.command("serve [port]")
+cli.command("serve [port]")
      .description("Serve the olojs environment via HTTP")
-     .action(port => serve(process.cwd(), port));
+     .action(async (port=8010) => {
+         const server = await package.serve(port);
+         console.log(`olojs HTTP serve listening on port ${port}`);
+     });
 
-olojs.parse(process.argv);
+cli.parse(process.argv);

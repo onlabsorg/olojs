@@ -1,0 +1,1 @@
+doc1.x = <%import("./doc1").x%>
