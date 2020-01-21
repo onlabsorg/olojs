@@ -2442,6 +2442,20 @@ describe("expression", () => {
     
     // MISCELLANEOUS
     
+    describe("string templates", () => {
+        
+        it("should evaluate the expressions between ${...} when the string is enclosed between accent quotes", async () => {
+            var ctx = createContext({y:2});
+            expect(await evaluate("`x = ${1+y}`", ctx)).to.equal("x = 3");
+        });
+
+        it("should evaluate the expressions in a child context", async () => {
+            var ctx = createContext({x:10, y:20});
+            expect(await evaluate("`${x=2}x+y = ${x+y}`", ctx)).to.equal("x+y = 22");
+            expect(ctx.x).to.equal(10);
+        });
+    });
+    
     describe("operators precedence and grouping", () => {
         
         it("should execute assignment operations (`=` and `:`) before pairing operations (`,`)", async () => {
