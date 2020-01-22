@@ -298,7 +298,7 @@ describe("expression", () => {
             await evaluate("a = 2", ctx);            
             await evaluate("a = 3", ctx);            
             expect(ctx.a).to.equal(3);
-        });
+        });        
     });
     
     describe("namespace definition: {expression}", () => {

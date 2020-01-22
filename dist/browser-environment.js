@@ -181,7 +181,7 @@ eval("__webpack_require__(/*! isomorphic-fetch */ \"./node_modules/isomorphic-fe
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("\nconst expression = __webpack_require__(/*! ../expression */ \"./lib/expression.js\");\n\nasync function createElement (tagName, attributes={}, ...childElements) {\n    var html = `<${tagName}`;\n    for (let attrName in attributes) {\n        let attrValue = await expression.stringify(attributes[attrName]);\n        html += ` ${attrName}=\"${attrValue}\"`\n    }\n    html += \">\";\n    for (let childElement of childElements) {\n        if (Array.isArray(childElement)) {\n            html += await createElement(childElement[0], childElement[1], ...childElements.slice(2));\n        } else {\n            html += await expression.stringify(childElement);\n        }\n    }\n    html += `</${tagName}>`;\n    return html;\n}\n\nexports.__apply__ = createElement;\n\n\n//# sourceURL=webpack:///./lib/stdlib/html.js?");
+eval("\nconst expression = __webpack_require__(/*! ../expression */ \"./lib/expression.js\");\n\nasync function createElement (tagName, attributes={}, ...childElements) {\n    var html = `<${tagName}`;\n    for (let attrName in attributes) {\n        let attrValue = await expression.stringify(attributes[attrName]);\n        html += ` ${attrName}=\"${attrValue}\"`\n    }\n    html += \">\";\n    html += childElements.join(\"\");\n    html += `</${tagName}>`;\n    return html;\n}\n\nexports.__apply__ = createElement;\n\n\n//# sourceURL=webpack:///./lib/stdlib/html.js?");
 
 /***/ }),
 
