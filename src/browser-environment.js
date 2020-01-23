@@ -27,7 +27,7 @@ class BrowserEnvironment extends Environment {
 
 class BrowserDocument extends Environment.Document {
     
-    async render (queryString) {
+    async render (queryString="?") {
         const argv = parseParams(...queryString.slice(1).split("&"));
         const rawHTML = await super.render({argv});
         return DOMPurify.sanitize(rawHTML);
