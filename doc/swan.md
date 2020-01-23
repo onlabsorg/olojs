@@ -481,6 +481,14 @@ and the definition of `map` would be:
 map: f -> {mf: (x,xs) -> xs ; (f x, mf xs)}.mf
 ```
 
+#### enum X
+The `enum` function taken a value `X` and return its content, which is:
+
+* If X is a string, it returns the tuple of its characters
+* If X is a list, it return the tuple of its items
+* If X is a namespace, it return the tuple of its names
+* If X is of any other type, it returns X itself
+
 
 ## Comments
 Everything following a `#` symbol, up to the end of the line, is a comment and 

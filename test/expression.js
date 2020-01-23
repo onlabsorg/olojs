@@ -767,6 +767,43 @@ describe("expression", () => {
         });
     });
     
+    describe("enum X", () => {
+        
+        it("should return the tuple of the X characters if X is a string", async () => {
+            var ctx = createContext();
+            var items = await evaluate("enum 'abc'", ctx);
+            expect(items).to.be.instanceof(Tuple);
+            expect(Array.from(items)).to.deep.equal(['a', 'b', 'c']);
+        });
+
+        it("should return the tuple of the X items if X is a list", async () => {
+            var ctx = createContext();
+            var items = await evaluate("enum [10,11,12]", ctx);
+            expect(items).to.be.instanceof(Tuple);
+            expect(Array.from(items)).to.deep.equal([10, 11, 12]);
+        });
+
+        it("should return the tuple of the X names if X is a namespace", async () => {
+            var ctx = createContext();
+            await evaluate("ns = {z:3, x:1, y:2}", ctx);
+            var items = await evaluate("enum ns", ctx);
+            expect(items).to.be.instanceof(Tuple);
+            expect(Array.from(items).sort()).to.deep.equal(['x','y','z']);
+        });
+        
+        it("should return X itself if it is of any other type", async () => {
+            var ctx = createContext({T:true, F:false, fn:x=>2*x});
+            expect(await evaluate("enum ()", ctx)).to.equal(null);
+            expect(await evaluate("enum T", ctx)).to.equal(true);
+            expect(await evaluate("enum F", ctx)).to.equal(false);
+            expect(await evaluate("enum fn", ctx)).to.equal(ctx.fn);
+            
+            var items = await evaluate("enum (1, 'abc', {x:10})", ctx);
+            expect(items).to.be.instanceof(Tuple);
+            expect(Array.from(items)).to.deep.equal([1,'abc',{x:10}]);
+        });
+    });
+    
     
     // LOGIC OPERATORS
     
