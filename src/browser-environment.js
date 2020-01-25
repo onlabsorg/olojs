@@ -32,6 +32,10 @@ class BrowserDocument extends Environment.Document {
         const rawHTML = await super.render({argv});
         return DOMPurify.sanitize(rawHTML);
     }
+    
+    static renderError (error) {
+        return `<span style="color:red; font-weight:bold">${super.renderError(error)}</span>`
+    }
 }
 
 
