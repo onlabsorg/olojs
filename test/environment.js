@@ -64,6 +64,20 @@ describe("env = new Environment(config)", () => {
                 expect(e.message).to.equal("Loader not defined for path /unmapped-store/path/to/doc");
             }
         });
+        
+        it("should cache the loaded documents", async () => {
+            var store = new Map();
+            store.set("/docs/doc1", "document 1");
+            store.set("/docs/doc2", "document 2");
+            var env = new Environment({
+                loaders: {
+                    "/path/to": subPath => store.get(subPath),
+                }
+            });
+            expect(await env.fetch("/path/to/docs/doc1")).to.equal("document 1")
+            store.set("/docs/doc1", "document 1 modified");
+            expect(await env.fetch("/path/to/docs/doc1")).to.equal("document 1")
+        });
     });
     
     describe("doc = await env.load(path)", () => {
