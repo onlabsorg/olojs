@@ -102,14 +102,14 @@ describe("env = new Environment(config)", () => {
             expect(doc.globals).to.equal(env.globals);
         });
 
-        it("should fill the document locals with the document path", async () => {
+        it("should add the document PATH to the document locals", async () => {
             var env = new Environment({
                 loaders: {
                     "/path/to": subPath => `Document at /path/to${subPath}`,
                 }
             });
             var doc = await env.load("/path/to/store1/path/to/doc1");
-            expect(doc.locals.path).to.equal("/path/to/store1/path/to/doc1");
+            expect(doc.locals.PATH).to.equal("/path/to/store1/path/to/doc1");
         });
     });    
 });
