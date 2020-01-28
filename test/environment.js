@@ -78,6 +78,17 @@ describe("env = new Environment(config)", () => {
             store.set("/docs/doc1", "document 1 modified");
             expect(await env.fetch("/path/to/docs/doc1")).to.equal("document 1")
         });
+        
+        it("should load the `index` document if the path ends with `/`", async () => {
+            var env = new Environment({
+                loaders: {
+                    "/path/to": subPath => `Document at /path/to${subPath}`,
+                }
+            });
+            
+            var source = await env.fetch("/path/to/dir/");
+            expect(source).to.equal("Document at /path/to/dir/index");
+        });
     });
     
     describe("doc = await env.load(path)", () => {
