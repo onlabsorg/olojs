@@ -40,7 +40,7 @@ cli.command("serve [port]")
      .description("Serve the olojs environment via HTTP")
      .action(async (port=8010) => {
          const server = await package.serve(port);
-         console.log(`olojs HTTP serve listening on port ${port}` + (package.getEnvironment().development ? " in development mode" : ""));
+         console.log(`olojs HTTP serve listening on port ${port}` + (package.getEnvironment().cache ? "" : " in development mode"));
      });
 
 cli.parse(process.argv);
