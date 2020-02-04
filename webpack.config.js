@@ -2,10 +2,11 @@ const path = require('path');
 
 module.exports = {
         
-    entry: "./src/browser-environment.js",
+    entry: "./lib/package/http-client-src/main.js",
     
     output: {
-        filename: 'browser-environment.js',
-        path: path.resolve(__dirname, 'dist')
+        filename: '[name].js',
+        chunkFilename: 'bin/[name].js',
+        path: path.resolve(__dirname, './lib/package/http-client')
     },    
 }
