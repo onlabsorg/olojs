@@ -1,8 +1,7 @@
 var expect = require("chai").expect;
 
 var Package = require("../lib/package");
-var HTTPLoader = require("../lib/loaders/http-loader");
-
+var HTTPStore = require("../lib/stores/http-store");
 var fs = require("fs");
 var Path = require("path");
 var rimraf = require("rimraf");
@@ -85,7 +84,7 @@ describe("package = new Package(rootPath)", () => {
             fs.writeFileSync(rootPath+"/doc5.olo", docSource, "utf8");
             var package = new Package(rootPath);
             var server = await package.serve(8999);
-            var fetchedSource = await HTTPLoader.fetch("http://localhost:8999/doc5");
+            var fetchedSource = await (new HTTPStore("http://localhost:8999")).fetch("/doc5");
             expect(fetchedSource).to.equal(docSource);
             await server.close();
         });
@@ -93,8 +92,8 @@ describe("package = new Package(rootPath)", () => {
         it("should return the single page app HTML file when requesting a .html resource", async () => {
             var package = new Package(rootPath);
             var server = await package.serve(8999);
-            var fetchedResource = await HTTPLoader.fetch("http://localhost:8999/doc5.html");
-            var htmlTemplate = fs.readFileSync(Path.resolve(__dirname, "../lib/package/http-client.html"), "utf8");
+            var fetchedResource = await (new HTTPStore("http://localhost:8999")).fetch("/doc5.html");
+            var htmlTemplate = fs.readFileSync(Path.resolve(__dirname, "../lib/http/public/index.html"), "utf8");
             expect(fetchedResource).to.equal(htmlTemplate);
             await server.close();
         });

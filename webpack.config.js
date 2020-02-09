@@ -2,11 +2,11 @@ const path = require('path');
 
 module.exports = {
         
-    entry: "./lib/package/http-client-src/main.js",
+    entry: "./lib/http/client.js",
     
     output: {
-        filename: '[name].js',
+        filename: 'main.js',
         chunkFilename: 'bin/[name].js',
-        path: path.resolve(__dirname, './lib/package/http-client')
+        path: path.resolve(__dirname, './lib/http/public')
     },    
 }

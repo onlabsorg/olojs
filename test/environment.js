@@ -11,7 +11,7 @@ describe("env = new Environment(config)", () => {
         
         it("should return the source mapped to the given path", async () => {
             var env = new Environment({
-                loaders: {
+                stores: {
                     "/path/to": subPath => `Document at /path/to${subPath}`,
                     "/path/to/store1": subPath => `Document at /path/to/store1${subPath}`,
                 }
@@ -24,32 +24,47 @@ describe("env = new Environment(config)", () => {
             expect(source).to.equal("Document at /path/to/store2/path/to/doc2");
         });
         
-        it("should return the response of an HTTP get request if the path start with http://", async () => {
+        it("should work with URL-like paths `protocol://path/to/`", async () => {
             var env = new Environment({
-                loaders: {
-                    "/path/to": subPath => `Document at /path/to${subPath}`,
-                    "/path/to/store1": subPath => `Document at /path/to/store1${subPath}`,
+                stores: {
+                    "ppp://path/to": subPath => `Document at ppp://path/to${subPath}`,
+                    "ppp://path/to/store1": subPath => `Document at ppp://path/to/store1${subPath}`,
                 }
             });
 
-            const app = express();
-            app.get("*", (req,res,next) => {
-                res.status(200).send(`Document at path ${req.path}`);
-            });
-            var server = await new Promise((resolve, reject) => {
-                var server = app.listen(8999, () => {
-                    resolve(server);
-                });
-            });
-            
-            var source = await env.fetch("http://localhost:8999/path/to/doc1");
-            expect(source).to.equal("Document at path /path/to/doc1");
-            server.close();
+            var source = await env.fetch("ppp://path/to/store1/path/to/doc1");
+            expect(source).to.equal("Document at ppp://path/to/store1/path/to/doc1");
+                        
+            var source = await env.fetch("ppp://path/to/store2/path/to/doc2");
+            expect(source).to.equal("Document at ppp://path/to/store2/path/to/doc2");
         });
         
+        it("should work also when the loader is defined as `fetch` method of the store", async () => {
+            var env = new Environment({
+                stores: {
+                    "/path/to": {fetch: subPath => `Document at /path/to${subPath}`},
+                    "/path/to/store1": {fetch: subPath => `Document at /path/to/store1${subPath}`},
+                    "ppp://path/to": {fetch: subPath => `Document at ppp://path/to${subPath}`},
+                    "ppp://path/to/store1": {fetch: subPath => `Document at ppp://path/to/store1${subPath}`},
+                }
+            });
+            
+            var source = await env.fetch("/path/to/store1/path/to/doc1");
+            expect(source).to.equal("Document at /path/to/store1/path/to/doc1");
+                        
+            var source = await env.fetch("/path/to/store2/path/to/doc2");
+            expect(source).to.equal("Document at /path/to/store2/path/to/doc2");
+
+            var source = await env.fetch("ppp://path/to/store1/path/to/doc1");
+            expect(source).to.equal("Document at ppp://path/to/store1/path/to/doc1");
+                        
+            var source = await env.fetch("ppp://path/to/store2/path/to/doc2");
+            expect(source).to.equal("Document at ppp://path/to/store2/path/to/doc2");
+        });
+
         it("should throw an error if no loader is defined for the given path", async () => {
             var env = new Environment({
-                loaders: {
+                stores: {
                     "/path/to": subPath => `Document at /path/to${subPath}`,
                     "/path/to/store1": subPath => `Document at /path/to/store1${subPath}`,
                 }
@@ -70,7 +85,7 @@ describe("env = new Environment(config)", () => {
             store.set("/docs/doc1", "document 1");
             store.set("/docs/doc2", "document 2");
             var env = new Environment({
-                loaders: {
+                stores: {
                     "/path/to": subPath => store.get(subPath),
                 }
             });
@@ -81,13 +96,17 @@ describe("env = new Environment(config)", () => {
         
         it("should load the `index` document if the path ends with `/`", async () => {
             var env = new Environment({
-                loaders: {
+                stores: {
                     "/path/to": subPath => `Document at /path/to${subPath}`,
+                    "ppp://path/to": subPath => `Document at ppp://path/to${subPath}`,
                 }
             });
             
             var source = await env.fetch("/path/to/dir/");
             expect(source).to.equal("Document at /path/to/dir/index");
+
+            var source = await env.fetch("ppp://path/to/store1/path/to/dir/");
+            expect(source).to.equal("Document at ppp://path/to/store1/path/to/dir/index");
         });
     });
     
@@ -95,7 +114,7 @@ describe("env = new Environment(config)", () => {
         
         it("should return a document instance", async () => {
             var env = new Environment({
-                loaders: {
+                stores: {
                     "/path/to": subPath => `Document at /path/to${subPath}`,
                 }
             });            
@@ -105,7 +124,7 @@ describe("env = new Environment(config)", () => {
         
         it("should set the document globals to the environment globals", async () => {
             var env = new Environment({
-                loaders: {
+                stores: {
                     "/path/to": subPath => `Document at /path/to${subPath}`,
                 }
             });
@@ -115,12 +134,27 @@ describe("env = new Environment(config)", () => {
 
         it("should add the document PATH to the document locals", async () => {
             var env = new Environment({
-                loaders: {
+                stores: {
                     "/path/to": subPath => `Document at /path/to${subPath}`,
                 }
             });
             var doc = await env.load("/path/to/store1/path/to/doc1");
             expect(doc.locals.PATH).to.equal("/path/to/store1/path/to/doc1");
+        });
+        
+        it("should delegate to the store `load` method if defined", async () => {
+            var env = new Environment({
+                stores: {
+                    "/path/to": {
+                        fetch: subPath => `Document at /path/to${subPath}`,
+                        load: subPath => ({path: `/path/to${subPath}`})
+                    }
+                }
+            });
+            var doc = await env.load("/path/to/store1/path/to/doc1");
+            expect(doc).to.deep.equal({
+                path: "/path/to/store1/path/to/doc1"
+            })
         });
     });    
 });
