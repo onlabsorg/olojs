@@ -3,7 +3,14 @@ const expect = require("chai").expect;
 const Environment = require("../lib/environment");
 const Document = require("../lib/document");
 
+
+const fs = require("fs")
+const FSStore = require("../lib/stores/fs-store")
+
 const express = require("express");
+const HTTPStore = require("../lib/stores/http-store");
+
+const stdlibStore = require("../lib/stores/stdlib-store");
 
 describe("env = new Environment(config)", () => {
     
@@ -39,13 +46,13 @@ describe("env = new Environment(config)", () => {
             expect(source).to.equal("Document at ppp://path/to/store2/path/to/doc2");
         });
         
-        it("should work also when the loader is defined as `fetch` method of the store", async () => {
+        it("should work also when the loader is defined as `read` method of the store", async () => {
             var env = new Environment({
                 stores: {
-                    "/path/to": {fetch: subPath => `Document at /path/to${subPath}`},
-                    "/path/to/store1": {fetch: subPath => `Document at /path/to/store1${subPath}`},
-                    "ppp://path/to": {fetch: subPath => `Document at ppp://path/to${subPath}`},
-                    "ppp://path/to/store1": {fetch: subPath => `Document at ppp://path/to/store1${subPath}`},
+                    "/path/to": {read: subPath => `Document at /path/to${subPath}`},
+                    "/path/to/store1": {read: subPath => `Document at /path/to/store1${subPath}`},
+                    "ppp://path/to": {read: subPath => `Document at ppp://path/to${subPath}`},
+                    "ppp://path/to/store1": {read: subPath => `Document at ppp://path/to/store1${subPath}`},
                 }
             });
             
@@ -142,19 +149,70 @@ describe("env = new Environment(config)", () => {
             expect(doc.locals.PATH).to.equal("/path/to/store1/path/to/doc1");
         });
         
-        it("should delegate to the store `load` method if defined", async () => {
+        it("should return the `store.read` return value if it is an instance of Document", async () => {
             var env = new Environment({
                 stores: {
-                    "/path/to": {
-                        fetch: subPath => `Document at /path/to${subPath}`,
-                        load: subPath => ({path: `/path/to${subPath}`})
-                    }
+                    "/path/to": subPath => new Document(`Document at /path/to${subPath}`, {loc:1}, {glob:2})
                 }
             });
             var doc = await env.load("/path/to/store1/path/to/doc1");
-            expect(doc).to.deep.equal({
-                path: "/path/to/store1/path/to/doc1"
-            })
+            expect(doc).to.be.instanceof(Document);
+            expect(doc.source).to.equal("Document at /path/to/store1/path/to/doc1");
+            expect(doc.locals).to.deep.equal({loc:1});
+            expect(doc.globals).to.deep.equal({glob:2});
         });
     });    
+    
+    describe("FSStore", () => {
+        it("should retrieve a source file from the filesystem", async () => {
+            var docSource = "Test document source";
+            fs.writeFileSync(__dirname+"/package/doc.olo", docSource, "utf8");
+            var env = new Environment({
+                stores: {
+                    "/fs/test": new FSStore(__dirname+"/package")
+                }
+            });            
+            expect(await env.fetch("/fs/test/doc")).to.equal(docSource);
+        });
+    });
+
+    describe("HTTPStore", () => {
+        var server;
+        
+        before (done => {
+            var app = express();
+            app.get("*", (req, res, next) => {
+                res.status(200).send(`Document at ${req.path}`);
+            });
+            server = app.listen(8999, done);
+        });
+        
+        it("should retrieve a source file via HTTP GET request", async () => {
+            var env = new Environment({
+                stores: {
+                    "/http/test": new HTTPStore("http://localhost:8999")
+                }
+            });            
+            expect(await env.fetch("/http/test/doc")).to.equal("Document at /doc");
+        });
+        
+        after (async () => {
+            await server.close();            
+        });
+    });
+    
+    describe("StdlibStore", () => {
+        it("should import a javascript module from the standard library", async () => {
+            var env = new Environment({
+                stores: {
+                    "/stdlib/test": stdlibStore
+                }
+            });       
+            var doc = await env.load("/stdlib/test/math");
+            expect(doc).to.be.instanceof(Document);
+
+            var mathModule = require("../lib/stores/stdlib/math");     
+            expect(await doc.evaluate()).to.equal(mathModule);
+        });
+    });
 });
