@@ -212,7 +212,7 @@ describe("env = new Environment(config)", () => {
             expect(doc).to.be.instanceof(Document);
 
             var mathModule = require("../lib/stores/stdlib/math");     
-            expect(await doc.evaluate()).to.equal(mathModule);
+            expect((await doc.evaluate()).namespace).to.equal(mathModule);
         });
     });
 });

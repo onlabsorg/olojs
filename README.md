@@ -223,8 +223,9 @@ In NodeJS you can create and manage an olojs environment as follows:
 const olojs = require("@onlabsorg/olojs");
 const env = new olojs.Environment(config);      // create a new environment given a configuration object
 const doc = await doc.load("/path/to/doc");     // load a document from the environment
-const docNamespace = await doc.evaluate(args);  // returns the document local namespace
-const renderedDoc = await doc.render(args);     // renders the document
+const content = await doc.evaluate(args);       // evaluates the document
+const ns = content.namespace;                   // returns the document namespace
+const renderedDoc = await content.render();     // renders the document
 ```
 
 

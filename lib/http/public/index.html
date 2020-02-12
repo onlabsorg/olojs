@@ -36,7 +36,8 @@
             document.addEventListener("DOMContentLoaded", async () => {
                 const docPath = location.pathname.slice(0,-5);
                 const doc = await olonv.load(docPath);
-                document.querySelector("main").innerHTML = await doc.render(location.search);
+                const content = await doc.evaluate(location.search);
+                document.querySelector("main").innerHTML = await content.render();
             });
         </script>
         

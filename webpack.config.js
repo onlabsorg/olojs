@@ -6,7 +6,7 @@ module.exports = {
     
     output: {
         filename: 'main.js',
-        chunkFilename: 'bin/[name].js',
+        chunkFilename: '[name].bundle.js',
         path: path.resolve(__dirname, './lib/http/public')
     },    
 }
