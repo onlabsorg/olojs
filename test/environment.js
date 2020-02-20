@@ -100,21 +100,6 @@ describe("env = new Environment(config)", () => {
             store.set("/docs/doc1", "document 1 modified");
             expect(await env.fetch("/path/to/docs/doc1")).to.equal("document 1")
         });
-        
-        it("should load the `index` document if the path ends with `/`", async () => {
-            var env = new Environment({
-                stores: {
-                    "/path/to": subPath => `Document at /path/to${subPath}`,
-                    "ppp://path/to": subPath => `Document at ppp://path/to${subPath}`,
-                }
-            });
-            
-            var source = await env.fetch("/path/to/dir/");
-            expect(source).to.equal("Document at /path/to/dir/index");
-
-            var source = await env.fetch("ppp://path/to/store1/path/to/dir/");
-            expect(source).to.equal("Document at ppp://path/to/store1/path/to/dir/index");
-        });
     });
     
     describe("doc = await env.load(path)", () => {
@@ -139,14 +124,14 @@ describe("env = new Environment(config)", () => {
             expect(doc.globals).to.equal(env.globals);
         });
 
-        it("should add the document PATH to the document locals", async () => {
+        it("should add the document __path__ to the document locals", async () => {
             var env = new Environment({
                 stores: {
                     "/path/to": subPath => `Document at /path/to${subPath}`,
                 }
             });
             var doc = await env.load("/path/to/store1/path/to/doc1");
-            expect(doc.locals.PATH).to.equal("/path/to/store1/path/to/doc1");
+            expect(doc.locals.__path__).to.equal("/path/to/store1/path/to/doc1");
         });
         
         it("should return the `store.read` return value if it is an instance of Document", async () => {
