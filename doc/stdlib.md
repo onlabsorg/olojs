@@ -60,3 +60,17 @@ functions and constants:
 [tan](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/tan), 
 [tanh](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/tanh), 
 [trunc](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/trunc). 
+
+
+## /bin/path
+
+The path library exposes the following methods of the [NodeJS path](https://nodejs.org/api/path.html) module:
+
+* `getBaseName`: is just NodeJS' `path.basename`
+* `getDirName`: is NodeJS' `path.dirname` but always with trailing slash
+* `getExtName`: is just NodeJS' `path.extname`
+* `format`: is just NodeJS' `path.format`
+* `parse`: is just NodeJS' `path.parse`
+* `join`: is just NodeJS' `path.join`
+* `normalize`: is just NodeJS' `path.normalize`
+* `resolve`: is NodeJS' `path.resolve` assuming always `/` as root
