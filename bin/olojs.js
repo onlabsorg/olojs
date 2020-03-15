@@ -1,29 +1,21 @@
 #!/usr/bin/env node
 
-const Path = require("path");
-const fs = require("fs");
-
-const Package = require("../lib/package");
-const package = new Package(process.cwd());
-
-function getVersion () {
-    const npmPackage = JSON.parse( fs.readFileSync(`${__dirname}/../package.json`, 'utf8') );
-    return npmPackage.version;    
-}
+const OloJS = require("../index");
+const olojs = new OloJS( process.cwd() );
 
 const commander = require("commander");
 const cli = new commander.Command();
 
-cli.version(getVersion());
+cli.version(OloJS.getVersion());
 
 cli.command("init")
     .description("Initialize the olojs environment")
     .action(async () => {
         try {
-            await package.init();
-            console.log("Package successfully initialized");
-        } catch (e) {
-            console.log("Initialization failed");
+            await olojs.init();
+            console.log("Local olojs environment successfully initialized");
+        } catch (error) {
+            console.log(error.message);
         }
     });
 
@@ -31,16 +23,16 @@ cli.command("render <path> [args...]")
      .description("Fetch and render an olodocument")
      .action(async (path, args) => {
          const parseParams = require("../lib/tools/parameters-parser");
-         const argv = parseParams(...args);
-         const renderedDoc = await package.render(path, argv);
+         const argns = parseParams(...args);
+         const renderedDoc = await olojs.render(path, argns);
          console.log(renderedDoc);
      });
 
 cli.command("serve [port]")
      .description("Serve the olojs environment via HTTP")
      .action(async (port=8010) => {
-         const server = await package.serve(port);
-         console.log(`olojs HTTP serve listening on port ${port}` + (package.getEnvironment().cache ? "" : " in development mode"));
+         const server = await olojs.serve(port);
+         console.log(`olojs HTTP server listening on port ${port}`);
      });
 
 cli.parse(process.argv);

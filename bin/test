@@ -10,12 +10,26 @@ case "$1" in
         mocha test/document.js
         ;;
 
+    "fs-store")
+        mocha test/fs-loader.js
+        mocha test/fs-store.js
+        ;;
+            
+    "http-store")
+        mocha test/http-loader.js
+        mocha test/http-store.js
+        ;;
+
     "environment")
         mocha test/environment.js
         ;;
 
-    "package")
-        mocha test/package.js
+    "backend-environment")
+        mocha test/environment.js
+        ;;
+
+    "olojs")
+        mocha test/index.js
         ;;
 
     "all")
@@ -25,18 +39,30 @@ case "$1" in
         npm test -- document
         read -n1 -r -p "Press any key to continue..." key
         
+        npm test -- fs-store
+        read -n1 -r -p "Press any key to continue..." key
+        
+        npm test -- http-store
+        read -n1 -r -p "Press any key to continue..." key
+        
         npm test -- environment
         read -n1 -r -p "Press any key to continue..." key
 
-        npm test -- package
+        npm test -- backend-environment
+        read -n1 -r -p "Press any key to continue..." key
+
+        npm test -- olojs
         ;;
 
     *)
         echo "Syntax:"
         echo "> npm test -- expression"
         echo "> npm test -- document"
+        echo "> npm test -- fs-store"
+        echo "> npm test -- http-store"
         echo "> npm test -- environment"
-        echo "> npm test -- package"
+        echo "> npm test -- backend-environment"
+        echo "> npm test -- olojs"
         echo "> npm test -- all"
         echo ""
         ;;

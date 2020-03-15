@@ -1,0 +1,2 @@
+<h1>imported doc1</h1>
+<% doc1: import "../../doc1" %>

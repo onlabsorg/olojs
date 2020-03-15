@@ -1,0 +1,3 @@
+<% doc2 = import "./doc2" %>
+<p> doc2.PI = <% doc2.PI %> </p>
+<p> argns.x = <% argns.x %> <p>

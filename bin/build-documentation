@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+echo ""
+echo "Generating the olojs documentation"
+
+echo "- Generate the documentation of the expression module"
+node bin/docgen.js lib/expression.js > doc/expression.md
+
+echo "- Generate the documentation of the document module"
+node bin/docgen.js lib/document.js > doc/document.md
+
+echo "- Generate the documentation of the Environment class"
+node bin/docgen.js lib/environment.js > doc/environment.md
+
+echo "- Generate the documentation of the BackendEnvironment class"
+node bin/docgen.js lib/environment/backend-environment.js > doc/backend-environment.md
+
+echo "- Generate the documentation of the BrowserEnvironment class"
+node bin/docgen.js src/browser-environment.js > doc/browser-environment.md
+
+echo "- Generate the documentation of the FSStore class"
+node bin/docgen.js lib/environment/fs-store.js > doc/fs-store.md
+
+echo "- Generate the documentation of the HTTPStore class"
+node bin/docgen.js lib/environment/http-store.js > doc/http-store.md
+
+echo "DONE!"
