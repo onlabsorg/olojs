@@ -22,4 +22,7 @@ Shortcut for `expression.parse(expressionSource)(context)`
 Stringifies swan objects returned by an expression evaluator.
 This is basically the `context.str` function adapted for javascript use.
   
+### expression.apply(f, ...args)
+Applies the `args` arguments to the callable `f`
+  
 
