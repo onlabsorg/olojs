@@ -28,6 +28,7 @@ describe("env = new Environment(config)", () => {
                 stores: {
                     "ppp://path/to": subPath => `Document at ppp://path/to${subPath}`,
                     "ppp://path/to/store1": subPath => `Document at ppp://path/to/store1${subPath}`,
+                    "ppp://": subPath => `Document at ppp://${subPath}`,
                 }
             });
 
@@ -36,6 +37,13 @@ describe("env = new Environment(config)", () => {
                         
             var doc = await env.readDocument("ppp://path/to/store2/path/to/doc2");
             expect(doc).to.equal("Document at ppp://path/to/store2/path/to/doc2");
+
+            console.log(env._stores);
+            console.log('subpath:', env._stores[2].path.getSubPath("ppp://path_to/doc"));
+            console.log('storepath:', String(env._stores[2].path));
+            
+            var doc = await env.readDocument("ppp://path_to/doc");
+            expect(doc).to.equal("Document at ppp://path_to/doc");
         });
         
         it("should work also when the loader is defined as `read` method of the store", async () => {
