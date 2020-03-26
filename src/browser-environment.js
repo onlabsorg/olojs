@@ -30,7 +30,10 @@ class BrowserEnvironment extends Environment {
         super({
             globals: {
                 require: require("../lib/stdlib/browser-require"),
-                $renderError: error => `<span style="color:red; font-weight:bold">${error.message}</span>`
+                $renderError (error) {
+                    console.error(error);
+                    return `<span style="color:red; font-weight:bold">${error.message}</span>`;
+                }
             },
             stores: {
                 "/":        new HTTPStore(origin, {headers}),
