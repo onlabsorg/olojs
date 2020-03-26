@@ -28,7 +28,7 @@ describe("env = new Environment(config)", () => {
                 stores: {
                     "ppp://path/to": subPath => `Document at ppp://path/to${subPath}`,
                     "ppp://path/to/store1": subPath => `Document at ppp://path/to/store1${subPath}`,
-                    "ppp://": subPath => `Document at ppp://${subPath}`,
+                    "ppp://": subPath => `Document at ppp:/${subPath}`,
                 }
             });
 

@@ -29,10 +29,10 @@ describe("Path", () => {
             expect(String(path)).to.equal("protocol://host/");            
 
             var path = new Path("protocol://");
-            expect(String(path)).to.equal("protocol:///");            
+            expect(String(path)).to.equal("protocol://");            
 
             var path = new Path("protocol:///");
-            expect(String(path)).to.equal("protocol:///");            
+            expect(String(path)).to.equal("protocol://");            
         });
         
         it("should not normalize the host part of an url", () => {
