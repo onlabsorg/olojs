@@ -27,11 +27,11 @@ three types of quotes:
 
 * `"double quotes string"`
 * `'single quotes string'`
-* `&#96;accent quotes string&#96;`
+* `` `accent quotes string` ``
 
 The accent quotes are although special: they define a string template, meaning
 that they evaluate the `${expression}` fields and replace them with the expression
-return value. For example the string `&#96;twice 3 is ${2*3}&#96;` will resolve
+return value. For example the string `` `twice 3 is ${2*3}` `` will resolve
 to `twice 3 is 6`.
 
 
