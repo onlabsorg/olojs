@@ -143,18 +143,18 @@ Their sum is: 30
 ```
 
 The `import` function is a global function that loads and evaluates another
-document and returns its local namespace (i.e. a namespace with all the names defined
-in the document). It relies on the environment loaders to fetch the external
-documents. Find out how to [modify the environment configuration](./doc/config.md)
-to add new loaders.
+document and returns its local namespace (i.e. a namespace with all the names 
+defined in the document). It relies on the environment loaders to fetch the 
+external documents. 
+Find out how to [modify the environment configuration](./doc/config.md) to add 
+new loaders.
 
 If the import path starts with `http://` or with `https://` then another special
 bult-in type of loader is used: the HTTP loader. If fetches the document from
 the web.
 
-Another way to pull data and functions in your document is the `require` function,
-which returns the javascript exports of the scripts contained in the 
-[olojs standard library](./doc/stdlib.md). For example `md = require("markdown")`  
+If the import path starts with `/bin`, then it will return a javascript module contained 
+in the [olojs standard library](./doc/stdlib.md). For example `md = import("/bin/markdown")`  
 will load the markdown module and assign its exports to the `md` variable.
 
 
@@ -221,7 +221,7 @@ in your configuration file you could add the following line:
 const package = require("an-olojs-package");
 // ...
 module.exports = new Environment({
-    stores: {
+    paths: {
         // ...
         "/pac" : package.load,
         // ...

@@ -16,7 +16,7 @@ echo "- Generate the documentation of the BackendEnvironment class"
 node bin/docgen.js lib/environment/backend-environment.js > doc/backend-environment.md
 
 echo "- Generate the documentation of the BrowserEnvironment class"
-node bin/docgen.js src/browser-environment.js > doc/browser-environment.md
+node bin/docgen.js lib/environment/browser-environment.js > doc/browser-environment.md
 
 echo "- Generate the documentation of the FSStore class"
 node bin/docgen.js lib/environment/fs-store.js > doc/fs-store.md
