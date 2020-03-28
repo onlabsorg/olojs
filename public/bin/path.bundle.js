@@ -1,1 +1,14 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[3],{21:function(e,a,o){const n=o(1);e.exports={getBaseName:n.basename,getDirName:e=>n.dirname(e)+"/",getExtName:n.extname,format:n.format,parse:n.parse,join:n.join,normalize:n.normalize,resolve:(...e)=>n.resolve("/",...e)}}}]);
+(window["webpackJsonp"] = window["webpackJsonp"] || []).push([["/bin/path"],{
+
+/***/ "./lib/environment/stdlib/path.js":
+/*!****************************************!*\
+  !*** ./lib/environment/stdlib/path.js ***!
+  \****************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("const Path = __webpack_require__(/*! path */ \"./node_modules/path-browserify/index.js\");\n\nmodule.exports = {\n    getBaseName: Path.basename,\n    getDirName: path => Path.dirname(path) + \"/\",\n    getExtName: Path.extname,\n    format: Path.format,\n    parse: Path.parse,\n    join: Path.join,\n    normalize: Path.normalize,\n    resolve: (...paths) => Path.resolve(\"/\", ...paths)\n};\n\n\n//# sourceURL=webpack:///./lib/environment/stdlib/path.js?");
+
+/***/ })
+
+}]);

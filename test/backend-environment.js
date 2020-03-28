@@ -2,11 +2,8 @@ var expect = require("chai").expect;
 var express = require("express");
 var fs = require("fs");
 var Path = require("path");
-
 var Environment = require("../lib/environment/backend-environment");
 var document = require("../lib/document");
-
-var EnvironmentHTTPServer = require("../lib/environment/http-server");
 require("isomorphic-fetch");
 
 function createMemoryStore (docs) {
@@ -20,7 +17,7 @@ function createMemoryStore (docs) {
 }
 
 
-describe("EnvironmentHTTPServer", () => {
+describe("BackendEnvironment", () => {
     
     describe("default server", () => {
         var store, server;
@@ -30,7 +27,7 @@ describe("EnvironmentHTTPServer", () => {
                 "/path/to/doc1": "doc1 source"
             });
             var env = new Environment({
-                stores: {"/":store},
+                paths: {"/":store},
             });
             server = await env.serve(8888);
         });
@@ -114,7 +111,7 @@ describe("EnvironmentHTTPServer", () => {
             });
             
             var env = new Environment({
-                stores: {"/":store},
+                paths: {"/":store},
                 publicPath: customPublicPath,
                 allow: req => {
                     if (req.path.slice(0, 9) === "/private/") return false;

@@ -26,20 +26,26 @@ class OloJS {
             throw new Error("Environment already initialized");
         }
         
+        // create a new environment script
         const document = require("./lib/document");
         const environmentScriptTemplate = this.constructor.getEnvironmentScriptTemplate();
         const context = document.createContext(templateVars);
-        const environmentScript = await document.render(await document.parse(environmentScriptTemplate)(context));
+        const environmentScript = await document.expression.stringify(await document.parse(environmentScriptTemplate)(context));
+        
+        // write the environment script on disc
         fs.writeFileSync(environmentScriptPath, environmentScript, "utf8");
-        for (let dir of dirs) await this._createDir(dir);
+        
+        // create folders
+        for (let dir of dirs) {
+            await this._createDir(dir);
+        }
     }
 
-    async render (localDocPath, argns={}) {
+    async render (docPath, argns={}) {
         const document = require("./lib/document");
         const env = this.getEnvironment();
-        const doc = await document.load(env, localDocPath);
-        const docNS = await doc.evaluate({argns});
-        return await document.render(docNS);
+        const doc = await env.load(docPath, argns);
+        return await document.expression.stringify(doc);
     }
 
     async serve (port=8010) {
