@@ -25,7 +25,7 @@ case "$1" in
         ;;
 
     "backend-environment")
-        mocha test/environment.js
+        mocha test/backend-environment.js
         ;;
 
     "olojs")

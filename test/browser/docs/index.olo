@@ -1,0 +1,6 @@
+<% assert = condition -> bool(condition) ? " **[OK]**" ; " **[Fail]**" %>
+<% __render__ = import "/bin/markdown" %>
+
+# olojs test client
+
+* It should evaluate expressions <% assert({x=10}.(x+1) == 11) %>
