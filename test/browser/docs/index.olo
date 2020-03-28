@@ -4,3 +4,4 @@
 # olojs test client
 
 * It should evaluate expressions <% assert({x=10}.(x+1) == 11) %>
+* It should import <% assert((import "./doc1").x == 10) %>
