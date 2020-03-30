@@ -350,54 +350,22 @@ describe("env = new Environment(config)", () => {
         });
     });
     
-    describe("env.load(path, argns)", () => {
+    describe("env.loadDocument(path, presets)", () => {
         
-        it("should return the return value of the `load` handler mapped to the given path", async () => {
+        it("should evaluate and return the namespace of the olo-document mapped to path", async () => {
             var env = new Environment({
                 paths: {
-                    "/path/to": {load: subPath => `Resource at /path/to${subPath}`},
-                    "/path/to/store1": {load: subPath => `Resource at /path/to/store1${subPath}`},
+                    "/path/to": subPath => `<% p = __path__ %> <% sp = "${subPath}" %> <% y = 2*x %>`,
                 }
             });
-            
-            var res = await env.load("/path/to/store1/path/to/doc1");
-            expect(res).to.equal("Resource at /path/to/store1/path/to/doc1");
-                        
-            var res = await env.load("/path/to/store2/path/to/doc2");
-            expect(res).to.equal("Resource at /path/to/store2/path/to/doc2");
-        });
-        
-        it("should throw an error if no store is defined for the given path", async () => {
-            var env = new Environment({
-                paths: {
-                    "/path/to": subPath => `Document at /path/to${subPath}`,
-                    "/path/to/store1": subPath => `Document at /path/to/store1${subPath}`,
-                }
-            });
-            
-            class ExceptionExpected extends Error {};
-            try {
-                await env.load("/unmapped-store/path/to/doc");
-                throw new ExceptionExpected();
-            } catch (e) {
-                expect(e).to.not.be.instanceof(ExceptionExpected);
-                expect(e.message).to.equal("Handler not defined for path /unmapped-store/path/to/doc");
-            }
-        });
-
-        it("should evaluate and return the namespace of the olo-document mapped to path if the `load` handler is not defined", async () => {
-            var env = new Environment({
-                paths: {
-                    "/path/to": subPath => `<% p = __path__ %> <% sp = "${subPath}" %> <% x = argns.x %>`,
-                }
-            });
-            var ns = await env.load("/path/to/a/doc", {x:10});
+            var ns = await env.loadDocument("/path/to/a/doc", {x:10});
             expect(ns.p).to.equal("/path/to/a/doc");
             expect(ns.sp).to.equal("/a/doc");
             expect(ns.x).to.equal(10);
+            expect(ns.y).to.equal(20);
         });
 
-        it("should throw an error if neither `read` nor `load` are defined", async () => {
+        it("should throw an error if `read` is not defined for the given path", async () => {
             var env = new Environment({
                 paths: {
                     "/path/to/store1": {},
@@ -406,7 +374,37 @@ describe("env = new Environment(config)", () => {
             
             class ExceptionExpected extends Error {};
             try {
-                await env.load("/path/to/store1/doc");
+                await env.loadDocument("/path/to/store1/doc");
+                throw new ExceptionExpected();
+            } catch (e) {
+                expect(e).to.not.be.instanceof(ExceptionExpected);
+                expect(e.message).to.equal("Read operation not defined for paths /path/to/store1/*");
+            }
+        });
+    });
+
+    describe("env.renderDocument(path, presets)", () => {
+        
+        it("should evaluate and return the stringified namespace of the olo-document mapped to path", async () => {
+            var env = new Environment({
+                paths: {
+                    "/path/to": subPath => `x is <% x %>`,
+                }
+            });
+            var text = await env.renderDocument("/path/to/a/doc", {x:10});
+            expect(text).to.equal("x is 10");
+        });
+
+        it("should throw an error if `read` is not defined for the given path", async () => {
+            var env = new Environment({
+                paths: {
+                    "/path/to/store1": {},
+                }
+            });
+            
+            class ExceptionExpected extends Error {};
+            try {
+                await env.renderDocument("/path/to/store1/doc");
                 throw new ExceptionExpected();
             } catch (e) {
                 expect(e).to.not.be.instanceof(ExceptionExpected);
