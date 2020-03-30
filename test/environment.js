@@ -328,13 +328,13 @@ describe("env = new Environment(config)", () => {
             }            
         });
         
-        it("should contain the an `import` function, decorating the `env.load` method with relative path resolutions", async () => {
+        it("should contain the an `import` function, decorating the `env.loadDocument` method with relative path resolutions", async () => {
             var env = new Environment();
             
             var pathArg, argnsArg, self;
-            env.load = function (path, argns) {
+            env.loadDocument = function (path, presets) {
                 pathArg = String(path);
-                argnsArg = argns;
+                argnsArg = presets.argns;
                 self = this;
                 return "called";
             }

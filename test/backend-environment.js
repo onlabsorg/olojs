@@ -233,4 +233,30 @@ describe("BackendEnvironment", () => {
             await server.close();
         });
     });
+
+    describe("BackendEnvironment.prototype.loadDocument(path, presets)", () => {
+        
+        it("should return a stdlib module if the path starts with `/bin/`", async () => {
+            var env = new Environment();
+            
+            var math = await env.loadDocument("/bin/math");
+            expect(math).to.equal(require("../lib/environment/stdlib/math"));
+
+            var math = await env.loadDocument("bin/math");
+            expect(math).to.equal(require("../lib/environment/stdlib/math"));
+        });
+        
+        it("should revert to the parent environment if path doesn't start by `/bin/`", async () => {
+            var env = new Environment({
+                paths: {
+                    "/path/to": subPath => `<% p = __path__ %> <% sp = "${subPath}" %> <% y = 2*x %>`,
+                }
+            });
+            var ns = await env.loadDocument("/path/to/a/doc", {x:10});
+            expect(ns.p).to.equal("/path/to/a/doc");
+            expect(ns.sp).to.equal("/a/doc");
+            expect(ns.x).to.equal(10);
+            expect(ns.y).to.equal(20);
+        });
+    });
 });
