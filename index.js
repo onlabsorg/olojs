@@ -44,8 +44,7 @@ class OloJS {
     async render (docPath, argns={}) {
         const document = require("./lib/document");
         const env = this.getEnvironment();
-        const doc = await env.load(docPath, argns);
-        return await document.expression.stringify(doc);
+        return await env.renderDocument(docPath, {argns});
     }
 
     async serve (port=8010) {
