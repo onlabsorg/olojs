@@ -36,8 +36,8 @@
         
             async function load (hash) {
                 const [docPath, argns] = olonv.parseURI(hash.slice(1));
-                const doc = await olonv.load(docPath);
-                const html = await olonv.stringifyDocumentExpression(doc);
+                olonv.docns = await olonv.loadDocument(docPath, {argns});
+                const html = await olonv.stringifyDocumentExpression(olonv.docns);
                 document.querySelector("main").innerHTML = html;            
             }
             
