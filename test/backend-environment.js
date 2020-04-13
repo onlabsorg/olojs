@@ -234,29 +234,17 @@ describe("BackendEnvironment", () => {
         });
     });
 
-    describe("BackendEnvironment.prototype.loadDocument(path, presets)", () => {
+    describe("BackendEnvironment globals", () => {
         
-        it("should return a stdlib module if the path starts with `/bin/`", async () => {
-            var env = new Environment();
-            
-            var math = await env.loadDocument("/bin/math");
-            expect(math).to.equal(require("../lib/environment/stdlib/math"));
-
-            var math = await env.loadDocument("bin/math");
-            expect(math).to.equal(require("../lib/environment/stdlib/math"));
-        });
-        
-        it("should revert to the parent environment if path doesn't start by `/bin/`", async () => {
+        it("should contain a `require` functions that loads the stdlib modules", async () => {
             var env = new Environment({
                 paths: {
-                    "/path/to": subPath => `<% p = __path__ %> <% sp = "${subPath}" %> <% y = 2*x %>`,
+                    "/path/to": subPath => `<% math = require 'math' %>`,
                 }
             });
-            var ns = await env.loadDocument("/path/to/a/doc", {x:10});
-            expect(ns.p).to.equal("/path/to/a/doc");
-            expect(ns.sp).to.equal("/a/doc");
-            expect(ns.x).to.equal(10);
-            expect(ns.y).to.equal(20);
+            var ns = await env.loadDocument("/path/to/a/doc");
+            expect(ns.math).to.equal(require("../lib/environment/stdlib/math"));
         });
     });
+    
 });

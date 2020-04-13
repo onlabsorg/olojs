@@ -1,5 +1,5 @@
 <% assert = condition -> bool(condition) ? " **[OK]**" ; " **[Fail]**" %>
-<% __render__ = import "/bin/markdown" %>
+<% __render__ = require "markdown" %>
 
 # olojs test client
 

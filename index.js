@@ -14,9 +14,11 @@ class OloJS {
 
     getEnvironment () {
         const environmentScriptPath = this.getEnvironmentScriptPath();
-        global.__olojspath = __dirname;
+        global.olojs = {
+            'require': modulePath => require(`./lib/${modulePath}`)
+        };
         const env = require(environmentScriptPath);
-        delete global.__olojspath;
+        delete global.olojs;
         return env;
     }
 

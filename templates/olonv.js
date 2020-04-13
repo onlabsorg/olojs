@@ -1,6 +1,6 @@
-const Environment = require(`${__olojspath}/lib/environment/backend-environment`);
-const FSStore     = require(`${__olojspath}/lib/environment/fs-store`);
-const HTTPStore   = require(`${__olojspath}/lib/environment/http-store`);
+const Environment = olojs.require("environment/backend-environment");
+const FSStore     = olojs.require("environment/fs-store");
+const HTTPStore   = olojs.require("environment/http-store");
 
 module.exports = new Environment({
     
