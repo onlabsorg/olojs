@@ -113,10 +113,7 @@ describe("BackendEnvironment", () => {
             var env = new Environment({
                 paths: {"/":store},
                 publicPath: customPublicPath,
-                allow: req => {
-                    if (req.path.slice(0, 9) === "/private/") return false;
-                    return true;
-                }
+                allow: req => req.path.slice(0,9) !== "/private/"
             });
             
             server = await env.serve(8888);            
