@@ -4,6 +4,7 @@ var fs = require("fs");
 var Path = require("path");
 var Environment = require("../lib/environment/backend-environment");
 var document = require("../lib/document");
+var Router = require("../lib/stores/router");
 require("isomorphic-fetch");
 
 function createMemoryStore (docs) {
@@ -26,9 +27,7 @@ describe("BackendEnvironment", () => {
             store = createMemoryStore({
                 "/path/to/doc1": "doc1 source"
             });
-            var env = new Environment({
-                paths: {"/":store},
-            });
+            var env = new Environment({store});
             server = await env.serve(8888);
         });
         
@@ -111,7 +110,7 @@ describe("BackendEnvironment", () => {
             });
             
             var env = new Environment({
-                paths: {"/":store},
+                store: store,
                 publicPath: customPublicPath,
                 allow: req => req.path.slice(0,9) !== "/private/"
             });
@@ -235,13 +234,12 @@ describe("BackendEnvironment", () => {
         
         it("should contain a `require` functions that loads the stdlib modules", async () => {
             var env = new Environment({
-                paths: {
+                store: new Router({
                     "/path/to": subPath => `<% math = require 'math' %>`,
-                }
+                })
             });
             var ns = await env.loadDocument("/path/to/a/doc");
             expect(ns.math).to.equal(require("../lib/environment/stdlib/math"));
         });
     });
-    
 });

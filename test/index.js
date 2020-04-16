@@ -1,7 +1,7 @@
 var expect = require("chai").expect;
 
 var OloJS = require("../index");
-var HTTPStore = require("../lib/environment/http-store");
+var HTTPStore = require("../lib/stores/http-store");
 var fs = require("fs");
 var afs = require("../lib/tools/afs");
 var Path = require("path");

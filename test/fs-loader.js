@@ -1,5 +1,5 @@
 
-var FSStore = require("../lib/environment/fs-store");
+var FSStore = require("../lib/stores/fs-store");
 
 var initStore = require("./init-fs-store");
 var ROOT_PATH = `${__dirname}/fs-store`;

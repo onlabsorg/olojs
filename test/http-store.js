@@ -1,7 +1,7 @@
 const expect = require("chai").expect;
 
-var HTTPStore = require("../lib/environment/http-store");
-var FSStore = require("../lib/environment/fs-store");
+var HTTPStore = require("../lib/stores/http-store");
+var FSStore = require("../lib/stores/fs-store");
 
 var express = require("express");
 
