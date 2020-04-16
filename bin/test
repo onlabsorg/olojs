@@ -24,8 +24,8 @@ case "$1" in
         mocha test/environment.js
         ;;
 
-    "backend-environment")
-        mocha test/backend-environment.js
+    "http-server")
+        mocha test/http-server.js
         ;;
 
     "olojs")
@@ -48,7 +48,7 @@ case "$1" in
         npm test -- environment
         read -n1 -r -p "Press any key to continue..." key
 
-        npm test -- backend-environment
+        npm test -- http-server
         read -n1 -r -p "Press any key to continue..." key
 
         npm test -- olojs
@@ -61,7 +61,7 @@ case "$1" in
         echo "> npm test -- fs-store"
         echo "> npm test -- http-store"
         echo "> npm test -- environment"
-        echo "> npm test -- backend-environment"
+        echo "> npm test -- http-server"
         echo "> npm test -- olojs"
         echo "> npm test -- all"
         echo ""

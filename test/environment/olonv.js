@@ -1,6 +1,7 @@
-const Environment = olojs.require("environment/backend-environment");
+const Environment = olojs.require("environment");
 const FSStore     = olojs.require("stores/fs-store");
 const HTTPStore   = olojs.require("stores/http-store");
+const HTTPServer  = olojs.require("http-server");
 const Router      = olojs.require("stores/router");
 
 module.exports = new Environment({
@@ -13,8 +14,14 @@ module.exports = new Environment({
     }),
     
     // global names available to all the documents
-    globals: {},
+    globals: {
+        require: modulePath => olojs.require(`stdlib/${modulePath}`)
+    },
     
     // true if the loaded document are not cached
     nocache: false,
+    
+    // a function that starts serving this environment over HTTP
+    // it takes a port as input and returns a server object as output
+    serve: HTTPServer()
 });
