@@ -239,7 +239,7 @@ describe("BackendEnvironment", () => {
                 })
             });
             var ns = await env.loadDocument("/path/to/a/doc");
-            expect(ns.math).to.equal(require("../lib/environment/stdlib/math"));
+            expect(ns.math).to.equal(require("../lib/stdlib/math"));
         });
     });
 });

@@ -72,8 +72,8 @@ module.exports = BrowserEnvironment;
 
 
 const modules = {
-    "math"     : () => import(/* webpackChunkName: "/bin/math" */     "../lib/environment/stdlib/math"),
-    "markdown" : () => import(/* webpackChunkName: "/bin/markdown" */ "../lib/environment/stdlib/markdown"),
-    "html"     : () => import(/* webpackChunkName: "/bin/html" */     "../lib/environment/stdlib/html"),
-    "path"     : () => import(/* webpackChunkName: "/bin/path" */     "../lib/environment/stdlib/path"),
+    "math"     : () => import(/* webpackChunkName: "/bin/math" */     "../lib/stdlib/math"),
+    "markdown" : () => import(/* webpackChunkName: "/bin/markdown" */ "../lib/stdlib/markdown"),
+    "html"     : () => import(/* webpackChunkName: "/bin/html" */     "../lib/stdlib/html"),
+    "path"     : () => import(/* webpackChunkName: "/bin/path" */     "../lib/stdlib/path"),
 }
