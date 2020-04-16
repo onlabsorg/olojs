@@ -5,12 +5,12 @@
  *  create and olojs environment suitable for browsers.
  */
 
-const Environment = require("../environment");
-const document = require("../document");
-const HTTPStore = require("../stores/http-store");
-const parseParams = require("../tools/parameters-parser");
+const Environment = require("../lib/environment");
+const document = require("../lib/document");
+const HTTPStore = require("../lib/stores/http-store");
+const parseParams = require("../lib/tools/parameters-parser");
 const DOMPurify = require("dompurify");    
-const Router = require("../stores/router");
+const Router = require("../lib/stores/router");
 
 
 class BrowserEnvironment extends Environment {
@@ -72,8 +72,8 @@ module.exports = BrowserEnvironment;
 
 
 const modules = {
-    "math"     : () => import(/* webpackChunkName: "/bin/math" */     "./stdlib/math"),
-    "markdown" : () => import(/* webpackChunkName: "/bin/markdown" */ "./stdlib/markdown"),
-    "html"     : () => import(/* webpackChunkName: "/bin/html" */     "./stdlib/html"),
-    "path"     : () => import(/* webpackChunkName: "/bin/path" */     "./stdlib/path"),
+    "math"     : () => import(/* webpackChunkName: "/bin/math" */     "../lib/environment/stdlib/math"),
+    "markdown" : () => import(/* webpackChunkName: "/bin/markdown" */ "../lib/environment/stdlib/markdown"),
+    "html"     : () => import(/* webpackChunkName: "/bin/html" */     "../lib/environment/stdlib/html"),
+    "path"     : () => import(/* webpackChunkName: "/bin/path" */     "../lib/environment/stdlib/path"),
 }
