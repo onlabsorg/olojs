@@ -739,7 +739,7 @@ describe("expression", () => {
             var ctx = createContext({ns:{__str__: "ns string"}});
             expect(await evaluate("str ns", ctx)).to.equal("ns string");
         });
-
+        
         it("should concatenate the serialized item if X is a tuple", async () => {
             var ctx = createContext({T:true, F:false, sum: (x,y) => x+y});
             expect(await evaluate("str('it is ',T,' that 1+2 is ',sum(1,2))", ctx)).to.equal("it is TRUE that 1+2 is 3");
