@@ -419,6 +419,17 @@ The subcontexting can be also used as an alternative way to access names defined
 inside a namespace. In the example above, the expression `ns.z` will indeed
 resolve to the value of `z` inside the namespace `ns`.
 
+When evaluating an expression in a namespace context, the context in which the
+namespace was create gets temporary restored. For example:
+
+```
+x = 10,
+ns = {y=20}.{z=30},
+ns.x,   # 10
+ns.y,   # 20
+ns.z    # 30    
+```
+
 
 ## Operators precedence
 
@@ -457,6 +468,8 @@ The `str` function convers `X` to a string as follows:
 * if `X` is a string, it resolves to `X` itself
 * if `X` is a list, it resolves to `"[n]"`, where `n` is the number of items in the list
 * if `X` is a namespace, it resolves to `"{n}"`, where `n` is the number of names in the namespace
+* if `X` is a namespace and `X.__str__` is a string, it returns the latter
+* if `X` is a namespace and `X.__str__` is a function, it returns `X.__str__(X)`
 * if `X` is a function, it resolves to `"&#2A0D;"`, where `n` is the number of names in the namespace
 * if `X` is a tuple `(x1,x2,x3,...)`, it resolves to `(str x1) + (str x2) + (str x3) + ...`
 
