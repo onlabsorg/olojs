@@ -469,7 +469,6 @@ The `str` function convers `X` to a string as follows:
 * if `X` is a list, it resolves to `"[n]"`, where `n` is the number of items in the list
 * if `X` is a namespace, it resolves to `"{n}"`, where `n` is the number of names in the namespace
 * if `X` is a namespace and `X.__str__` is a string, it returns the latter
-* if `X` is a namespace and `X.__str__` is a function, it returns `X.__str__(X)`
 * if `X` is a function, it resolves to `"&#2A0D;"`, where `n` is the number of names in the namespace
 * if `X` is a tuple `(x1,x2,x3,...)`, it resolves to `(str x1) + (str x2) + (str x3) + ...`
 

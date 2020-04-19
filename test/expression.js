@@ -748,14 +748,6 @@ describe("expression", () => {
             expect(await evaluate("str ns", ctx)).to.equal("ns string");
         });
         
-        it("should return X.__str__(X) if it exists and it is a function", async () => {
-            var ctx = createContext({ns:{
-                s: "ns string",
-                __str__: self => self.s
-            }});
-            expect(await evaluate("str ns", ctx)).to.equal("ns string");
-        });
-
         it("should concatenate the serialized item if X is a tuple", async () => {
             var ctx = createContext({T:true, F:false, sum: (x,y) => x+y});
             expect(await evaluate("str('it is ',T,' that 1+2 is ',sum(1,2))", ctx)).to.equal("it is TRUE that 1+2 is 3");
