@@ -544,6 +544,14 @@ describe("expression", () => {
             expect(await evaluate("ns.[x,y,z]", ctx)).to.deep.equal([10,20,30]);
         });
         
+        it("should restore the context in which X was created", async () => {
+            var ctx = createContext({x:10});
+            await evaluate("ns = {y=20}.{z:30}", ctx);
+            expect(await evaluate("ns.x", ctx)).to.equal(10);
+            expect(await evaluate("ns.y", ctx)).to.equal(20);
+            expect(await evaluate("ns.z", ctx)).to.equal(30);
+        });
+        
         it("should return a tuple obtained by sub-contexting each item of X if X is a tuple", async () => {
             var ctx = createContext({
                 ns1: {a:11, b:12, c:13},
