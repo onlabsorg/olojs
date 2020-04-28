@@ -55,6 +55,18 @@ A special type of tuple is the empty tuple `()` which is used in swan to
 represent the concept of nothingness.
 
 
+## Range operator
+The range operation `a:b` creates a numeric tuple containing all the integers
+between `a` and `b`, including also `a` and `b`. For example:
+
+* `3:7` is equivalent to `3,4,5,6,7`
+* `7:3` is equivalent to `7,6,5,4,3`
+* `2:2` is equivalent to `2`
+
+If a range boundary is a decimal, it will be truncated. For example `3.2:5.8` is
+equivalent to `3:5` and resolves to `3,4,5`.
+
+
 ## List data type
 A list is an ordered sequence of values, just like a tuple, but it behaves
 like a single value (uni-dimensional tuple). For this reason, it allows 
@@ -85,12 +97,6 @@ underscore character (`_`), but they cannot start with a number character.
 Every expression has a return value; in particular an assignment expression
 `x = 10` returns nothing (`null` in javascript). 
 
-If we want an assignment expression to return the expression value instead,
-we should use the `:` operator instead of the `=` operator.
-
-For example `x : 10` works exactly like `x = 10` but it returns `10` instead of
-nothing.
-
 Multiple values (a tuple of values) can be assigned to multiple name (a tuple
 of names) as follows:
 
@@ -116,7 +122,7 @@ A namespace is a set of name-value pairs defined as `{tuple}`.
 ```
 {
     x = 10,
-    y : 20,
+    y = 20,
     z = 30
 }
 ```
@@ -128,7 +134,7 @@ In order to access the names inside a namespace, you can use either the applicat
 operator ` ` or the subcontexting operator `.`. We will explain these operators
 later, but some examples are aticipated below:
 
-* `ns = {a:1, b=2, c=3}` defines a namespace and maps it to the name `ns`
+* `ns = {a=1, b=2, c=3}` defines a namespace and maps it to the name `ns`
 * `ns.a` resolves to `1`
 * `ns('b')` resolves to `2`
 
@@ -193,15 +199,16 @@ If X is an out-of-range number or not a number, `F X` will return an empty tuple
 
 **When F is a string and X is a number**, the application `F X` returns the 
 character at position X. This works exactly the same as if a string was a
-list of characters.
+list of characters, except that it returns an empty string when a list would
+return an empty tuple.
 
 **When F is a namespace and X is a string**, the application `F X` returns the 
 value of `F` mapped to the name `X`. A namespace can therefore be interpreted
 as a mapping between names and values.
 
 Examples:
-* `{a:1, b:2} "a"` will return `1`
-* `{a:1, b:2}("b")` will return `2`
+* `{a=1, b=2} "a"` will return `1`
+* `{a=1, b=2}("b")` will return `2`
 
 If X is a non-mapped name or not a name at all, `F X` will return an empty tuple `()`.
 
@@ -250,11 +257,11 @@ and returns the list `l` repeated `n` times. For example `3 * [1,2,3]`, as well 
 The namespace type implements only the sum operation.
 
 The sum `ns1 + ns2` between two namespaces returns a new namespace obtained by
-merging `ns1` and `ns2`. For example `{a:1,b:2} + {c:3,d:4}` returns 
-`{a:1, b:2, c:3, d:4}`.
+merging `ns1` and `ns2`. For example `{a=1,b=2} + {c=3,d=4}` returns 
+`{a=1, b=2, c=3, d=4}`.
 
 If `ns1` and `ns2` contain the same name, the value of `ns2` prevales. For
-example `{a:1,b:2} + {b:3, c:4}` returns `{a:1, b:3, c:4}`.
+example `{a=1,b=2} + {b=3, c=4}` returns `{a=1, b=3, c=4}`.
 
 #### Arithmetic operations between tuples
 The sum of a tuple `t1=(x1,x2,x3)` and a tuple `t2=(y1,y2,y3)` is the tuple
@@ -316,7 +323,7 @@ For example, the following expressions return true:
 
 #### Comparison operations between namespaces
 Two namespaces are equal if they contain the same set of name-value pairs.
-For example `{a:1,b:2} == {a:1,b:2}` is true, but `{a:1,b:2} == {a:1,b:4,c:5}`
+For example `{a=1,b=2} == {a=1,b=2}` is true, but `{a=1,b=2} == {a=1,b=4,c=5}`
 is false.
 
 No order is defined for the namespace type, therefore only the `==` and `!=`
@@ -391,15 +398,15 @@ When you assign a value to a name with `name = value` or with `name: value`,
 you are defining that name in the global namespace and you can access the 
 associated value as `name` in another expression.
 
-When you assign a value to a name between curly braces `{name1=10, name2:20}`,
+When you assign a value to a name between curly braces `{name1=10, name2=20}`,
 you are defining names in a sub-namespace and you can access the associated 
-values with an apply operation `{a:1}("a")`.
+values with an apply operation `{a=1}("a")`.
 
 A subcontexting operation `ns . expression` executes the right-hand expression
 in a sub-context obtained by extending the parent context with the names 
 contained in the namespace `ns`.
 
-For example, `{a:2,b:3}.(a+b)` will resolve to `5`.
+For example, `{a=2,b=3}.(a+b)` will resolve to `5`.
 
 The global names are still visible in the righ-hand expression, unless they are
 overridden by local namespace names. For example:
@@ -407,7 +414,7 @@ overridden by local namespace names. For example:
 ```
 x = 10,
 y = 20,
-ns = {x:100, z:300},
+ns = {x=100, z=300},
 sum = ns.(x+y+z)
 ```
 
@@ -442,7 +449,7 @@ ns.z    # 30
 7. `?`
 8. `;`
 9. `->`
-10. `=` , `:`
+10. `=`
 11. `,`
 
 
@@ -490,7 +497,7 @@ mf: (x,xs) -> xs ; (f(x), mf(xs))
 and the definition of `map` would be:
 
 ```
-map: f -> {mf: (x,xs) -> xs ; (f x, mf xs)}.mf
+map: f -> {mf = (x,xs) -> xs ; (f x, mf xs)}.mf
 ```
 
 #### enum X

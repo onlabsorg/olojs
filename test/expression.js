@@ -95,6 +95,125 @@ describe("expression", () => {
         });
     });
     
+    describe("ranges: `a:b`", () => {
+    
+        it("should return the tuple of all the integers between a and b", async () => {
+            var ctx = createContext();
+            var range = await evaluate("2:6", ctx);
+            expect(range).to.be.instanceof(Tuple);
+            expect(Array.from(range)).to.deep.equal([2,3,4,5,6]);            
+        });
+
+        it("should work also if b < a", async () => {
+            var ctx = createContext();
+            var range = await evaluate("6:2", ctx);
+            expect(range).to.be.instanceof(Tuple);
+            expect(Array.from(range)).to.deep.equal([6,5,4,3,2]);            
+        });
+
+        it("should return a if a == b", async () => {
+            var ctx = createContext();
+            var range = await evaluate("2:2", ctx);
+            expect(range).to.equal(2);
+        });
+        
+        it("should truncate the boundaries a and/or b if decimal", async () => {
+            var ctx = createContext();
+            var range = await evaluate("2.7:6.1", ctx);
+            expect(range).to.be.instanceof(Tuple);
+            expect(Array.from(range)).to.deep.equal([2,3,4,5,6]);            
+
+            var ctx = createContext();
+            var range = await evaluate("6.1:2.7", ctx);
+            expect(range).to.be.instanceof(Tuple);
+            expect(Array.from(range)).to.deep.equal([6,5,4,3,2]);            
+        });
+        
+        it("should throw an exception if a and/or b are not numbers", async () => {
+            var ctx = createContext({fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false});
+            var expectRangeError = (expression, xType, yType) => expectException(() => evaluate(expression, ctx), `Range operation not defined between ${xType} and ${yType}`);
+            
+            var xType='NOTHING'; ctx.x = null;
+            await expectRangeError("x:()",    xType, 'NOTHING');                                                
+            await expectRangeError("x:F",     xType, 'BOOLEAN');                                    
+            await expectRangeError("x:1",     xType, 'NUMBER');                                    
+            await expectRangeError("x:'abc'", xType, 'STRING');                                    
+            await expectRangeError("x:ls",    xType, 'LIST');                                    
+            await expectRangeError("x:ns",    xType, 'NAMESPACE');                                    
+            await expectRangeError("x:fn",    xType, 'FUNCTION');                                                
+            await expectRangeError("x:(1,2)", xType, 'TUPLE');                                                
+
+            var xType='BOOLEAN'; ctx.x = false;
+            await expectRangeError("x:()",    xType, 'NOTHING');                                                
+            await expectRangeError("x:F",     xType, 'BOOLEAN');                                    
+            await expectRangeError("x:1",     xType, 'NUMBER');                                    
+            await expectRangeError("x:'abc'", xType, 'STRING');                                    
+            await expectRangeError("x:ls",    xType, 'LIST');                                    
+            await expectRangeError("x:ns",    xType, 'NAMESPACE');                                    
+            await expectRangeError("x:fn",    xType, 'FUNCTION');                                                
+            await expectRangeError("x:(1,2)", xType, 'TUPLE');                                                
+            
+            var xType='NUMBER'; ctx.x = 1;
+            await expectRangeError("x:()",    xType, 'NOTHING');                                                
+            await expectRangeError("x:F",     xType, 'BOOLEAN');                                    
+            await expectRangeError("x:'abc'", xType, 'STRING');                                    
+            await expectRangeError("x:ls",    xType, 'LIST');                                    
+            await expectRangeError("x:ns",    xType, 'NAMESPACE');                                    
+            await expectRangeError("x:fn",    xType, 'FUNCTION');                                                
+            await expectRangeError("x:(1,2)", xType, 'TUPLE');                                                
+
+            var xType='STRING'; ctx.x = "abc";
+            await expectRangeError("x:()",    xType, 'NOTHING');                                                
+            await expectRangeError("x:F",     xType, 'BOOLEAN');                                    
+            await expectRangeError("x:1",     xType, 'NUMBER');                                    
+            await expectRangeError("x:'abc'", xType, 'STRING');                                    
+            await expectRangeError("x:ls",    xType, 'LIST');                                    
+            await expectRangeError("x:ns",    xType, 'NAMESPACE');                                    
+            await expectRangeError("x:fn",    xType, 'FUNCTION');                                                
+            await expectRangeError("x:(1,2)", xType, 'TUPLE');                                                
+
+            var xType='LIST'; ctx.x = [1,2,3];
+            await expectRangeError("x:()",    xType, 'NOTHING');                                                
+            await expectRangeError("x:F",     xType, 'BOOLEAN');                                    
+            await expectRangeError("x:1",     xType, 'NUMBER');                                    
+            await expectRangeError("x:'abc'", xType, 'STRING');                                    
+            await expectRangeError("x:ls",    xType, 'LIST');                                    
+            await expectRangeError("x:ns",    xType, 'NAMESPACE');                                    
+            await expectRangeError("x:fn",    xType, 'FUNCTION');                                                
+            await expectRangeError("x:(1,2)", xType, 'TUPLE');                                                
+
+            var xType='FUNCTION'; ctx.x = x=>2*x;
+            await expectRangeError("x:()",    xType, 'NOTHING');                                                
+            await expectRangeError("x:F",     xType, 'BOOLEAN');                                    
+            await expectRangeError("x:1",     xType, 'NUMBER');                                    
+            await expectRangeError("x:'abc'", xType, 'STRING');                                    
+            await expectRangeError("x:ls",    xType, 'LIST');                                    
+            await expectRangeError("x:ns",    xType, 'NAMESPACE');                                    
+            await expectRangeError("x:fn",    xType, 'FUNCTION');                                                
+            await expectRangeError("x:(1,2)", xType, 'TUPLE');                                                
+
+            var xType='NAMESPACE'; ctx.x = {a:1,b:2,c:3};
+            await expectRangeError("x:()",    xType, 'NOTHING');                                                
+            await expectRangeError("x:F",     xType, 'BOOLEAN');                                    
+            await expectRangeError("x:1",     xType, 'NUMBER');                                    
+            await expectRangeError("x:'abc'", xType, 'STRING');                                    
+            await expectRangeError("x:ls",    xType, 'LIST');                                    
+            await expectRangeError("x:ns",    xType, 'NAMESPACE');                                    
+            await expectRangeError("x:fn",    xType, 'FUNCTION');                                                
+            await expectRangeError("x:(1,2)", xType, 'TUPLE');                                                
+
+            var xType='TUPLE'; ctx.x = new Tuple(1,2,3);
+            await expectRangeError("x:()",    xType, 'NOTHING');                                                
+            await expectRangeError("x:F",     xType, 'BOOLEAN');                                    
+            await expectRangeError("x:1",     xType, 'NUMBER');                                    
+            await expectRangeError("x:'abc'", xType, 'STRING');                                    
+            await expectRangeError("x:ls",    xType, 'LIST');                                    
+            await expectRangeError("x:ns",    xType, 'NAMESPACE');                                    
+            await expectRangeError("x:fn",    xType, 'FUNCTION');                                                
+            await expectRangeError("x:(1,2)", xType, 'TUPLE');                                                
+        });
+    });
+    
     describe("lists: `[expression]`", () => {
         
         it("should return an array", async () => {
@@ -191,65 +310,6 @@ describe("expression", () => {
         });
     });
     
-    describe("labelling operation: `name: expression`", () => {
-        
-        it("should return the expression value", async () => {
-            var ctx = createContext();
-            expect(await evaluate("x : 10", ctx)).to.equal(10);            
-            
-            var val = await evaluate("x: (1,2,3)", ctx);
-            expect(val).to.be.instanceof(Tuple);
-            expect(Array.from(val)).to.deep.equal([1,2,3]);
-
-            var val = await evaluate("(x,y): (1,2,3)", ctx);
-            expect(val).to.be.instanceof(Tuple);
-            expect(Array.from(val)).to.deep.equal([1,2,3]);
-        });
-
-        it("should create a new name in the current context and map it to the given value", async () => {
-            var ctx = createContext();            
-            await evaluate("x: 10", ctx);
-            expect(ctx.x).to.equal(10);            
-        });
-        
-        it("should assign a tuple of values to a tuple of names", async () => {
-            var ctx = createContext();            
-            await evaluate("(a,b,c): (1,2,3)", ctx);
-            expect(ctx.a).to.equal(1);        
-            expect(ctx.b).to.equal(2);        
-            expect(ctx.c).to.equal(3);        
-        });
-        
-        it("should assign null to the last names if the values tuple is smaller than the names tuple", async () => {
-            var ctx = createContext();
-            await evaluate("(a,b,c,d): (10,20)", ctx);
-            expect(ctx.a).to.equal(10);        
-            expect(ctx.b).to.equal(20);        
-            expect(ctx.c).to.be.null;                    
-            expect(ctx.d).to.be.null;                    
-        });
-        
-        it("should assign to the last name the tuple of remaining values if the names tuple is smaller than the values tuple", async () => {
-            var ctx = createContext();
-            
-            await evaluate("(a,b): (100,200,300)", ctx);
-            expect(ctx.a).to.equal(100);        
-            expect(ctx.b).to.be.instanceof(Tuple);
-            expect(Array.from(ctx.b)).to.deep.equal([200,300]);
-            
-            await evaluate("c: (10,20,30)", ctx);
-            expect(ctx.c).to.be.instanceof(Tuple);
-            expect(Array.from(ctx.c)).to.deep.equal([10,20,30]);
-        });
-        
-        it("should overwrite an existing name-value mapping", async () => {
-            var ctx = createContext({a:1});
-            await evaluate("a: 2", ctx);            
-            await evaluate("a: 3", ctx);            
-            expect(ctx.a).to.equal(3);
-        });
-    });
-
     describe("assignment operation: name = expression", () => {        
         
         it("should return null", async () => {
@@ -305,12 +365,12 @@ describe("expression", () => {
 
         it("return an object with the mapped names", async () => {
             var ctx = createContext();                    
-            expect(await evaluate("{x=1, y:2, z=3}", ctx)).to.deep.equal({x:1,y:2,z:3});
+            expect(await evaluate("{x=1, y=2, z=3}", ctx)).to.deep.equal({x:1,y:2,z:3});
         });
         
         it("should ignore the non-assignment operations", async () => {
             var ctx = createContext();                    
-            expect(await evaluate("{x=1, 10, y:2, z=3}", ctx)).to.deep.equal({x:1,y:2,z:3});
+            expect(await evaluate("{x=1, 10, y=2, z=3}", ctx)).to.deep.equal({x:1,y:2,z:3});
         });
 
         it("should not assign the names to the parent context", async () => {
@@ -384,16 +444,16 @@ describe("expression", () => {
                 expect(await evaluate("'abcdef' (-2)", ctx)).to.equal('e');                                        
             });
             
-            it("should return null if the Y is an out of range number", async () => {
+            it("should return an empty string if Y is an out of range number", async () => {
                 var ctx = createContext();
-                expect(await evaluate("'abcdef' 100", ctx)).to.equal(null);
-                expect(await evaluate("'abcdef' (-100)", ctx)).to.equal(null);                                                            
+                expect(await evaluate("'abcdef' 100", ctx)).to.equal("");
+                expect(await evaluate("'abcdef' (-100)", ctx)).to.equal("");                                                            
             });
 
-            it("should return null if Y is not a number", async () => {
+            it("should return an empty string if Y is not a number", async () => {
                 var ctx = createContext();
-                expect(await evaluate("'abcdef' '2'", ctx)).to.equal(null);  
-                expect(await evaluate("'abcdef' (1,3)", ctx)).to.equal(null);  
+                expect(await evaluate("'abcdef' '2'", ctx)).to.equal("");  
+                expect(await evaluate("'abcdef' (1,3)", ctx)).to.equal("");  
             });     
         });
         
@@ -431,31 +491,31 @@ describe("expression", () => {
             
             it("should return the value mapped to the name Y", async () => {
                 var ctx = createContext();
-                expect(await evaluate("{a:1,b:2,c:3} 'c'", ctx)).to.equal(3);
+                expect(await evaluate("{a=1,b=2,c=3} 'c'", ctx)).to.equal(3);
             });
             
             it("should return null if Y is not a valid name", async () => {                    
                 var ctx = createContext();
-                expect(await evaluate("{a:1,b:2,c:3} 1", ctx)).to.equal(null);
-                expect(await evaluate("{a:1,b:2,c:3} '$key'", ctx)).to.equal(null);
-                expect(await evaluate("{a:1,b:2,c:3} ('a','b')", ctx)).to.equal(null);
+                expect(await evaluate("{a=1,b=2,c=3} 1", ctx)).to.equal(null);
+                expect(await evaluate("{a=1,b=2,c=3} '$key'", ctx)).to.equal(null);
+                expect(await evaluate("{a=1,b=2,c=3} ('a','b')", ctx)).to.equal(null);
             });
             
             it("should return null if Y is a name not mapped to any value", async () => {
                 var ctx = createContext();
-                expect(await evaluate("{a:1,b:2,c:3} 'd'", ctx)).to.equal(null);
+                expect(await evaluate("{a=1,b=2,c=3} 'd'", ctx)).to.equal(null);
             });
 
             it("should delegate to `X.__apply__` if it exists and it is a function", async () => {
                 var ctx = createContext();
                 
-                var val = await evaluate("{__apply__: s -> ['val of', s]}('x')", ctx);
+                var val = await evaluate("{__apply__ = s -> ['val of', s]}('x')", ctx);
                 expect(val).to.deep.equal(["val of", "x"]);
 
-                var val = await evaluate("{__apply__: (x,y) -> ['val:', y, x]}(10,20)", ctx);
+                var val = await evaluate("{__apply__ = (x,y) -> ['val:', y, x]}(10,20)", ctx);
                 expect(val).to.deep.equal(["val:", 20, 10]);
                 
-                val = await evaluate("{__apply__:1, a:2}('a')", ctx);
+                val = await evaluate("{__apply__=1, a=2}('a')", ctx);
                 expect(val).to.equal(2);
             });            
         });
@@ -546,7 +606,7 @@ describe("expression", () => {
         
         it("should restore the context in which X was created", async () => {
             var ctx = createContext({x:10});
-            await evaluate("ns = {y=20}.{z:30}", ctx);
+            await evaluate("ns = {y=20}.{z=30}", ctx);
             expect(await evaluate("ns.x", ctx)).to.equal(10);
             expect(await evaluate("ns.y", ctx)).to.equal(20);
             expect(await evaluate("ns.z", ctx)).to.equal(30);
@@ -793,7 +853,7 @@ describe("expression", () => {
 
         it("should return the tuple of the X names if X is a namespace", async () => {
             var ctx = createContext();
-            await evaluate("ns = {z:3, x:1, y:2}", ctx);
+            await evaluate("ns = {z=3, x=1, y=2}", ctx);
             var items = await evaluate("enum ns", ctx);
             expect(items).to.be.instanceof(Tuple);
             expect(Array.from(items).sort()).to.deep.equal(['x','y','z']);
@@ -806,7 +866,7 @@ describe("expression", () => {
             expect(await evaluate("enum F", ctx)).to.equal(false);
             expect(await evaluate("enum fn", ctx)).to.equal(ctx.fn);
             
-            var items = await evaluate("enum (1, 'abc', {x:10})", ctx);
+            var items = await evaluate("enum (1, 'abc', {x=10})", ctx);
             expect(items).to.be.instanceof(Tuple);
             expect(Array.from(items)).to.deep.equal([1,'abc',{x:10}]);
         });
@@ -2503,7 +2563,7 @@ describe("expression", () => {
     
     describe("operators precedence and grouping", () => {
         
-        it("should execute assignment operations (`=` and `:`) before pairing operations (`,`)", async () => {
+        it("should execute assignment operations (`=`) before pairing operations (`,`)", async () => {
             var ctx = createContext();
             
             await evaluate("x = 1,2,3", ctx);
@@ -2512,35 +2572,19 @@ describe("expression", () => {
             await evaluate("x = (1,2,3)", ctx);
             expect(ctx.x).to.be.instanceof(Tuple);
             expect(Array.from(ctx.x)).to.deep.equal([1,2,3]);
-
-            var retval = await evaluate("x : 1,2,3", ctx);
-            expect(retval).to.be.instanceof(Tuple);
-            expect(Array.from(retval)).to.deep.equal([1,2,3]);
-            expect(ctx.x).to.equal(1);
-            
-            var retval = await evaluate("x : (1,2,3)", ctx);
-            expect(retval).to.be.instanceof(Tuple);
-            expect(Array.from(retval)).to.deep.equal([1,2,3]);
-            expect(ctx.x).to.be.instanceof(Tuple);
-            expect(Array.from(ctx.x)).to.deep.equal([1,2,3]);
         });
         
-        it("should execute function definitions (`->`) before assignment operations (`=` and `:`)", async () => {
+        it("should execute function definitions (`->`) before assignment operations (`=`)", async () => {
             var ctx = createContext();
             
             await evaluate("f = x -> [x]", ctx);
             expect(ctx.f).to.be.a("function");
             expect(await ctx.f(1)).to.deep.equal([1]);
             
-            await evaluate("f: x -> [x]", ctx);
+            var retval = await evaluate("1, f = x -> [x], 2", ctx);
             expect(ctx.f).to.be.a("function");
-            expect(await ctx.f(1)).to.deep.equal([1]);
-
-            var retval = await evaluate("f: x -> [x], 2", ctx);
-            expect(ctx.f).to.be.a("function");
-            expect(await ctx.f(1)).to.deep.equal([1]);
             expect(retval).to.be.instanceof(Tuple);
-            expect(Array.from(retval)).to.deep.equal([ctx.f,2]);
+            expect(Array.from(retval)).to.deep.equal([1,2]);
         });
         
         it("should execure `;` operations before function definitions (`->`)", async () => {
@@ -2599,11 +2643,11 @@ describe("expression", () => {
             expect(await evaluate("double 2+3", ctx)).to.equal(7);
             expect(await evaluate("double(2+3)", ctx)).to.equal(10);
             
-            expect(await evaluate("{a:1,b:2}.a+b", ctx)).to.equal(11);
-            expect(await evaluate("{a:1,b:2}.(a+b)", ctx)).to.equal(3);            
+            expect(await evaluate("{a=1,b=2}.a+b", ctx)).to.equal(11);
+            expect(await evaluate("{a=1,b=2}.(a+b)", ctx)).to.equal(3);            
 
             expect(await evaluate("{f=x->2*x}.f 2", ctx)).to.equal(4);
-            expect(await evaluate("(x->{a:2*x}) 4 . a", ctx)).to.equal(8);
+            expect(await evaluate("(x->{a=2*x}) 4 . a", ctx)).to.equal(8);
         });
     });
 });
