@@ -318,7 +318,7 @@ describe("expression", () => {
         });
 
         it("should create a new name in the current context and map it to the given value", async () => {
-            var ctx = createContext();            
+            var ctx = createContext();                        
             await evaluate("x = 10", ctx);
             expect(ctx.x).to.equal(10);            
         });
@@ -382,7 +382,7 @@ describe("expression", () => {
 
     describe("function definition: names_tuple -> expression", () => {
 
-        it("return a function resolving the expression in a context augumented with the argument names", async () => {
+        it("should return a function resolving the expression in a context augumented with the argument names", async () => {
             var ctx = createContext();        
             var foo = await evaluate("(x, y) -> [y,x]", ctx);
             expect(foo).to.be.a("function");
