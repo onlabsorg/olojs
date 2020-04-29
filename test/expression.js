@@ -1,6 +1,8 @@
 var expect = require("chai").expect;
 var {parse, createContext, evaluate, Exception, Tuple} = require("../lib/expression");
 
+const isTuple = value => typeof value[Symbol.iterator] === "function";
+
 
 class ExceptionExpected extends Error {};
 
@@ -59,14 +61,14 @@ describe("expression", () => {
         it("should return the comma-separated values as an iterable", async () => {
             var ctx = createContext();
             var tuple = await evaluate("10,'abc'", ctx);
-            expect(tuple).to.be.instanceof(Tuple);
+            expect(isTuple(tuple)).to.be.true;
             expect(Array.from(tuple)).to.deep.equal([10,"abc"]);            
         });
 
         it("should flatten tuples of tuples: `(X,Y),Z` results in `X,Y,Z`", async () => {
             var ctx = createContext();
             var tuple = await evaluate("1,(2,3),4,(5,(6,7)),8,9", ctx);
-            expect(tuple).to.be.instanceof(Tuple);
+            expect(isTuple(tuple)).to.be.true;
             expect(Array.from(tuple)).to.deep.equal([1,2,3,4,5,6,7,8,9]);
         });
 
@@ -74,11 +76,11 @@ describe("expression", () => {
             var ctx = createContext();
             
             var tuple = await evaluate("1,(),2", ctx);
-            expect(tuple).to.be.instanceof(Tuple);
+            expect(isTuple(tuple)).to.be.true;
             expect(Array.from(tuple)).to.deep.equal([1,2]);
 
             var tuple = await evaluate("(),(1,(),2),(),3", ctx);
-            expect(tuple).to.be.instanceof(Tuple);
+            expect(isTuple(tuple)).to.be.true;
             expect(Array.from(tuple)).to.deep.equal([1,2,3]);            
         });
         
@@ -100,14 +102,14 @@ describe("expression", () => {
         it("should return the tuple of all the integers between a and b", async () => {
             var ctx = createContext();
             var range = await evaluate("2:6", ctx);
-            expect(range).to.be.instanceof(Tuple);
+            expect(isTuple(range)).to.be.true;
             expect(Array.from(range)).to.deep.equal([2,3,4,5,6]);            
         });
 
         it("should work also if b < a", async () => {
             var ctx = createContext();
             var range = await evaluate("6:2", ctx);
-            expect(range).to.be.instanceof(Tuple);
+            expect(isTuple(range)).to.be.true;
             expect(Array.from(range)).to.deep.equal([6,5,4,3,2]);            
         });
 
@@ -120,12 +122,12 @@ describe("expression", () => {
         it("should truncate the boundaries a and/or b if decimal", async () => {
             var ctx = createContext();
             var range = await evaluate("2.7:6.1", ctx);
-            expect(range).to.be.instanceof(Tuple);
+            expect(isTuple(range)).to.be.true;
             expect(Array.from(range)).to.deep.equal([2,3,4,5,6]);            
 
             var ctx = createContext();
             var range = await evaluate("6.1:2.7", ctx);
-            expect(range).to.be.instanceof(Tuple);
+            expect(isTuple(range)).to.be.true;
             expect(Array.from(range)).to.deep.equal([6,5,4,3,2]);            
         });
         
@@ -202,7 +204,7 @@ describe("expression", () => {
             await expectRangeError("x:fn",    xType, 'FUNCTION');                                                
             await expectRangeError("x:(1,2)", xType, 'TUPLE');                                                
 
-            var xType='TUPLE'; ctx.x = new Tuple(1,2,3);
+            var xType='TUPLE'; ctx.x = {*[Symbol.iterator] () {yield 1; yield 2; yield 3}};
             await expectRangeError("x:()",    xType, 'NOTHING');                                                
             await expectRangeError("x:F",     xType, 'BOOLEAN');                                    
             await expectRangeError("x:1",     xType, 'NUMBER');                                    
@@ -345,11 +347,11 @@ describe("expression", () => {
             
             await evaluate("(a,b) = (100,200,300)", ctx);
             expect(ctx.a).to.equal(100);        
-            expect(ctx.b).to.be.instanceof(Tuple);
+            expect(isTuple(ctx.b)).to.be.true;
             expect(Array.from(ctx.b)).to.deep.equal([200,300]);
             
             await evaluate("c = (10,20,30)", ctx);
-            expect(ctx.c).to.be.instanceof(Tuple);
+            expect(isTuple(ctx.c)).to.be.true;
             expect(Array.from(ctx.c)).to.deep.equal([10,20,30]);
         });
         
@@ -397,7 +399,7 @@ describe("expression", () => {
 
             var retval = await foo(10,20,30);
             expect(retval.a).to.equal(10);
-            expect(retval.b).to.be.instanceof(Tuple);
+            expect(isTuple(retval.b)).to.be.true;
             expect(Array.from(retval.b)).to.deep.equal([20,30]);
         });
         
@@ -560,7 +562,7 @@ describe("expression", () => {
                 });
                 
                 var retval = await evaluate("(x2,x3,x4) 2", ctx);
-                expect(retval).to.be.instanceof(Tuple);
+                expect(isTuple(retval)).to.be.true;
                 expect(Array.from(retval)).to.deep.equal([4,6,300]);
             });
             
@@ -619,7 +621,7 @@ describe("expression", () => {
                 ns3: {},
             });
             var value = await evaluate("(ns1, ns2, ns3).b", ctx);
-            expect(value).to.be.instanceof(Tuple);
+            expect(isTuple(value)).to.be.true;
             expect(Array.from(value)).to.deep.equal([12,22]);
         });
 
@@ -630,9 +632,9 @@ describe("expression", () => {
 
         it("should throw an exception if 'X' is of any other type", async () => {
             var ctx = createContext();
-            await expectException(() => evaluate("(10).name", ctx), "Namespace expected on the left size of the '.' operator");
-            await expectException(() => evaluate("[].name", ctx), "Namespace expected on the left size of the '.' operator");
-            await expectException(() => evaluate("(x->x).name", ctx), "Namespace expected on the left size of the '.' operator");
+            await expectException(() => evaluate("(10).name", ctx), "Namespace expected on the left side of the '.' operator");
+            await expectException(() => evaluate("[].name", ctx), "Namespace expected on the left side of the '.' operator");
+            await expectException(() => evaluate("(x->x).name", ctx), "Namespace expected on the left side of the '.' operator");
         });
     });
     
@@ -821,14 +823,14 @@ describe("expression", () => {
             const mappingFn = await evaluate("map fn", ctx);
             expect(mappingFn).to.be.a("function");
             const mappedValues = await evaluate("map fn (1,2,3,4)", ctx);
-            expect(mappedValues).to.be.instanceof(Tuple);
+            expect(isTuple(mappedValues)).to.be.true;
             expect(Array.from(mappedValues)).to.deep.equal([2,4,6,8]);
         });
 
         it("should work with any type", async () => {
             var ctx = createContext({T:true, F:false, fn:x=>2*x});
             var retvals = await evaluate("map fn (1,2,3)", ctx);
-            expect(retvals).to.be.instanceof(Tuple);
+            expect(isTuple(retvals)).to.be.true;
             expect(Array.from(retvals)).to.deep.equal([2,4,6]);
             
             expect(await evaluate("map fn ()", ctx)).to.equal(null);
@@ -840,14 +842,14 @@ describe("expression", () => {
         it("should return the tuple of the X characters if X is a string", async () => {
             var ctx = createContext();
             var items = await evaluate("enum 'abc'", ctx);
-            expect(items).to.be.instanceof(Tuple);
+            expect(isTuple(items)).to.be.true;
             expect(Array.from(items)).to.deep.equal(['a', 'b', 'c']);
         });
 
         it("should return the tuple of the X items if X is a list", async () => {
             var ctx = createContext();
             var items = await evaluate("enum [10,11,12]", ctx);
-            expect(items).to.be.instanceof(Tuple);
+            expect(isTuple(items)).to.be.true;
             expect(Array.from(items)).to.deep.equal([10, 11, 12]);
         });
 
@@ -855,7 +857,7 @@ describe("expression", () => {
             var ctx = createContext();
             await evaluate("ns = {z=3, x=1, y=2}", ctx);
             var items = await evaluate("enum ns", ctx);
-            expect(items).to.be.instanceof(Tuple);
+            expect(isTuple(items)).to.be.true;
             expect(Array.from(items).sort()).to.deep.equal(['x','y','z']);
         });
         
@@ -867,7 +869,7 @@ describe("expression", () => {
             expect(await evaluate("enum fn", ctx)).to.equal(ctx.fn);
             
             var items = await evaluate("enum (1, 'abc', {x=10})", ctx);
-            expect(items).to.be.instanceof(Tuple);
+            expect(isTuple(items)).to.be.true;
             expect(Array.from(items)).to.deep.equal([1,'abc',{x:10}]);
         });
     });
@@ -990,7 +992,7 @@ describe("expression", () => {
             expect(await evaluate("() + ns", ctx)).to.deep.equal({a:1,b:2,c:3});
     
             var tuple = await evaluate("() + (1,2,3)", ctx);
-            expect(tuple).to.be.instanceof(Tuple);
+            expect(isTuple(tuple)).to.be.true;
             expect(Array.from(tuple)).to.deep.equal([1,2,3]);
         });
     
@@ -1006,7 +1008,7 @@ describe("expression", () => {
             expect(await evaluate("ns + ()", ctx)).to.deep.equal({a:1,b:2,c:3});
     
             var tuple = await evaluate("(1,2,3) + ()", ctx);
-            expect(tuple).to.be.instanceof(Tuple);
+            expect(isTuple(tuple)).to.be.true;
             expect(Array.from(tuple)).to.deep.equal([1,2,3]);
         });
     
@@ -2570,7 +2572,7 @@ describe("expression", () => {
             expect(ctx.x).to.equal(1);
             
             await evaluate("x = (1,2,3)", ctx);
-            expect(ctx.x).to.be.instanceof(Tuple);
+            expect(isTuple(ctx.x)).to.be.true;
             expect(Array.from(ctx.x)).to.deep.equal([1,2,3]);
         });
         
@@ -2583,7 +2585,7 @@ describe("expression", () => {
             
             var retval = await evaluate("1, f = x -> [x], 2", ctx);
             expect(ctx.f).to.be.a("function");
-            expect(retval).to.be.instanceof(Tuple);
+            expect(isTuple(retval)).to.be.true;
             expect(Array.from(retval)).to.deep.equal([1,2]);
         });
         
