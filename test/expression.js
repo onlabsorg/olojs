@@ -873,6 +873,41 @@ describe("expression", () => {
             expect(Array.from(items)).to.deep.equal([1,'abc',{x:10}]);
         });
     });
+
+    describe("size X", () => {
+        
+        it("should return the length if X is a string", async () => {
+            var ctx = createContext();
+            var size = await evaluate("size 'abc'", ctx);
+            expect(size).to.equal(3);
+        });
+
+        it("should return the length if X is a list", async () => {
+            var ctx = createContext();
+            var size = await evaluate("size [1,2,3]", ctx);
+            expect(size).to.equal(3);
+        });
+
+        it("should return the number of own names if X is a namespace", async () => {
+            var ctx = createContext();            
+            var size = await evaluate("size {a=1,b=2,c=3}", ctx);
+            expect(size).to.equal(3);
+            
+            ctx.o = Object.assign(Object.create({x:1,y:2}), {a:1,b:2,c:3});
+            var size = await evaluate("size o", ctx);
+            expect(size).to.equal(3);
+        });
+        
+        it("should throw an exception if X is of any other type", async () => {
+            var ctx = createContext();            
+            var expectSizeError = (expression, XType) => expectException(() => evaluate(expression,ctx), `Size not defined on ${XType}`);
+            await expectSizeError("size TRUE", "BOOLEAN");
+            await expectSizeError("size 1", "NUMBER");
+            await expectSizeError("size (1,2,3)", "TUPLE");
+            await expectSizeError("size ()", "NOTHING");
+            await expectSizeError("size (x->2*x)", "FUNCTION");
+        });
+    });
     
     
     // LOGIC OPERATORS
