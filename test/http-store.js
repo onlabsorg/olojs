@@ -13,7 +13,7 @@ var port = 8888;
 
 var testStore = require("./store");
 
-describe("load = HTTPStore.createLoader(url, options)", () => {
+describe("load = new HTTPStore(url, options)", () => {
     var server, store;
     
     before(async () => {
@@ -41,6 +41,15 @@ describe("load = HTTPStore.createLoader(url, options)", () => {
         it("should throw HTTPStore.WriteAccessDeniedError on 403 PUT responses", async () => {
             try {
                 await store.write("/private/path/to/doc", "xxx");
+                throw new Error("it didn't throw")
+            } catch (error) {
+                expect(error).to.be.instanceof(HTTPStore.WriteAccessDeniedError);
+            } 
+        });
+
+        it("should throw HTTPStore.WriteAccessDeniedError on 403 POST responses", async () => {
+            try {
+                await store.append("/private/path/to/doc", "xxx");
                 throw new Error("it didn't throw")
             } catch (error) {
                 expect(error).to.be.instanceof(HTTPStore.WriteAccessDeniedError);

@@ -252,6 +252,60 @@ describe("env = new Environment(config)", () => {
         });        
     });   
     
+    describe("await env.appendDocument(path, source)", () => {
+        
+        it("should call the proper store.append method", async () => {
+            var docs = {};
+            var env = new Environment({
+                store: new Router({
+                    "/path/to/store1": {append: (subPath, source) => {docs["/path/to/store1"+subPath] = source}},
+                    "/path/to": {append: (subPath, source) => {docs["$/path/to"+subPath] = source}}
+                })
+            })
+            
+            await env.appendDocument("/path/to/store1/subpath/to/doc1", "doc1 source");
+            expect(docs["/path/to/store1/subpath/to/doc1"]).to.equal("doc1 source");
+
+            await env.appendDocument("/path/to/store2/subpath/to/doc2", "doc2 source");
+            expect(docs["$/path/to/store2/subpath/to/doc2"]).to.equal("doc2 source");            
+        });
+
+        it("should throw an error if no store is defined for path", async () => {
+            var env = new Environment({
+                store: new Router({
+                    "/path/to": subPath => `Document at /path/to${subPath}`,
+                    "/path/to/store1": subPath => `Document at /path/to/store1${subPath}`,
+                })
+            });
+            
+            class ExceptionExpected extends Error {};
+            try {
+                await env.appendDocument("/unmapped-store/path/to/doc", "doc source");
+                throw new ExceptionExpected();
+            } catch (e) {
+                expect(e).to.not.be.instanceof(ExceptionExpected);
+                expect(e.message).to.equal("Handler not defined for path /unmapped-store/path/to/doc");
+            }            
+        });
+        
+        it("should throw an error if the store doesn't define an `append` method", async () => {
+            var env = new Environment({
+                store: new Router({
+                    "/path/to/store1": {},
+                })
+            });
+            
+            class ExceptionExpected extends Error {};
+            try {
+                await env.appendDocument("/path/to/store1/doc", "doc source");
+                throw new ExceptionExpected();
+            } catch (e) {
+                expect(e).to.not.be.instanceof(ExceptionExpected);
+                expect(e.message).to.equal("Append operation not defined for path /path/to/store1/doc");
+            }
+        });        
+    });   
+    
     describe("env.parseDocument(dource)", () => {
         
         it("should call document.parse", () => {

@@ -47,6 +47,19 @@ module.exports = async function (store, port) {
         }        
     });    
     
+    router.post(`*`, async (req, res, next) => { 
+        if (req.get("Accept") !== "text/olo") return next();
+        if (req.path.slice(0,9) === "/private/") {
+            return res.status(403).send();
+        }
+        try {
+            await store.append(req.path, req.body);
+            res.status(200).send("Posted!");            
+        } catch (error) {
+            res.status(500).send(error.message);
+        }        
+    });    
+
     return await listen(router, port);
 }
 

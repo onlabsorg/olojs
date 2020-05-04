@@ -113,7 +113,7 @@ module.exports = function (createStore) {
             ]);
         });            
     });
-
+    
     describe(`Store.prototype.delete(documentPath) - async method`, () => {
         
         it("should remove the document at the given path", async () => {    
@@ -231,6 +231,30 @@ module.exports = function (createStore) {
                 "doc2",
                 "doc3",
             ]);                
+        });
+    });
+
+    describe("Store.prototype.append(path, source) - async method", () => {
+        
+        it("should add a document to the directory path, assigning a timestamp name to it", async () => {
+            var docSource = "post source";
+            var timeBefore = (new Date()).getTime();
+            await store.append("/path/to/posts", docSource);
+            var timeAfter = (new Date()).getTime();
+            
+            var posts = await document.parse(await store.read("/path/to/posts/"))(document.createContext());
+            expect(posts.items.length).to.equal(1);
+            var postTimestamp = (new Date(posts.items[0])).getTime();
+            
+            expect(timeBefore <= postTimestamp && postTimestamp <= timeAfter).to.be.true;
+            
+            expect(await store.read(`/path/to/posts/${posts.items[0]}`)).to.equal(docSource);
+        });        
+        
+        it("should do nothing if the source is an empty string", async () => {
+            await store.append("/path/to/posts", "");
+            var posts = await document.parse(await store.read("/path/to/posts/"))(document.createContext());
+            expect(posts.items.length).to.equal(1);
         });
     });
 }
