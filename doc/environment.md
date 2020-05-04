@@ -41,7 +41,7 @@ The environment context contains:
 - All the names contained in `environment.globals` (from the config parameter)
 - All the names contained in the `presets` object
 - A `__path__` string, meant to represent the document path
-- An `import` function that return `environment.load(fullPath)` after
+- An `import` function that return `environment.loadDocument(fullPath)` after
   resolving the passed path as relative to `__path__`
   
 ### Environment.prototype.parseDocument(source) 
