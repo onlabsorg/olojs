@@ -12,16 +12,19 @@ node bin/docgen.js lib/document.js > doc/document.md
 echo "- Generate the documentation of the Environment class"
 node bin/docgen.js lib/environment.js > doc/environment.md
 
-echo "- Generate the documentation of the BackendEnvironment class"
-node bin/docgen.js lib/environment/backend-environment.js > doc/backend-environment.md
+echo "- Generate the documentation of the HTTPServer class"
+node bin/docgen.js lib/http-server.js > doc/http-server.md
 
 echo "- Generate the documentation of the BrowserEnvironment class"
-node bin/docgen.js lib/environment/browser-environment.js > doc/browser-environment.md
+node bin/docgen.js src/browser-environment.js > doc/browser-environment.md
 
 echo "- Generate the documentation of the FSStore class"
-node bin/docgen.js lib/environment/fs-store.js > doc/fs-store.md
+node bin/docgen.js lib/stores/fs-store.js > doc/fs-store.md
 
 echo "- Generate the documentation of the HTTPStore class"
-node bin/docgen.js lib/environment/http-store.js > doc/http-store.md
+node bin/docgen.js lib/stores/http-store.js > doc/http-store.md
+
+echo "- Generate the documentation of the Router class"
+node bin/docgen.js lib/stores/router.js > doc/router.md
 
 echo "DONE!"

@@ -13,7 +13,12 @@ Incase of 403 response code, throws `HTTPStore.ReadAccessDeniedError`.
   
 ### HTTPStore.prototype.write(path, source)
 Sends a HTTP `PUT path` request with `source` as body to `this.host` 
-and resolves on 200 or 201 response code or rejects or error response code.
+and resolves on 200 or 201 response code or rejects on error response code.
+Incase of 403 response code, throws `HTTPStore.WriteAccessDeniedError`.
+  
+### HTTPStore.prototype.write(path, source)
+Sends a HTTP `POST path` request with `source` as body to `this.host` 
+and resolves on 200 or 201 response code or rejects on error response code.
 Incase of 403 response code, throws `HTTPStore.WriteAccessDeniedError`.
   
 ### HTTPStore.prototype.delete(path)

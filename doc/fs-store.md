@@ -19,6 +19,9 @@ Midifies the content of the document at `path` with the given `source`.
 If the document at `path` doesn't exist, it creates it.
 If the `source` is an empty string, this is equivalent to `.delete(path)`.
   
+### FSStore.prototype.append(path, source)
+Add a document to the directory path, assigning a timestamp name to it.
+  
 ### FSStore.prototype.delete(path)
 Deletes the olo-document at `path` if it exists.
   

@@ -12,8 +12,8 @@ The root http reader `/` adds the passed headers to every request
 The environment globals contain a `require` function that loads the
 [olojs standard library](./stdlib.md) modules.
   
-### BrowserEnvironment.renderNamespace(namespace)
-This method renders and sanitizes a document namespace.
+### BrowserEnvironment.stringifyDocumentExpression(value)
+This method stringifies and sanitizes an expression value.
   
 ### BrowserEnvironment.parseURI(uri)
 Given an uri in the form `path?var1=val1&var2=val2&...`, returns

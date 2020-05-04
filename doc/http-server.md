@@ -1,9 +1,3 @@
-# BackendEnvironment class
-This class extends the [Environment](./environment.md) class by adding
-HTTP server functionalities.
-This backend matches the requirements of the `olonv.js` local environment
-configuration script; therefore it is used by default as its return value.
-  
 ### new BackendEnvironment(config)
 Besides the properties required by the `Environment` constructor, this
 `config` object should also contain:

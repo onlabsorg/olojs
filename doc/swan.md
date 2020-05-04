@@ -508,6 +508,13 @@ The `enum` function taken a value `X` and return its content, which is:
 * If X is a namespace, it return the tuple of its names
 * If X is of any other type, it returns X itself
 
+#### size X
+The `size` function taken a value `X` and returns:
+
+* The number of characters if X is a string
+* The number of items if X is a list
+* The number of own names if X is a namespace
+
 
 ## Comments
 Everything following a `#` symbol, up to the end of the line, is a comment and 
