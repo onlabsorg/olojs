@@ -1,21 +1,25 @@
-const Environment = olojs.require("environment");
-const FSStore     = olojs.require("stores/fs-store");
-const HTTPStore   = olojs.require("stores/http-store");
-const HTTPServer  = olojs.require("http-server");
-const Router      = olojs.require("stores/router");
+const Environment = require("@onlabsorg/olojs/lib/environment");
+
+const Router      = require("@onlabsorg/olojs/lib/stores/router");
+const FSStore     = require("@onlabsorg/olojs/lib/stores/fs-store");
+const HTTPStore   = require("@onlabsorg/olojs/lib/stores/http-store");
+
+const HTTPServer  = require("@onlabsorg/olojs/lib/http-server");
+
+
 
 module.exports = new Environment({
     
     // path handlers
     store: new Router({
-        "/"        : FSStore.createReader(__dirname + "/docs"),
+        "/"        : FSStore.createReader(__dirname + "/documents"),
         "http://"  : HTTPStore.createReader("http://"),
-        "https://" : HTTPStore.createReader("http://"),
+        "https://" : HTTPStore.createReader("https://"),
     }),
     
     // global names available to all the documents
     globals: {
-        require: modulePath => olojs.require(`stdlib/${modulePath}`)
+        require: modulePath => require(`@onlabsorg/olojs/lib/stdlib/${modulePath}`)
     },
     
     // true if the loaded document are not cached

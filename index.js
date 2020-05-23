@@ -13,16 +13,10 @@ class OloJS {
     }
 
     getEnvironment () {
-        const environmentScriptPath = this.getEnvironmentScriptPath();
-        global.olojs = {
-            'require': modulePath => require(`./lib/${modulePath}`)
-        };
-        const env = require(environmentScriptPath);
-        delete global.olojs;
-        return env;
+        return require( this.getEnvironmentScriptPath() );
     }
 
-    async init (templateVars={}, dirs=["docs"]) {
+    async init (templateVars={}, dirs=["documents"]) {
         const environmentScriptPath = this.getEnvironmentScriptPath();
         if (fs.existsSync(environmentScriptPath)) {
             throw new Error("Environment already initialized");
@@ -62,7 +56,9 @@ class OloJS {
                     if (err) reject(err);
                     else resolve();
                 });
-            }            
+            } else {
+                resolve();
+            }         
         });
     }
 
