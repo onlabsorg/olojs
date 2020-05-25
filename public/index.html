@@ -2,7 +2,7 @@
 
     <head>
         
-        <script src="/environment-http-client.js"></script>
+        <script src="/olo.js"></script>
         <link rel="stylesheet" href="/main.css"></link>
         
         <style>
@@ -14,7 +14,7 @@
                 height: 100%;
             }
             
-            main {
+            #olo-document {
                 position: absolute;
                 top: 0;
                 bottom: 0;
@@ -27,28 +27,7 @@
     </head>
 
     <body>
-        
-        <main>
-            <p>Loading ...</p>
-        </main>
-        
-        <script>
-        
-            async function load (hash) {
-                const [docPath, argns] = olonv.parseURI(hash.slice(1));
-                olonv.docns = await olonv.loadDocument(docPath, {argns});
-                const html = await olonv.stringifyDocumentExpression(olonv.docns);
-                document.querySelector("main").innerHTML = html;            
-            }
-            
-            document.addEventListener("DOMContentLoaded", async () => {
-                window.addEventListener("hashchange", async (event) => {
-                    await load(location.hash);
-                });
-                await load(location.hash);
-            });
-        </script>
-        
+        <olo-viewer id="olo-document" :src="hash"></olo-viewer>
     </body>
 
 </html>

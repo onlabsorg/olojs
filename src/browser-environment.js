@@ -9,7 +9,6 @@ const Environment = require("../lib/environment");
 const document = require("../lib/document");
 const HTTPStore = require("../lib/stores/http-store");
 const parseParams = require("../lib/tools/parameters-parser");
-const DOMPurify = require("dompurify");    
 const Router = require("../lib/stores/router");
 
 
@@ -42,27 +41,6 @@ class BrowserEnvironment extends Environment {
                 "https://": HTTPStore.createReader("https://"),
             })
         })
-    }
-
-    
-    /**
-     *  ### BrowserEnvironment.stringifyDocumentExpression(value)
-     *  This method stringifies and sanitizes an expression value.
-     */
-    async stringifyDocumentExpression (value) {
-        const html = await super.stringifyDocumentExpression(value);
-        return DOMPurify.sanitize(html);
-    }
-    
-    /**
-     *  ### BrowserEnvironment.parseURI(uri)
-     *  Given an uri in the form `path?var1=val1&var2=val2&...`, returns
-     *  a the path and the parameters namespace as a pair [docPath, argns]
-     */
-    parseURI (uri) {
-        let [docPath, args] = uri.split("?");
-        let argns = args ? parseParams(...args.split("&")) : {};
-        return [docPath, argns];
     }
 }
 

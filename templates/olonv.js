@@ -12,7 +12,7 @@ module.exports = new Environment({
     
     // path handlers
     store: new Router({
-        "/"        : FSStore.createReader(__dirname + "/documents"),
+        "/"        : FSStore.createReader(__dirname + "/docs"),
         "http://"  : HTTPStore.createReader("http://"),
         "https://" : HTTPStore.createReader("https://"),
     }),

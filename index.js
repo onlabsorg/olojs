@@ -16,7 +16,7 @@ class OloJS {
         return require( this.getEnvironmentScriptPath() );
     }
 
-    async init (templateVars={}, dirs=["documents"]) {
+    async init (templateVars={}, dirs=["docs"]) {
         const environmentScriptPath = this.getEnvironmentScriptPath();
         if (fs.existsSync(environmentScriptPath)) {
             throw new Error("Environment already initialized");
