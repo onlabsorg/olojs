@@ -160,3 +160,9 @@ server.listen(8010);
 ### License
 
 [MIT](https://opensource.org/licenses/MIT)
+
+
+### Related projects
+
+* onlabsorg/olojs-li - a command-line-interface for creating and managing a 
+  local olo-documents repository
