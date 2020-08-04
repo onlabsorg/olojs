@@ -3,7 +3,7 @@
 `olojs` is a distributed content management framework whose unit of content is
 called an `olo-document`.
 
-An olo-document is a template with [swan](./doc/swan.md) inline expressions: it 
+An olo-document is a template with [swan](./docs/swan.md) inline expressions: it 
 renders to the text obtained by replacing the inline expressions with their
 values.
 
