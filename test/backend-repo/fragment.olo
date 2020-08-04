@@ -1,0 +1,12 @@
+<% test = (import './import').test %>
+
+<h1>olojs fragment markup test</h1>
+
+<p>The <% test("green",TRUE) %> tests are passed, whilte the <% test("red", FALSE) %>
+are failed.</p>
+
+<ul>
+    <li><% test("It should execute before it's defined", str(test_fragment1({x=10})) == "x = 10") %>
+    <def:test_fragment1>x = <% x %></def:test_fragment1>    
+    <li><% test("It should execute after it's defined", str(test_fragment1({x=20})) == "x = 20") %>
+</ul>

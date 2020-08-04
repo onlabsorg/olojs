@@ -13,7 +13,7 @@ var port = 8888;
 
 var testStore = require("./store");
 
-describe("load = new HTTPStore(url, options)", () => {
+describe("http_store = new HTTPStore(url, options)", () => {
     var server, store;
     
     before(async () => {
@@ -23,11 +23,18 @@ describe("load = new HTTPStore(url, options)", () => {
     
     testStore(async function (content) {
         await initStore(ROOT_PATH, content);
-        store = new HTTPStore(`http://localhost:${port}`);
+        store = new HTTPStore(`http://localhost:${port}`, {
+            decorateHttpRequest (request) {
+                if (request.url === `http://localhost:${port}/decorator-test`) {
+                    request.headers.set("throw", `Decorated ${request.method} request received`);
+                }
+                return request;
+            }
+        });
         return store;
     });
 
-    describe("access control", () => {
+    describe("access control errors", () => {
         
         it("should throw HTTPStore.ReadAccessDeniedError on 403 GET responses", async () => {
             try {
@@ -47,21 +54,42 @@ describe("load = new HTTPStore(url, options)", () => {
             } 
         });
 
-        it("should throw HTTPStore.WriteAccessDeniedError on 403 POST responses", async () => {
-            try {
-                await store.append("/private/path/to/doc", "xxx");
-                throw new Error("it didn't throw")
-            } catch (error) {
-                expect(error).to.be.instanceof(HTTPStore.WriteAccessDeniedError);
-            } 
-        });
-
         it("should throw HTTPStore.WriteAccessDeniedError on 403 DELETE responses", async () => {
             try {
                 await store.delete("/private/path/to/doc");
                 throw new Error("it didn't throw")
             } catch (error) {
                 expect(error).to.be.instanceof(HTTPStore.WriteAccessDeniedError);
+            } 
+        });
+    });
+    
+    describe("options.decorateHttpRequest", () => {
+        
+        it("should decorate the HTTP GET requests", async () => {
+            try {
+                await store.read("/decorator-test");
+                throw new Error("it didn't throw")
+            } catch (error) {
+                expect(error.message).to.equal("Decorated get request received");
+            } 
+        });
+
+        it("should decorate the HTTP PUT requests", async () => {
+            try {
+                await store.write("/decorator-test", "...");
+                throw new Error("it didn't throw")
+            } catch (error) {
+                expect(error.message).to.equal("Decorated put request received");
+            } 
+        });
+
+        it("should decorate the HTTP DELETE requests", async () => {
+            try {
+                await store.delete("/decorator-test");
+                throw new Error("it didn't throw")
+            } catch (error) {
+                expect(error.message).to.equal("Decorated delete request received");
             } 
         });
     });

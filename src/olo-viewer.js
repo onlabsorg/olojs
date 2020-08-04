@@ -1,6 +1,6 @@
-const olonv = window.olonv;
-
+const olonv = require("./browser-environment");
 const DOMPurify = require("dompurify");
+const parseParams = require("../lib/tools/parameters-parser");
 
 module.exports = {
     
@@ -33,13 +33,11 @@ module.exports = {
     methods: {
         async refresh () {
             olonv.docSource = await olonv.readDocument(this.docPath);
-            
-            const context = olonv.createContext(this.docPath, {argns:this.argns});
-            const evaluate = olonv.parseDocument(olonv.docSource);
-            olonv.docns = await evaluate(context);
-
-            const html = await olonv.stringifyDocumentExpression(olonv.docns);
-            this.html = DOMPurify.sanitize(html);
+            olonv.context = olonv.createContext(this.docPath, this.argns);
+            olonv.evaluate = olonv.parseDocument(olonv.docSource);            
+            olonv.docns = await olonv.evaluate(olonv.context);
+            const rawHTML = await olonv.render(olonv.docns);
+            this.html = DOMPurify.sanitize(rawHTML);
         }
     },
     

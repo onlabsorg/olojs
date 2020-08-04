@@ -1,6 +1,5 @@
-
-const BrowserEnvironment = require("./browser-environment");
-const olonv = window.olonv = new BrowserEnvironment(location.origin);
+window.pathlib = require("path")
+const olonv = window.olonv = require("./browser-environment");
 
 const Vue = require("vue/dist/vue.js");
 

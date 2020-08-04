@@ -1,0 +1,11 @@
+<% test = (description, assertion) -> `<span style="color:${assertion?'green';'red'}">${description}</span>` %>
+
+<h1>olojs import function test</h1>
+
+<p>The <% test("green",TRUE) %> tests are passed, whilte the <% test("red", FALSE) %>
+are failed.</p>
+
+<% importee = import "./importee" %>
+<ul>
+    <li><% test("The import function should load the document namespace", importee.x == 10) %></li>
+</ul>

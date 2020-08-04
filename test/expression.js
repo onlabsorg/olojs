@@ -1,5 +1,6 @@
 var expect = require("chai").expect;
-var {parse, createContext, evaluate, Exception, createTuple} = require("../lib/expression");
+var {parse, createContext, Exception, createTuple} = require("../lib/expression");
+var evaluate = (source, context) => parse(source)(context);
 
 const isTuple = value => typeof value[Symbol.iterator] === "function";
 

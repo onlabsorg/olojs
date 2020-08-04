@@ -7,7 +7,7 @@
     "url": "https://github.com/onlabsorg/olojs/issues"
   },
   "license": "MIT",
-  "author": "Marcello Del Buono <m.delbuono@onlabs.org> (https://plus.google.com/u/0/+MarcelloDelBuono)",
+  "author": "Marcello Del Buono <m.delbuono@onlabs.org>",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -15,11 +15,17 @@
   },
   "scripts": {
     "develop": "webpack --mode development --watch",
-    "build": "webpack --mode production ; bin/build-documentation",
-    "test": "./bin/test"
-  },
-  "bin": {
-    "olojs": "./bin/olojs.js"
+    "build": "webpack --mode production",
+    "test": "mocha test/index.js",
+    "expression-test": "mocha test/expression.js",
+    "document-test": "mocha test/document.js",
+    "fs-store-test": "mocha test/fs-store.js",
+    "http-store-test": "mocha test/http-store.js",
+    "router-test": "mocha test/router.js",
+    "environment-test": "mocha test/environment.js",
+    "http-server-test": "mocha test/http-server.js",
+    "stdlib-test": "mocha test/stdlib.js",
+    "test-server": "node test/backend-repo-server.js"
   },
   "devDependencies": {
     "chai": "^4.2.0",
@@ -30,7 +36,6 @@
   },
   "dependencies": {
     "body-parser": "^1.19.0",
-    "commander": "^4.1.1",
     "dompurify": "^2.0.8",
     "express": "^4.17.1",
     "isomorphic-fetch": "^2.2.1",

@@ -19,21 +19,25 @@ function createMemoryStore (docs) {
 
 describe("HTTPServer", () => {
     
-    describe("default server", () => {
-        var store, server;
+    describe("Default HTTP server", () => {
+        var environment, server;
         
-        before(async () => {
-            store = createMemoryStore({
+        before((done) => {
+            var store = createMemoryStore({
                 "/path/to/doc1": "doc1 source"
             });
-            var env = new Environment({store, serve:HTTPServer()});
-            server = await env.serve(8888);
-        });
+            environment = new Environment({store});
+            server = HTTPServer(environment);
+            server.listen(8888, done);
+        });            
         
-        describe("HTTP GET", () => {
+        describe("HTTP GET with 'text/olo' mimeType", () => {
             
-            it("should return the document source at path if the mimeType is 'text/olo'", async () => {
+            it("should return the document source at path from the passed environment", async () => {
                 var docPath = "/path/to/doc1";
+                var docSource = "document source ...";
+                await environment.writeDocument(docPath, docSource);
+                
                 var response = await fetch(`http://localhost:8888${docPath}`, {
                     method: 'get',
                     headers: {
@@ -41,16 +45,19 @@ describe("HTTPServer", () => {
                     },
                 });
                 expect(response.status).to.equal(200);
-                expect(await response.text()).to.equal(store.read(docPath));
+                expect(await response.text()).to.equal(docSource);
             });
+        });
+            
+        describe("HTTP GET with any other mimeType", async () => {
             
             it("should return the default index.html page if the path is '/'", async () => {
                 var indexHTMLPage = fs.readFileSync(Path.resolve(__dirname, "../public/index.html"), "utf8");
                 var response = await fetch(`http://localhost:8888/`);
                 expect(response.status).to.equal(200);
-                expect(await response.text()).to.equal(indexHTMLPage);                
+                expect(await response.text()).to.equal(indexHTMLPage);           
             });
-
+            
             it("should return files from the public path for non-text/olo GET requests", async () => {
                 var indexHTMLPage = fs.readFileSync(Path.resolve(__dirname, "../public/index.html"), "utf8");
                 var response = await fetch(`http://localhost:8888/index.html`);
@@ -59,9 +66,9 @@ describe("HTTPServer", () => {
             });
         });
         
-        describe("HTTP PUT", () => {
-            
-            it("should set the document source at path equal to the body if the mimeType is 'text/olo'", async () => {
+        describe("HTTP PUT with 'text/olo' mimeType", () => {
+
+            it("should set the document source at path equal to the body", async () => {
                 var docPath = "/path/to/doc1";
                 var newSource = "new doc1 source";
                 var response = await fetch(`http://localhost:8888${docPath}`, {
@@ -73,14 +80,18 @@ describe("HTTPServer", () => {
                     body: newSource
                 });
                 expect(response.status).to.equal(200);
-                expect(store.read(docPath)).to.equal(newSource);
-            });            
+                expect(await environment.readDocument(docPath)).to.equal(newSource);
+            });
         });
-        
-        describe("HTTP DELETE", () => {
 
-            it("should remove the document at path if the mimeType is 'text/olo'", async () => {
+        describe("HTTP DELETE with `text/olo` mimeType", () => {
+    
+            it("should remove the document at path", async () => {
                 var docPath = "/path/to/doc1";
+                
+                await environment.writeDocument(docPath, "some text ...");
+                expect(await environment.readDocument(docPath)).to.equal("some text ...");
+                
                 var response = await fetch(`http://localhost:8888${docPath}`, {
                     method: 'delete',
                     headers: {
@@ -88,146 +99,129 @@ describe("HTTPServer", () => {
                     }
                 });
                 expect(response.status).to.equal(200);
-                expect(store.read(docPath)).to.equal("");
+                expect(await environment.readDocument(docPath)).to.equal("");
             });                        
         });
-        
-        after(async () => {
-            await server.close();
-        });
+
+        after((done) => {
+            server.close(done);
+        });        
     });
     
-    describe("custom server", () => {
-        var store, server, customDocumentHTMLPage="<p>custom html document page</p>";
+    describe("HTTPServer with custom `options.before` middleware", () => {        
+        var environment, server;
         
-        before(async () => {
-            var customPublicPath = Path.resolve(__dirname, "./public");
-            fs.writeFileSync(customPublicPath+"/index.html", customDocumentHTMLPage, "utf8");
-
-            store = createMemoryStore({
+        before((done) => {
+            var store = createMemoryStore({
                 "/path/to/doc1": "doc1 source"
             });
-            
-            var env = new Environment({
-                store: store,
-                serve: HTTPServer({
-                    publicPath: customPublicPath,
-                    allow: req => req.path.slice(0,9) !== "/private/"
-                })
+            environment = new Environment({store});
+            server = HTTPServer(environment, {
+                before: (req, res, next) => {
+                    res.status(200).send("before middleware executed");
+                }
             });
-            
-            server = await env.serve(8888);            
-        });
-        
-        describe("HTTP GET", () => {
-            
-            it("should return the document source at path if the mimeType is 'text/olo'", async () => {
-                var docPath = "/path/to/doc1";
-                var response = await fetch(`http://localhost:8888${docPath}`, {
-                    method: 'get',
-                    headers: {
-                        'Accept': 'text/olo'
-                    },
-                });
-                expect(response.status).to.equal(200);
-                expect(await response.text()).to.equal(store.read(docPath));
-            });
-            
-            it("should return the custom index.html page if the path is '/'", async () => {
-                var response = await fetch(`http://localhost:8888/`);
-                expect(response.status).to.equal(200);
-                expect(await response.text()).to.equal(customDocumentHTMLPage);                
-            });
-            
-            it("should return files from the public path for non-text/olo GET requests", async () => {
-                var response = await fetch(`http://localhost:8888/index.html`);
-                expect(response.status).to.equal(200);
-                expect(await response.text()).to.equal(customDocumentHTMLPage);                
-            });
+            server.listen(8888, done);
+        });            
 
-            it("should return a 403 status if reading the resource is not allowed", async () => {
-                var response = await fetch(`http://localhost:8888/private/path/to/doc`, {
-                    method: 'get',
-                    headers: {
-                        'Accept': 'text/olo'
-                    },
-                });
-                expect(response.status).to.equal(403);                
-                expect(await response.text()).to.equal("");
-            });
-        });
-        
-        describe("HTTP PUT", () => {
+        it("should execute before handling the `text/olo` requests", async () => {
+            var docPath = "/path/to/doc1";
+            var docSource = "document source ...";
+            await environment.writeDocument(docPath, docSource);
             
-            it("should set the document source at path equal to the body if the mimeType is 'text/olo'", async () => {
-                var docPath = "/path/to/doc1";
-                var newSource = "new doc1 source";
-                var response = await fetch(`http://localhost:8888${docPath}`, {
-                    method: 'put',
-                    headers: {
-                        'Accept': 'text/olo',
-                        'Content-Type': 'text/olo'
-                    },
-                    body: newSource
-                });
-                expect(response.status).to.equal(200);
-                expect(store.read(docPath)).to.equal(newSource);
-            });            
-
-            it("should return a 403 status if writing the resource is not allowed", async () => {
-                var docPath = "/private/path/to/doc1";
-                var docSource = "private doc source";
-                store.write(docPath, docSource);
-                expect(store.read(docPath)).to.equal(docSource);
-                
-                var response = await fetch(`http://localhost:8888${docPath}`, {
-                    method: 'put',
-                    headers: {
-                        'Accept': 'text/olo',
-                        'Content-Type': 'text/olo'
-                    },
-                    body: "modified body"
-                });
-                
-                expect(response.status).to.equal(403);                
-                expect(store.read(docPath)).to.equal(docSource);
+            var response = await fetch(`http://localhost:8888${docPath}`, {
+                method: 'get',
+                headers: {
+                    'Accept': 'text/olo'
+                },
             });
+            expect(response.status).to.equal(200);
+            expect(await response.text()).to.equal("before middleware executed");            
         });
+
+        after((done) => {
+            server.close(done);
+        });        
+    });
+
+    describe("HTTPServer with custom `options.after` middleware", () => {
+        var environment, server;
         
-        describe("HTTP DELETE", () => {
-
-            it("should remove the document at path if the mimeType is 'text/olo'", async () => {
-                var docPath = "/path/to/doc1";
-                var response = await fetch(`http://localhost:8888${docPath}`, {
-                    method: 'delete',
-                    headers: {
-                        'Accept': 'text/olo'
-                    }
-                });
-                expect(response.status).to.equal(200);
-                expect(store.read(docPath)).to.equal("");
-            });                        
-
-            it("should return a 403 status if deleting the resource is not allowed", async () => {
-                var docPath = "/private/path/to/doc1";
-                var docSource = "private doc source";
-                store.write(docPath, docSource);
-                expect(store.read(docPath)).to.equal(docSource);
-                
-                var response = await fetch(`http://localhost:8888${docPath}`, {
-                    method: 'delete',
-                    headers: {
-                        'Accept': 'text/olo'
-                    },
-                });
-                
-                expect(response.status).to.equal(403);                
-                expect(store.read(docPath)).to.equal(docSource);
+        before((done) => {
+            var store = createMemoryStore({
+                "/path/to/doc1": "doc1 source"
             });
+            environment = new Environment({store});
+            server = HTTPServer(environment, {
+                after: (req, res, next) => {
+                    res.status(200).send("after middleware executed");
+                }
+            });
+            server.listen(8888, done);
+        });            
+
+        it("should execute after handling the `text/olo` requests", async () => {
+            
+            // GET `text/olo` executes before options.after
+            var docPath = "/path/to/doc1";
+            var docSource = "document source ...";
+            await environment.writeDocument(docPath, docSource);
+            var response = await fetch(`http://localhost:8888${docPath}`, {
+                method: 'get',
+                headers: {
+                    'Accept': 'text/olo'
+                },
+            });
+            expect(response.status).to.equal(200);
+            expect(await response.text()).to.equal(docSource);
+            
+            // GET other content doesn't execute because options.after executes first
+            var response = await fetch(`http://localhost:8888/`);
+            expect(response.status).to.equal(200);
+            expect(await response.text()).to.equal("after middleware executed");           
         });
+
+        after((done) => {
+            server.close(done);
+        });                
+    });
+
+    describe("HTTPServer with custom `options.publicPath` path", () => {
+        var environment, server, customPublicPath;
         
-        after(async () => {
-            await server.close();
+        before((done) => {
+            customPublicPath = Path.resolve(__dirname, "./public");
+
+            var store = createMemoryStore({
+                "/path/to/doc1": "doc1 source"
+            });
+            environment = new Environment({store});
+            server = HTTPServer(environment, {
+                publicPath: customPublicPath
+            });
+            server.listen(8888, done);
+        });                    
+        
+        it("should return the custom index.html page if the path is '/'", async () => {
+            var customIndexPage = "<p>custom html document page</p>";
+            fs.writeFileSync(customPublicPath+"/index.html", customIndexPage, "utf8");
+
+            var response = await fetch(`http://localhost:8888/`);
+            expect(response.status).to.equal(200);
+            expect(await response.text()).to.equal(customIndexPage);                
         });
+
+        it("should return files from the public path for non-text/olo GET requests", async () => {
+            var file1_content = "content of file 1";
+            fs.writeFileSync(customPublicPath+"/file1.txt", file1_content, "utf8");
+            
+            var response = await fetch(`http://localhost:8888/file1.txt`);
+            expect(response.status).to.equal(200);
+            expect(await response.text()).to.equal(file1_content);                
+        });
+
+        after((done) => {
+            server.close(done);
+        });        
     });
 });

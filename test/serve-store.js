@@ -4,6 +4,15 @@ const bodyParser = require('body-parser');
 
 module.exports = async function (store, port) {
     var router = express();
+    
+    router.all("*", async (req, res, next) => {
+        let errorMessage = req.get("throw");
+        if (errorMessage) {
+            res.status(500).send(errorMessage);
+        } else {
+            next();
+        }
+    });
 
     router.get("*", async (req, res, next) => {
         if (req.get("Accept") !== "text/olo") return next();
@@ -42,19 +51,6 @@ module.exports = async function (store, port) {
         try {
             await store.write(req.path, req.body);
             res.status(200).send("Updated!");            
-        } catch (error) {
-            res.status(500).send(error.message);
-        }        
-    });    
-    
-    router.post(`*`, async (req, res, next) => { 
-        if (req.get("Accept") !== "text/olo") return next();
-        if (req.path.slice(0,9) === "/private/") {
-            return res.status(403).send();
-        }
-        try {
-            await store.append(req.path, req.body);
-            res.status(200).send("Posted!");            
         } catch (error) {
             res.status(500).send(error.message);
         }        

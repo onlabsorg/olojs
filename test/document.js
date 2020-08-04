@@ -98,17 +98,29 @@ describe("document", () => {
                 var docNS = await evaluate(context);
                 expect(docNS).to.deep.equal({a:10, __str__:"<ERR!>"})
             });            
-        });
+        });        
+    });
+    
+    describe("rendered_doc = await document.render(doc_namespace)", () => {
         
-        it("should decorate the stringified docns via constext.__render__(str) if it exists", async () => {
+        it("should stringify the document namespace", async () => {
             var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
             var evaluate = document.parse(source);
-            var context = expression.createContext({
-                __render__: text => text + " ..."
-            }).$extend();
-            var docNS = await evaluate(context);
-            expect(docNS).to.deep.equal({a:10, b:20, __str__:"a + b = 30 ..."})            
+            var context = expression.createContext({});
+            var doc_namespace = await evaluate(context);
+            var doc_rendering = await document.render(doc_namespace);
+            expect(doc_rendering).to.equal("a + b = 30");
         });
+        
+        it("should decorate the stringified docns via context.__render__(str) if it exists", async () => {
+            var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
+            var evaluate = document.parse(source);
+            var context = expression.createContext({});
+            context.__render__ = text => text + "!";
+            var doc_namespace = await evaluate(context);
+            var doc_rendering = await document.render(doc_namespace);
+            expect(doc_rendering).to.equal("a + b = 30!");
+        });        
     });
     
     describe("context = document.createContext(namespace)", () => {
