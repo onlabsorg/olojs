@@ -3,7 +3,7 @@
 ### The basics
 An olo-document is a text template like [Mustache](https://mustache.github.io/),
 [EJS](https://ejs.co/), [Handlebars](https://handlebarsjs.com/), etc. A document
-source template is just plain text containing [swan](./swan.m) expressions
+source template is just plain text containing [swan](./swan.md) expressions
 enclosed between `<%` and `%>` which gets replaced with the expression result
 value once the document is rendered.  
 

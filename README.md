@@ -79,8 +79,8 @@ const environment = new Environment({
 
 > A store is any object containing the `read`, `write` and `delete` methods 
 > operating on an olo-docs archive. You can define your own store or you can use 
-> one of the predefined stores: [fs-store](./docs/api/fs-store), 
-> [http-store](./docs/api/http-store) or [router](./docs/api/router).
+> one of the predefined stores: [fs-store](./docs/api/fs-store.md), 
+> [http-store](./docs/api/http-store.md) or [router](./docs/api/router.md).
 
 Store a document to your environment:
 
@@ -146,9 +146,9 @@ server.listen(8010);
 * Learn the [document](./docs/api/document.md) module API
 * Learn the [environment](./docs/api/environment.md) module API
 * Learn the [http-server](./docs/api/http-server.md) module API
-* Learn the [fs-store](./docs/api/fs-store) module API
-* Learn the [fs-store](./docs/api/http-store) module API
-* Learn the [router](./docs/api/router) module API
+* Learn the [fs-store](./docs/api/fs-store.md) module API
+* Learn the [fs-store](./docs/api/http-store.md) module API
+* Learn the [router](./docs/api/router.md) module API
 
 
 ### Test 
