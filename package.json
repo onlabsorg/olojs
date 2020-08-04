@@ -1,6 +1,6 @@
 {
   "name": "@onlabsorg/olojs",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "javascript library that allows concurrent editing of JSON objects",
   "homepage": "https://github.com/onlabsorg/olojs#readme",
   "bugs": {
@@ -40,6 +40,7 @@
     "express": "^4.17.1",
     "isomorphic-fetch": "^2.2.1",
     "marked": "^0.8.0",
+    "mkdirp": "^1.0.4",
     "vue": "^2.6.11"
   }
 }
