@@ -57,8 +57,5 @@ typings/
 .env
 
 # development files
-dev/
 test-repo/
 *.todo
-documents/
-olonv.js
