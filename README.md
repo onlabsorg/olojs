@@ -57,8 +57,9 @@ npx olojs init
 > initialize the npm package, intall olojs-cli and initialize the repository.
 
 After initializing the olojs repository, you will find in your npm packages two
-new directories: `documents` and `.olojs`. The first will contain your documents,
-while the second will contain the repository settings.
+new directories: `documents` and `olonv.js`. The first will contain your documents,
+while the second is a javascript module that exports the repository
+[environment](./docs/api/environment.md).
 
 Now you can are ready to render some documents:
 

@@ -46,5 +46,5 @@ at `documents/<path>`.
 Returns the http server to be used by `npx init serve [port]` to serve the
 repository environment via HTTP.
 
-By default the server is an [HTTPServer](./http-server) instance, created with
-the parameters defined in `repository.getEnvironment().httpOptions`. 
+By default the server is an [HTTPServer](./http-server.md) instance, created 
+with the parameters defined in `repository.getEnvironment().httpOptions`. 
