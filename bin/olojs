@@ -1,0 +1,71 @@
+#!/usr/bin/env node
+
+const logger = require("js-logger");
+logger.useDefaults();
+
+const fs = require("fs");
+
+const npmPackage = JSON.parse( fs.readFileSync(`${__dirname}/../package.json`, 'utf8') );
+
+function getRepository () {
+    const Repository = require((npmPackage.olojs && npmPackage.olojs.Repository) || "../lib/repository");
+    return new Repository(process.cwd(), {logLevel:"INFO"});    
+}
+
+function setRepository (repositoryModulePath) {
+    if (!npmPackage.olojs) npmPackage.olojs = {};
+    npmPackage.olojs.Repository = repositoryModulePath;
+    fs.writeFileSync(`${__dirname}/../package.json`, JSON.stringify(npmPackage, null, 2), 'utf8')           
+}
+
+
+const cmd = require("commander");
+
+cmd.version(`v${npmPackage.version}`, "-v --version");
+
+cmd.command("init [template]")
+   .description("Initialize the local repository")
+   .action(async (template) => {
+       logger.info(`Initializing olojs repository`);
+       if (template) setRepository(template);
+       try {
+           const repository = getRepository();
+           await repository.init(template);
+           logger.info("Repository successfully initialized.");
+       } catch (err) {
+           logger.error(err);
+       }
+   });
+
+cmd.command("render <path> [args...]")
+    .description("Render a document from the current repository")
+    .action(async (path, args) => {
+        const repository = getRepository();
+        
+        const parseParams = require("@onlabsorg/olojs/lib/tools/parameters-parser");
+        const argns = parseParams(...args);
+        
+        const environment = repository.getEnvironment();
+        const docRendering = await environment.renderDocument(path, argns);        
+        
+        console.log(docRendering);
+    });
+
+cmd.command("serve [port]")
+    .description("Render a document from the current repository")
+    .action(async (port=8010) => {
+        logger.info(`Loading repository`);
+        const repository = getRepository();
+
+        logger.info(`Starting olojs server`);
+        const server = repository.getHttpServer();        
+        await new Promise((resolve, reject) => {
+            server.listen(port, err => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+        logger.info(`olojs server listening on port ${port}`);
+    });
+   
+cmd.parse( process.argv );

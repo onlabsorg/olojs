@@ -37,7 +37,52 @@ Three centuries later <% einstein.name %> could freely use Newton's work and the
 work of many other scientists like him to formulate his well known relativity theory.
 ```
 
-### Getting started
+
+### Getting started with the CLI interface
+
+First of all create an npm package in a new directory and install olojs-cli.
+
+```sh
+npm init
+npm install @onlabsorg/olojs-cli --save 
+```
+
+Then you can decorate the npm package into an olo-docs repository:
+
+```sh
+npx olojs init [template-package-name]
+```
+
+> Soon just `npx olojs init` will do. Meaning that it will automatically 
+> initialize the npm package, intall olojs-cli and initialize the repository.
+
+After initializing the olojs repository, you will find in your npm packages two
+new directories: `documents` and `.olojs`. The first will contain your documents,
+while the second will contain the repository settings.
+
+Now you can are ready to render some documents:
+
+```sh
+npx olojs render /index
+npx olojs render /license
+```
+
+The `npx olojs render <path>` command prints the rendered version of the 
+document found at `./documents/<path>`.
+
+You can now add as many documents as you want and render them out to the console 
+or redirect them to to a file. If you want instead to render your document in 
+the browser, you can serve them via http.
+
+```sh
+npx olojs serve [port=8010]
+```
+
+After starting the http server, your documents become accessible via the URL 
+`http://localhost:8010/#/path/to/document`.
+
+
+### Getting started with the JavaScript API
 
 Install olojs via npm
 
