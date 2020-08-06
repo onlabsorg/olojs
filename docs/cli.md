@@ -1,8 +1,32 @@
 
-# olojs repository customization
+# olojs command-line interface
 
-### Customize olonv.js
+### olojs init [template] [options...]
+Initializes a repository in the current directory.
 
-### Install a repository template
+When called without the `[template]` and `[options...]` parameter, it
+creates a `olonv.js` file and a `documents` directory in the current directory.
+The `olonv.js` file is a javascript module that exports an 
+[olojs environment](./api/environment.md), while the `documents` directory is
+the place where the documents are stored.
 
-### Extend the Repository class
+You can customize the repository environment by modifying the `olonv.js` file.
+
+When called with the `[template]` and `[options...]` parameter, it will delegate
+the repository creation to `require(template).init()`.
+
+### olojs render <path> [args...]
+Renders the document `./documents/<path>` and prints it to the console.
+If you provide arguments (e.g. arg1=10, arg2=20, ...), they will be added to
+the document namespace before rendering it.
+
+### olojs serve [port]
+Serve the current repository via HTTP.
+Once the server is running, you can render the repository documents in the
+browser by typing their path (relative to ./documents) as hash.
+
+### olojs -h
+Displays help for the cli
+
+### olojs -v
+Outputs the olojs cli version

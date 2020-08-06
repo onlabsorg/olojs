@@ -40,17 +40,17 @@ work of many other scientists like him to formulate his well known relativity th
 
 ### Getting started with the CLI interface
 
-First of all create an npm package in a new directory and install olojs-cli.
+First of all create an npm package in a new directory and install olojs.
 
 ```sh
 npm init
-npm install @onlabsorg/olojs-cli --save 
+npm install --save @onlabsorg/olojs
 ```
 
 Then you can decorate the npm package into an olo-docs repository:
 
 ```sh
-npx olojs init [template-package-name]
+npx olojs init
 ```
 
 > Soon just `npx olojs init` will do. Meaning that it will automatically 
@@ -64,7 +64,6 @@ Now you can are ready to render some documents:
 
 ```sh
 npx olojs render /index
-npx olojs render /license
 ```
 
 The `npx olojs render <path>` command prints the rendered version of the 
@@ -194,6 +193,8 @@ server.listen(8010);
 * Learn the [fs-store](./docs/api/fs-store.md) module API
 * Learn the [fs-store](./docs/api/http-store.md) module API
 * Learn the [router](./docs/api/router.md) module API
+* Learn the [repository](./docs/api/repository.md) module API
+* Learn the [cli](./docs/cli.md) commands
 
 
 ### Test 
@@ -205,9 +206,3 @@ server.listen(8010);
 ### License
 
 [MIT](https://opensource.org/licenses/MIT)
-
-
-### Related projects
-
-* onlabsorg/olojs-li - a command-line-interface for creating and managing a 
-  local olo-documents repository

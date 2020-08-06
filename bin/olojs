@@ -9,7 +9,7 @@ const npmPackage = JSON.parse( fs.readFileSync(`${__dirname}/../package.json`, '
 
 function getRepository () {
     const Repository = require((npmPackage.olojs && npmPackage.olojs.Repository) || "../lib/repository");
-    return new Repository(process.cwd(), {logLevel:"INFO"});    
+    return new Repository(process.cwd());
 }
 
 function setRepository (repositoryModulePath) {
@@ -23,14 +23,18 @@ const cmd = require("commander");
 
 cmd.version(`v${npmPackage.version}`, "-v --version");
 
-cmd.command("init [template]")
+cmd.command("init [template] [args...]")
    .description("Initialize the local repository")
-   .action(async (template) => {
+   .action(async (template, args) => {
        logger.info(`Initializing olojs repository`);
        if (template) setRepository(template);
        try {
            const repository = getRepository();
-           await repository.init(template);
+           
+           const parseParams = require("../lib/tools/parameters-parser");
+           const options = parseParams(...args);           
+           
+           await repository.init(options);
            logger.info("Repository successfully initialized.");
        } catch (err) {
            logger.error(err);
@@ -42,7 +46,7 @@ cmd.command("render <path> [args...]")
     .action(async (path, args) => {
         const repository = getRepository();
         
-        const parseParams = require("@onlabsorg/olojs/lib/tools/parameters-parser");
+        const parseParams = require("../lib/tools/parameters-parser");
         const argns = parseParams(...args);
         
         const environment = repository.getEnvironment();
@@ -52,7 +56,7 @@ cmd.command("render <path> [args...]")
     });
 
 cmd.command("serve [port]")
-    .description("Render a document from the current repository")
+    .description("Serve the current repository over HTTP")
     .action(async (port=8010) => {
         logger.info(`Loading repository`);
         const repository = getRepository();
