@@ -57,7 +57,7 @@ npx olojs init
 > initialize the npm package, intall olojs-cli and initialize the repository.
 
 After initializing the olojs repository, you will find in your npm packages two
-new directories: `documents` and `olonv.js`. The first will contain your documents,
+new directories: `docrs` and `olonv.js`. The first will contain your documents,
 while the second is a javascript module that exports the repository
 [environment](./docs/api/environment.md).
 
@@ -68,7 +68,7 @@ npx olojs render /index
 ```
 
 The `npx olojs render <path>` command prints the rendered version of the 
-document found at `./documents/<path>`.
+document found at `./docrs/<path>`.
 
 You can now add as many documents as you want and render them out to the console 
 or redirect them to to a file. If you want instead to render your document in 

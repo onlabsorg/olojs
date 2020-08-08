@@ -17,15 +17,14 @@ Returns the root path of the repository passed to the constructor.
 
 
 ### repository.init(options)
-Initializes the repository. 
+Initializes the repository. The `npx olojs init` command delegates to this
+method.
 
-By default, this creates the `olonv.js` file and the `documents` directory in
+By default, this creates the `olonv.js` file and the `olors` directory in
 the `repository.rootPath`.
 
 The `options` object can be useful for Repository extensions, while for the
 default Repository class, it is ignored.
-
-When you type `npx olojs init`, this method will be called.  
 
 When you type `npx olojs init my-repo-template opt1=val1 opt2=val2 ...`, the
 repository returned by `require(my-repo-template)` will be called with the
@@ -39,7 +38,7 @@ By default, this is the object exported by the `olonv.js` module contained in
 the `repository.rootPath`.
 
 This environment is used by `npx olojs render <path>` to render the document
-at `documents/<path>`.
+at `docrs/<path>`.
 
 
 ### environment = repository.getHttpServer()
