@@ -6,17 +6,6 @@ var Router = require("../lib/stores/router");
 var HTTPServer = require("../lib/http-server");
 require("isomorphic-fetch");
 
-function createMemoryStore (docs) {
-    var store = new Map();
-    for (let path in docs) store.set(path, docs[path]);
-    return {
-        read: path => store.get(path) || "",
-        write: (path, source) => store.set(path, String(source)),
-        delete: path => store.delete(path)
-    }
-}
-
-
 describe("HTTPServer", () => {
     
     describe("Default HTTP server", () => {
@@ -31,17 +20,17 @@ describe("HTTPServer", () => {
             server.listen(8888, done);
         });            
         
-        describe("HTTP GET with 'text/olo' mimeType", () => {
+        describe("HTTP GET /olors/*", () => {
             
             it("should return the document source at path from the passed environment", async () => {
                 var docPath = "/path/to/doc1";
                 var docSource = "document source ...";
                 await environment.writeDocument(docPath, docSource);
                 
-                var response = await fetch(`http://localhost:8888${docPath}`, {
+                var response = await fetch(`http://localhost:8888/olors${docPath}`, {
                     method: 'get',
                     headers: {
-                        'Accept': 'text/olo'
+                        'Accept': 'text/*'
                     },
                 });
                 expect(response.status).to.equal(200);
@@ -49,7 +38,7 @@ describe("HTTPServer", () => {
             });
         });
             
-        describe("HTTP GET with any other mimeType", async () => {
+        describe("HTTP GET /*", async () => {
             
             it("should return the default index.html page if the path is '/'", async () => {
                 var indexHTMLPage = fs.readFileSync(Path.resolve(__dirname, "../public/index.html"), "utf8");
@@ -66,12 +55,12 @@ describe("HTTPServer", () => {
             });
         });
         
-        describe("HTTP PUT with 'text/olo' mimeType", () => {
+        describe("HTTP PUT /olors/*", () => {
 
             it("should set the document source at path equal to the body", async () => {
                 var docPath = "/path/to/doc1";
                 var newSource = "new doc1 source";
-                var response = await fetch(`http://localhost:8888${docPath}`, {
+                var response = await fetch(`http://localhost:8888/olors/${docPath}`, {
                     method: 'put',
                     headers: {
                         'Accept': 'text/olo',
@@ -84,7 +73,7 @@ describe("HTTPServer", () => {
             });
         });
 
-        describe("HTTP DELETE with `text/olo` mimeType", () => {
+        describe("HTTP DELETE /olors/*", () => {
     
             it("should remove the document at path", async () => {
                 var docPath = "/path/to/doc1";
@@ -92,7 +81,7 @@ describe("HTTPServer", () => {
                 await environment.writeDocument(docPath, "some text ...");
                 expect(await environment.readDocument(docPath)).to.equal("some text ...");
                 
-                var response = await fetch(`http://localhost:8888${docPath}`, {
+                var response = await fetch(`http://localhost:8888/olors/${docPath}`, {
                     method: 'delete',
                     headers: {
                         'Accept': 'text/olo'
@@ -129,7 +118,7 @@ describe("HTTPServer", () => {
             var docSource = "document source ...";
             await environment.writeDocument(docPath, docSource);
             
-            var response = await fetch(`http://localhost:8888${docPath}`, {
+            var response = await fetch(`http://localhost:8888/olors/${docPath}`, {
                 method: 'get',
                 headers: {
                     'Accept': 'text/olo'
@@ -166,7 +155,7 @@ describe("HTTPServer", () => {
             var docPath = "/path/to/doc1";
             var docSource = "document source ...";
             await environment.writeDocument(docPath, docSource);
-            var response = await fetch(`http://localhost:8888${docPath}`, {
+            var response = await fetch(`http://localhost:8888/olors/${docPath}`, {
                 method: 'get',
                 headers: {
                     'Accept': 'text/olo'
@@ -225,3 +214,19 @@ describe("HTTPServer", () => {
         });        
     });
 });
+
+
+
+// -----------------------------------------------------------------------------
+//  Helper Functions
+// -----------------------------------------------------------------------------
+
+function createMemoryStore (docs) {
+    var store = new Map();
+    for (let path in docs) store.set(path, docs[path]);
+    return {
+        read: path => store.get(path) || "",
+        write: (path, source) => store.set(path, String(source)),
+        delete: path => store.delete(path)
+    }
+}
