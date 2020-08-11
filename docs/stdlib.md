@@ -58,3 +58,12 @@ The path library exposes the following methods of the [NodeJS path](https://node
 * `join`: is just NodeJS' `path.join`
 * `normalize`: is just NodeJS' `path.normalize`
 * `resolve`: is NodeJS' `path.resolve` assuming always `/` as root
+
+
+## json
+
+The json library exposes the following methods to parse and stringify json data:
+
+* `json.parse(text)`: converts the JSON text to an object,
+* `json.stringify(object, [spaces])`: converts the provided object to a JSON
+  string, optionally with the given number of indentation spaces

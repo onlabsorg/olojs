@@ -55,4 +55,13 @@ describe("stdlib", () => {
             expect(math.trunc).to.equal(Math.trunc);    
         });
     });
+
+    describe("json", () => {
+        it("should expose NodeJS JSON methods", async () => {
+            var json = await loadlib("json");
+            expect(json.parse(`{"a":1, "b":true}`)).to.deep.equal({a:1, b:true});
+            expect(json.stringify({a:1})).to.equal(`{"a":1}`);
+            expect(json.stringify({a:1}, 2)).to.equal(`{\n  "a": 1\n}`);
+        });
+    });
 });

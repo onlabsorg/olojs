@@ -912,17 +912,28 @@ describe("expression", () => {
     
     describe("require <module-name>", () => {
         
-        it("should load a stdlib module", async () => {
+        it("should load the `math` module", async () => {
             var ctx = createContext();
-            
             var math = await evaluate("require 'math'", ctx);
             expect(math).to.equal(require("../lib/expression/stdlib/math"));            
+        });
 
+        it("should load the `markdown` module", async () => {
+            var ctx = createContext();
             var markdown = await evaluate("require 'markdown'", ctx);
             expect(markdown).to.equal(require("../lib/expression/stdlib/markdown"));            
+        });
 
+        it("should load the `path` module", async () => {
+            var ctx = createContext();
             var path = await evaluate("require 'path'", ctx);
             expect(path).to.equal(require("../lib/expression/stdlib/path"));            
+        });
+
+        it("should load the `json` module", async () => {
+            var ctx = createContext();
+            var json = await evaluate("require 'json'", ctx);
+            expect(json).to.equal(require("../lib/expression/stdlib/json"));            
         });
     });
     
