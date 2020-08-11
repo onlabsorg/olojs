@@ -941,6 +941,12 @@ describe("expression", () => {
             var text = await evaluate("require 'text'", ctx);
             expect(text).to.equal(require("../lib/expression/stdlib/text"));            
         });
+
+        it("should load the `list` module", async () => {
+            var ctx = createContext();
+            var list = await evaluate("require 'list'", ctx);
+            expect(list).to.equal(require("../lib/expression/stdlib/list"));            
+        });
     });
     
     

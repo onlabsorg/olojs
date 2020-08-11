@@ -100,7 +100,7 @@ It returns the slice of the given string between the `firstIndex` and the
 
 Negative indexes are relative to the end of the string.
 
-A missing `lastIndex` meand "up to the end of the string".
+A missing `lastIndex` means "up to the end of the string".
 
 ##### text.split(str, divider)
 The split method divides a string into an ordered list of substrings, puts these 
@@ -109,3 +109,31 @@ The division is done by searching for the `divider` pattern.
 
 ##### text.upper(str)
 Returns the passed string converted to upper case characters.
+
+
+### list
+
+The list library exposes methods to manipulate lists.
+
+##### list.find(lst, item)
+Returns the index of the first occurrence of `item` in `lst`.
+Returns -1 if `item` is not contained in `lst` at all.
+
+##### list.join(lst, separator)
+Returns a string obtained by joining together the string items of `lst`.
+If provided, the `separator` string gets interposed between the items.
+
+##### list.reverse(lst)
+Returns a copy of the passed list, in reverse order.
+
+##### list.rfind(lst, item)
+Returns the index of the last occurrence of `item` in `lst`.
+Returns -1 if `item` is not contained in `lst` at all.
+
+##### list.slice(lst, firstIndex, lastIndex)
+It returns the slice of the given list between the `firstIndex` and the
+`lastIndex` (not included).
+
+Negative indexes are relative to the end of the string.
+
+A missing `lastIndex` means "up to the end of the list".
