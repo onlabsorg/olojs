@@ -14,7 +14,7 @@ is typically used as post-render function as follows:
 ```
 
 
-# math
+### math
 
 The math library exposes the following [JavaScript Math](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math)
 functions and constants: 
@@ -46,7 +46,7 @@ functions and constants:
 [trunc](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/trunc). 
 
 
-## path
+### path
 
 The path library exposes the following methods of the [NodeJS path](https://nodejs.org/api/path.html) module:
 
@@ -60,10 +60,48 @@ The path library exposes the following methods of the [NodeJS path](https://node
 * `resolve`: is NodeJS' `path.resolve` assuming always `/` as root
 
 
-## json
+### json
 
 The json library exposes the following methods to parse and stringify json data:
 
 * `json.parse(text)`: converts the JSON text to an object,
 * `json.stringify(object, [spaces])`: converts the provided object to a JSON
   string, optionally with the given number of indentation spaces
+
+
+### text
+
+The text library exposes methods to manipulate strings.
+
+##### text.char(...charCodes)
+Returns the string made of the given UTF char codes.
+
+##### text.code(str)
+Returns the list of the UTF codes the given string is made of.
+
+##### text.find(str, subStr)
+Returns the index of the first occurrence of `subStr` in `str`.
+Returns -1 if `subStr` is not contained in `str` at all.
+
+##### text.lower(str)
+Returns the passed string converted to lower case characters.
+
+##### text.rfind(str, subStr)
+Returns the index of the last occurrence of `subStr` in `str`.
+Returns -1 if `subStr` is not contained in `str` at all.
+
+##### text.slice(str, firstIndex, lastIndex)
+It returns the slice of the given string between the `firstIndex` and the
+`lastIndex` (not included).
+
+Negative indexes are relative to the end of the string.
+
+A missing `lastIndex` meand "up to the end of the string".
+
+##### text.split(str, divider)
+The split method divides a string into an ordered list of substrings, puts these 
+substrings into a list, and returns the list.  
+The division is done by searching for the `divider` pattern.
+
+##### text.upper(str)
+Returns the passed string converted to upper case characters.

@@ -521,6 +521,9 @@ The `size` function taken a value `X` and returns:
 * The number of items if X is a list
 * The number of own names if X is a namespace
 
+#### require <module_path>
+This function imports a module from the [standard swan library](./stdlib.d).
+
 
 ## Comments
 Everything following a `#` symbol, up to the end of the line, is a comment and 

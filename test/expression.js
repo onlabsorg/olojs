@@ -935,6 +935,12 @@ describe("expression", () => {
             var json = await evaluate("require 'json'", ctx);
             expect(json).to.equal(require("../lib/expression/stdlib/json"));            
         });
+        
+        it("should load the `text` module", async () => {
+            var ctx = createContext();
+            var text = await evaluate("require 'text'", ctx);
+            expect(text).to.equal(require("../lib/expression/stdlib/text"));            
+        });
     });
     
     

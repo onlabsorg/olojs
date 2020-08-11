@@ -74,7 +74,6 @@ Evaluation context for the document mapped to `doc_path`, containing:
 - the `__path__` string, equal to `doc_path` 
 - the `import` function which, given a document path (relative to 
   `__path___`, returns the mapped document namespace
-- the `require` function which loads a javascript module from the `stdlib`
 
   
 ### evaluate_doc = environment.parseDocument(source) 
