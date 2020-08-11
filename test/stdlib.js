@@ -1,6 +1,8 @@
 var expect = require("chai").expect;
 var loadlib = require("../lib/expression/stdlib-loader");
 var expression = require("../lib/expression");
+var express = require("express");
+
 
 describe("stdlib", () => {
     
@@ -225,4 +227,57 @@ describe("stdlib", () => {
             });
         });
     });
+
+    describe("http", () => {
+        var server;
+        
+        before(async () => {
+            server = await startServer(8010);
+        });
+        
+        describe("http.get(url, options)", () => {
+            
+            it("should fetch the text at the given url", async () => {
+                var http = await loadlib("http");
+                var url = "http://localhost:8010/path/to/resource";
+                expect(await http.get(url)).to.equal("Received HTTP GET /path/to/resource");
+            });
+
+            it("should throw an error if the response status is not 2XX", async () => {
+                var http = await loadlib("http");
+                var url = "http://localhost:8010/fail/this/request";
+                try {
+                    await http.get(url);
+                    throw new Error("it didn't throw");
+                } catch (error) {
+                    expect(error.message).to.equal("500");
+                }
+            });
+        });
+        
+        after(async () => {
+            await server.close();
+        });
+    });
 });
+
+
+
+function startServer (port) {
+    var express = require("express");
+    var app = express();
+    
+    app.get("*", (req, res, next) => {
+        if (req.path.slice(0,6) === "/fail/") {
+            res.status(500).send();
+        } else {
+            res.status(200).send(`Received HTTP GET ${req.path}`);
+        }
+    });
+
+    return new Promise((resolve, reject) => {
+        var server = app.listen(port, () => {
+            resolve(server);
+        });
+    });        
+}

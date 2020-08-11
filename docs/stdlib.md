@@ -137,3 +137,16 @@ It returns the slice of the given list between the `firstIndex` and the
 Negative indexes are relative to the end of the string.
 
 A missing `lastIndex` means "up to the end of the list".
+
+
+### http
+
+The http library exposes methods to handle the HTTP protocol.
+
+##### http.get(url, options)
+Sends an HTTP GET request to the given URL and returns the response body as
+text.
+In case of error, it throws the HTTP statu code.
+The `options` object is the second parameter of the JavaScript 
+[fetch](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch) 
+function. 

@@ -947,6 +947,12 @@ describe("expression", () => {
             var list = await evaluate("require 'list'", ctx);
             expect(list).to.equal(require("../lib/expression/stdlib/list"));            
         });
+
+        it("should load the `http` module", async () => {
+            var ctx = createContext();
+            var http = await evaluate("require 'http'", ctx);
+            expect(http).to.equal(require("../lib/expression/stdlib/http"));            
+        });
     });
     
     
