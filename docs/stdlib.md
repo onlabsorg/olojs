@@ -86,6 +86,10 @@ Returns -1 if `subStr` is not contained in `str` at all.
 ##### text.lower(str)
 Returns the passed string converted to lower case characters.
 
+##### text.replace(str, subStr, newSubStr)
+Replaces all the occurrences of `subStr` with `newSubStr` and returns the
+resulting string.
+
 ##### text.rfind(str, subStr)
 Returns the index of the last occurrence of `subStr` in `str`.
 Returns -1 if `subStr` is not contained in `str` at all.
