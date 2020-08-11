@@ -150,5 +150,13 @@ describe("stdlib", () => {
                 expect(await text.split("Abc,def,hij", ",")).to.deep.equal(["Abc", "def", "hij"]);
             });
         });
+
+        describe("text.replace(str, subStr, newSubStr)", () => {
+            
+            it("should replace all the occurencies of `subStr` with `newSubStr`", async () => {
+                var text = await loadlib("text");
+                expect(await text.replace("abcXYdefXYghi", "XY", "Z")).to.equal("abcZdefZghi");
+            });
+        });
     });
 });
