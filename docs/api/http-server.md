@@ -17,7 +17,7 @@ The `options` object may contain one or more of the following properties:
   first (e.g. in order to implement authentication/authroization). 
 - `options.after` expression middleware, which gest to handle the request
   as second to last, just before the static server middleware
-- `options.public` path of a custom public directory
+- `options.publicPath` path of a custom public directory
 
 > The default public directory index contains a single page application
 > which loads and renders in the browser the document at `#/path/to/doc`

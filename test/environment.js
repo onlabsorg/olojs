@@ -225,13 +225,7 @@ describe("env = new Environment(config)", () => {
             expect(pathArg).to.equal("/path/to/b/c");
             expect(presetsArg).to.equal(10);
             expect(self).to.equal(env);
-        });
-        
-        it("should contain the `require` function, loading the stdlib modules", async () => {
-            var env = new Environment({store:{read:()=>{}}});
-            var context = env.createContext();
-            expect(await context.require("math")).to.equal(require("../lib/stdlib/modules/math"));
-        });
+        });        
     });
     
     describe("env.loadDocument(path, presets)", () => {

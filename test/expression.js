@@ -910,6 +910,22 @@ describe("expression", () => {
         });
     });
     
+    describe("require <module-name>", () => {
+        
+        it("should load a stdlib module", async () => {
+            var ctx = createContext();
+            
+            var math = await evaluate("require 'math'", ctx);
+            expect(math).to.equal(require("../lib/expression/stdlib/math"));            
+
+            var markdown = await evaluate("require 'markdown'", ctx);
+            expect(markdown).to.equal(require("../lib/expression/stdlib/markdown"));            
+
+            var path = await evaluate("require 'path'", ctx);
+            expect(path).to.equal(require("../lib/expression/stdlib/path"));            
+        });
+    });
+    
     
     // LOGIC OPERATORS
     

@@ -1,5 +1,5 @@
 var expect = require("chai").expect;
-var loadlib = require("../lib/stdlib/loader");
+var loadlib = require("../lib/expression/stdlib-loader");
 var expression = require("../lib/expression");
 
 describe("stdlib", () => {

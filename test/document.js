@@ -27,7 +27,7 @@ describe("document", () => {
             it("should contain all the names defined in the swan expressions", async () => {
                 var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
                 var evaluate = document.parse(source);
-                var context = expression.createContext();
+                var context = expression.createContext({});
                 var docNS = await evaluate(context);
                 expect(docNS).to.deep.equal({a:10, b:20, __str__:"a + b = 30"});                
             });
