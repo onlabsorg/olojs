@@ -11,8 +11,8 @@ const environment = new Environment({
     
     store: new Router({
         "/": new FSStore(path.resolve(__dirname, "olors")),
-        "http:/": new HTTPStore("http:/"),
-        "https:/": new HTTPStore("https:/")
+        "/http": new HTTPStore("http:/"),
+        "/https": new HTTPStore("https:/")
     }),
     
     globals: {},
