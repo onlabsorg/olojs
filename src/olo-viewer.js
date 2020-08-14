@@ -1,8 +1,9 @@
-const olonv = require("./browser-environment");
 const DOMPurify = require("dompurify");
 const parseParams = require("../lib/tools/parameters-parser");
 
-module.exports = {
+require("./olo-viewer.css");
+
+module.exports = olonv => ({
     
     template: `<div class="olo-viewer" v-html="html"></div>`,
     
@@ -44,4 +45,4 @@ module.exports = {
     mounted () {
         this.refresh();
     }
-};
+});

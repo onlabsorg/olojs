@@ -1,27 +1,3 @@
-html, body {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: block;
-    margin: 0 auto;
-    background-color: #FFFFFF;
-    line-height: 1.4;
-}
-
-.olo-viewer {
-    display: block;
-    padding: 2em 20%;
-}
-
-@media (max-width: 480px) { 
-    .olo-viewer {
-        padding-left: 3%;
-        padding-right: 3%;
-    }
-}
-
 
 @font-face {
     font-family: "Ubuntu";
@@ -389,4 +365,3 @@ html, body {
     display: block;
     font-size: 0.8rem;
 }
-

@@ -1,1 +1,1 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[2],{24:function(n,p,o){const w=o(37);p.__apply__=n=>w(n)}}]);
+(window.webpackJsonp=window.webpackJsonp||[]).push([[2],{26:function(n,p,o){const w=o(39);p.__apply__=n=>w(n)}}]);

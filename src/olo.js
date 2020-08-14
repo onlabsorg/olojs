@@ -1,11 +1,9 @@
 window.pathlib = require("path")
+require("./olo.css");
 const olonv = window.olonv = require("./browser-environment");
 
 const Vue = require("vue/dist/vue.js");
-
-const parseParams = require("../lib/tools/parameters-parser");
-
-
+const OloViewer = require("./olo-viewer");
 
 document.addEventListener("DOMContentLoaded", () => new Vue({
         
@@ -14,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => new Vue({
     props: ['src'],
     
     components: {
-        'olo-viewer': require("./olo-viewer"),          
+        'olo-viewer': OloViewer(olonv),          
     },        
     
     data: {            
