@@ -50,7 +50,7 @@ cmd.command("render <path> [args...]")
         const argns = parseParams(...args);
         
         const environment = repository.getEnvironment();
-        const docRendering = await environment.renderDocument(path, argns);        
+        const docRendering = await environment.renderDocument(path, {argns});        
         
         console.log(docRendering);
     });

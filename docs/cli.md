@@ -17,8 +17,8 @@ the repository creation to `require(template).init()`.
 
 ### olojs render <path> [args...]
 Renders the document `./docrs/<path>` and prints it to the console.
-If you provide arguments (e.g. arg1=10, arg2=20, ...), they will be added to
-the document namespace before rendering it.
+If you provide arguments (e.g. arg1=10, arg2=20, ...), they will be accessible
+to inline expression as items of the `argns` namespace.
 
 ### olojs serve [port]
 Serve the current repository via HTTP.
