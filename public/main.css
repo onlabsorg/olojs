@@ -15,6 +15,11 @@ html, body {
     padding: 2em 20%;
 }
 
+.olo-viewer .runtime-error {
+    color: red;
+    font-family: "monospace";
+}
+
 @media (max-width: 480px) { 
     .olo-viewer {
         padding-left: 3%;

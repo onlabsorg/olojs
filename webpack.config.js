@@ -13,10 +13,10 @@ const cssRule = {
 
 module.exports = {
         
-    entry: "./src/olo.js",
+    entry: "./src/olonv.js",
     
     output: {
-        filename: 'olo.js',
+        filename: 'olonv.js',
         chunkFilename: '[name].bundle.js',
         path: path.resolve(__dirname, './public')
     },  

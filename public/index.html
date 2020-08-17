@@ -1,12 +1,15 @@
 <html>
 
     <head>
-        <script src="/olo.js"></script>
+        <script src="/olonv.js"></script>
         <link rel="stylesheet" href="/main.css"></link>        
     </head>
 
     <body>
         <olo-viewer id="olo-document" :src="hash"></olo-viewer>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => olonv.init("#olo-document"));
+        </script>
     </body>
 
 </html>
