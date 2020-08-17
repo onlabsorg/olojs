@@ -34,7 +34,10 @@ class BrowserEnvironment extends Environment {
 
 const browser_environment_globals = Object.assign({}, Environment.globals, {
     $renderError (error) {
-        return `<pre class="runtime-error">${error.message}</pre>`;
+        return `<pre class="runtime-error">
+                <div class="message">${error.message}</div>
+                <div class="source">${error.source}</div>
+            </pre>`;
     }    
 });
 

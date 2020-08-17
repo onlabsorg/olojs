@@ -16,8 +16,17 @@ html, body {
 }
 
 .olo-viewer .runtime-error {
-    color: red;
     font-family: "monospace";
+    border: 1px solid #D32F2F;
+    color: #D32F2F;
+}
+
+.olo-viewer .runtime-error .message {
+    font-size: 1em;
+}
+
+.olo-viewer .runtime-error .source {
+    font-size: 0.8em;
 }
 
 @media (max-width: 480px) { 
