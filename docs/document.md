@@ -41,43 +41,6 @@ a touring-complete expression language which can produce any kind of output you
 can imagine.
 
 
-### Fragments
-Besides inline [swan] expressions, the olo-document markup has only one other 
-type of variable content: _framgments_. A fragment is a parametric sub-document,
-defined as shown in the following example:
-
-```
-<def:myFragment>
-    <% name %> is <% age %> years old.
-</def>
-```
-
-This syntax will not render to anything (just like assignment expressons), but
-it will create a `myFragment` function that you can re-use multiple times
-within the document. 
-
-For example, the following template
-
-```
-<% myFragment({name="Mario", age=35}) %>
-<% myFragment({name="Lucia", age=20}) %>
-```
-
-will render to
-
-```
-Mario is 35 years old.
-Lucia is 20 years old.
-```
-
-Fragments are rendered before any [swan] expression, therefore you can use
-them before they are even defined.
-
-> Notice that the fragment syntax is not strictly necessary, since the same
-> result can be obtained also with plain [swan] expressions, but it makes the
-> document more readable.
-
-
 ### Rendering documents
 An olo-document source template can be rendered using the `document` module as 
 shown in the following example:
