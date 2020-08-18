@@ -105,6 +105,15 @@ will be assigned the tuple of the remaining values: `(a,b,c) = (1,2,3,4,5)` will
 result in `a=1`, `b=2` and `c=(3,4,5)`.
 
 
+## Labeling operator
+The labelling operator `:` works exactly as the assginment operator `=`, with
+the only exception that the operation return the right-hand value instead of
+`Nothing`. For example, the following expression binds `11` to `x` and returns
+`11`.
+
+`x: 10 + 1`
+
+
 ## Namespace data type
 A namespace is a set of name-value pairs defined as `{tuple}`.
 

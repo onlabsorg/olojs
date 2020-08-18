@@ -195,54 +195,66 @@ describe("expression", () => {
     });
 
     describe("labelling operation `name: expression`", () => {        
-    
-        it("should return the expression value", async () => {
-            var ctx = createContext();
-            expect(await evaluate("x: 10", ctx)).to.equal(10);            
-        });
-    
-        it.skip("should create a new name in the current context and map it to the given value", async () => {
+        
+        it("should create a new name in the current context and map it to the given value", async () => {
             var ctx = createContext();                        
-            await evaluate("x = 10", ctx);
+            await evaluate("x: 10", ctx);
             expect(ctx.x).to.equal(10);            
         });
     
-        it.skip("should assign a tuple of values to a tuple of names", async () => {
+        it("should assign a tuple of values to a tuple of names", async () => {
             var ctx = createContext();            
-            await evaluate("(a,b,c) = (1,2,3)", ctx);
+            await evaluate("(a,b,c) : (1,2,3)", ctx);
             expect(ctx.a).to.equal(1);        
             expect(ctx.b).to.equal(2);        
             expect(ctx.c).to.equal(3);        
         });
     
-        it.skip("should assign null to the last names if the values tuple is smaller than the names tuple", async () => {
+        it("should assign null to the last names if the values tuple is smaller than the names tuple", async () => {
             var ctx = createContext();
-            await evaluate("(a,b,c,d) = (10,20)", ctx);
+            await evaluate("(a,b,c,d) : (10,20)", ctx);
             expect(ctx.a).to.equal(10);        
             expect(ctx.b).to.equal(20);        
             expect(ctx.c).to.be.null;                    
             expect(ctx.d).to.be.null;                    
         });
     
-        it.skip("should assign to the last name the tuple of remaining values if the names tuple is smaller than the values tuple", async () => {
+        it("should assign to the last name the tuple of remaining values if the names tuple is smaller than the values tuple", async () => {
             var ctx = createContext();
     
-            await evaluate("(a,b) = (100,200,300)", ctx);
+            await evaluate("(a,b) : (100,200,300)", ctx);
             expect(ctx.a).to.equal(100);        
             expect(isTuple(ctx.b)).to.be.true;
             expect(Array.from(ctx.b)).to.deep.equal([200,300]);
     
-            await evaluate("c = (10,20,30)", ctx);
+            await evaluate("c : (10,20,30)", ctx);
             expect(isTuple(ctx.c)).to.be.true;
             expect(Array.from(ctx.c)).to.deep.equal([10,20,30]);
         });
     
-        it.skip("should overwrite an existing name-value mapping", async () => {
+        it("should overwrite an existing name-value mapping", async () => {
             var ctx = createContext({a:1});
-            await evaluate("a = 2", ctx);            
-            await evaluate("a = 3", ctx);            
+            await evaluate("a : 2", ctx);            
+            await evaluate("a : 3", ctx);            
             expect(ctx.a).to.equal(3);
         });        
+        
+        it("should return the expression value", async () => {
+            var ctx = createContext();
+            expect(await evaluate("x: 10", ctx)).to.equal(10);  
+            
+            var val = await evaluate("(a,b,c) : (1,2,3)", ctx);
+            expect(Array.from(val)).to.deep.equal([1,2,3]);
+                      
+            var val = await evaluate("(a,b,c,d) : (10,20)", ctx);
+            expect(Array.from(val)).to.deep.equal([10,20]);
+
+            var val = await evaluate("(a,b) : (100,200,300)", ctx);
+            expect(Array.from(val)).to.deep.equal([100,200,300]);
+
+            var val = await evaluate("c : (10,20,30)", ctx);
+            expect(Array.from(val)).to.deep.equal([10,20,30]);
+        });
     });
         
     describe("assignment operation: name = expression", () => {        
