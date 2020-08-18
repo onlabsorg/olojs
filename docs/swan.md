@@ -510,7 +510,7 @@ The `size` function taken a value `X` and returns:
 * The number of items if X is a list
 * The number of own names if X is a namespace
 
-## range(a,v)
+## range(a,b)
 The range function creates a numeric tuple containing all the integers
 between `a` and `b`, including also `a` and `b`. For example:
 
