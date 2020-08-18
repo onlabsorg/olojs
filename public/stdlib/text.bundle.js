@@ -1,1 +1,14 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[5],{29:function(r,n){function e(r){if("string"!=typeof r)throw new Error("String type expected")}function t(r){if(Number.isNaN(r))throw new Error("Number type expected")}n.find=function(r,n){return e(r),e(n),r.indexOf(n)},n.rfind=function(r,n){return e(r),e(n),r.lastIndexOf(n)},n.lower=function(r){return e(r),r.toLowerCase()},n.upper=function(r){return e(r),r.toUpperCase()},n.char=function(...r){for(let n of r)t(n);return String.fromCharCode(...r)},n.code=function(r){return e(r),Array.from(r).map(r=>r.charCodeAt(0))},n.slice=function(r,n,o){return e(r),t(n),void 0!==o&&t(o),r.slice(n,o)},n.split=function(r,n){return e(r),e(n),r.split(n)},n.replace=(r,n,t)=>{for(e(r),e(n),e(t);-1!==r.indexOf(n);)r=r.replace(n,t);return r}}}]);
+(window["webpackJsonp"] = window["webpackJsonp"] || []).push([["/stdlib/text"],{
+
+/***/ "./lib/expression/stdlib/text.js":
+/*!***************************************!*\
+  !*** ./lib/expression/stdlib/text.js ***!
+  \***************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("\n\nexports.find = function (str, subStr) {\n    ensureString(str);\n    ensureString(subStr);\n    return str.indexOf(subStr);\n}\n\nexports.rfind = function (str, subStr) {\n    ensureString(str);\n    ensureString(subStr);\n    return str.lastIndexOf(subStr);\n}\n\nexports.lower = function (str) {\n    ensureString(str);\n    return str.toLowerCase();\n}\n\nexports.upper = function (str) {\n    ensureString(str);    \n    return str.toUpperCase();\n}\n\nexports.char = function (...charCodes) {\n    for (let charCode of charCodes) ensureNumber(charCode);\n    return String.fromCharCode(...charCodes);\n}\nexports.code = function (str) {\n    ensureString(str);    \n    return Array.from(str).map(c => c.charCodeAt(0));\n}\n\nexports.slice = function (str, firstIndex, lastIndex) {\n    ensureString(str);\n    ensureNumber(firstIndex);\n    if (lastIndex !== undefined) ensureNumber(lastIndex);\n    return str.slice(firstIndex, lastIndex);\n}\n\nexports.split = function (str, divider) {\n    ensureString(str);\n    ensureString(divider);\n    return str.split(divider);\n}\n\nexports.replace = (str, subStr, newSubStr) => {\n    ensureString(str);\n    ensureString(subStr);\n    ensureString(newSubStr);\n    while (str.indexOf(subStr) !== -1) {\n        str = str.replace(subStr, newSubStr);\n    }\n    return str;\n}\n\n\n\nfunction ensureString (string) {\n    if (typeof string !== \"string\") throw new Error(\"String type expected\");\n}\n\nfunction ensureNumber (number) {\n    if (Number.isNaN(number)) throw new Error(\"Number type expected\");\n}\n\n\n//# sourceURL=webpack:///./lib/expression/stdlib/text.js?");
+
+/***/ })
+
+}]);

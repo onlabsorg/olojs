@@ -98,125 +98,6 @@ describe("expression", () => {
         });
     });
     
-    describe("ranges: `a:b`", () => {
-    
-        it("should return the tuple of all the integers between a and b", async () => {
-            var ctx = createContext();
-            var range = await evaluate("2:6", ctx);
-            expect(isTuple(range)).to.be.true;
-            expect(Array.from(range)).to.deep.equal([2,3,4,5,6]);            
-        });
-    
-        it("should work also if b < a", async () => {
-            var ctx = createContext();
-            var range = await evaluate("6:2", ctx);
-            expect(isTuple(range)).to.be.true;
-            expect(Array.from(range)).to.deep.equal([6,5,4,3,2]);            
-        });
-    
-        it("should return a if a == b", async () => {
-            var ctx = createContext();
-            var range = await evaluate("2:2", ctx);
-            expect(range).to.equal(2);
-        });
-    
-        it("should truncate the boundaries a and/or b if decimal", async () => {
-            var ctx = createContext();
-            var range = await evaluate("2.7:6.1", ctx);
-            expect(isTuple(range)).to.be.true;
-            expect(Array.from(range)).to.deep.equal([2,3,4,5,6]);            
-    
-            var ctx = createContext();
-            var range = await evaluate("6.1:2.7", ctx);
-            expect(isTuple(range)).to.be.true;
-            expect(Array.from(range)).to.deep.equal([6,5,4,3,2]);            
-        });
-    
-        it("should throw an exception if a and/or b are not numbers", async () => {
-            var ctx = createContext({fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false});
-            var expectRangeError = (expression, xType, yType) => expectException(() => evaluate(expression, ctx), `Range operation not defined between ${xType} and ${yType}`);
-    
-            var xType='Nothing'; ctx.x = null;
-            await expectRangeError("x:()",    xType, 'Nothing');                                                
-            await expectRangeError("x:F",     xType, 'Boolean');                                    
-            await expectRangeError("x:1",     xType, 'Number');                                    
-            await expectRangeError("x:'abc'", xType, 'String');                                    
-            await expectRangeError("x:ls",    xType, 'List');                                    
-            await expectRangeError("x:ns",    xType, 'Namespace');                                    
-            await expectRangeError("x:fn",    xType, 'Function');                                                
-            await expectRangeError("x:(1,2)", xType, 'Tuple');                                                
-    
-            var xType='Boolean'; ctx.x = false;
-            await expectRangeError("x:()",    xType, 'Nothing');                                                
-            await expectRangeError("x:F",     xType, 'Boolean');                                    
-            await expectRangeError("x:1",     xType, 'Number');                                    
-            await expectRangeError("x:'abc'", xType, 'String');                                    
-            await expectRangeError("x:ls",    xType, 'List');                                    
-            await expectRangeError("x:ns",    xType, 'Namespace');                                    
-            await expectRangeError("x:fn",    xType, 'Function');                                                
-            await expectRangeError("x:(1,2)", xType, 'Tuple');                                                
-    
-            var xType='Number'; ctx.x = 1;
-            await expectRangeError("x:()",    xType, 'Nothing');                                                
-            await expectRangeError("x:F",     xType, 'Boolean');                                    
-            await expectRangeError("x:'abc'", xType, 'String');                                    
-            await expectRangeError("x:ls",    xType, 'List');                                    
-            await expectRangeError("x:ns",    xType, 'Namespace');                                    
-            await expectRangeError("x:fn",    xType, 'Function');                                                
-            await expectRangeError("x:(1,2)", xType, 'Tuple');                                                
-    
-            var xType='String'; ctx.x = "abc";
-            await expectRangeError("x:()",    xType, 'Nothing');                                                
-            await expectRangeError("x:F",     xType, 'Boolean');                                    
-            await expectRangeError("x:1",     xType, 'Number');                                    
-            await expectRangeError("x:'abc'", xType, 'String');                                    
-            await expectRangeError("x:ls",    xType, 'List');                                    
-            await expectRangeError("x:ns",    xType, 'Namespace');                                    
-            await expectRangeError("x:fn",    xType, 'Function');                                                
-            await expectRangeError("x:(1,2)", xType, 'Tuple');                                                
-    
-            var xType='List'; ctx.x = [1,2,3];
-            await expectRangeError("x:()",    xType, 'Nothing');                                                
-            await expectRangeError("x:F",     xType, 'Boolean');                                    
-            await expectRangeError("x:1",     xType, 'Number');                                    
-            await expectRangeError("x:'abc'", xType, 'String');                                    
-            await expectRangeError("x:ls",    xType, 'List');                                    
-            await expectRangeError("x:ns",    xType, 'Namespace');                                    
-            await expectRangeError("x:fn",    xType, 'Function');                                                
-            await expectRangeError("x:(1,2)", xType, 'Tuple');                                                
-    
-            var xType='Function'; ctx.x = x=>2*x;
-            await expectRangeError("x:()",    xType, 'Nothing');                                                
-            await expectRangeError("x:F",     xType, 'Boolean');                                    
-            await expectRangeError("x:1",     xType, 'Number');                                    
-            await expectRangeError("x:'abc'", xType, 'String');                                    
-            await expectRangeError("x:ls",    xType, 'List');                                    
-            await expectRangeError("x:ns",    xType, 'Namespace');                                    
-            await expectRangeError("x:fn",    xType, 'Function');                                                
-            await expectRangeError("x:(1,2)", xType, 'Tuple');                                                
-    
-            var xType='Namespace'; ctx.x = {a:1,b:2,c:3};
-            await expectRangeError("x:()",    xType, 'Nothing');                                                
-            await expectRangeError("x:F",     xType, 'Boolean');                                    
-            await expectRangeError("x:1",     xType, 'Number');                                    
-            await expectRangeError("x:'abc'", xType, 'String');                                    
-            await expectRangeError("x:ls",    xType, 'List');                                    
-            await expectRangeError("x:ns",    xType, 'Namespace');                                    
-            await expectRangeError("x:fn",    xType, 'Function');                                                
-            await expectRangeError("x:(1,2)", xType, 'Tuple');                                                
-    
-            var xType='Tuple'; ctx.x = createTuple(1,2,3);
-            await expectRangeError("x:()",    xType, 'Nothing');                                                
-            await expectRangeError("x:F",     xType, 'Boolean');                                    
-            await expectRangeError("x:1",     xType, 'Number');                                    
-            await expectRangeError("x:'abc'", xType, 'String');                                    
-            await expectRangeError("x:ls",    xType, 'List');                                    
-            await expectRangeError("x:ns",    xType, 'Namespace');                                    
-            await expectRangeError("x:fn",    xType, 'Function');                                                
-            await expectRangeError("x:(1,2)", xType, 'Tuple');                                                
-        });
-    });
-    
     describe("lists: `[expression]`", () => {
     
         it("should return an array", async () => {
@@ -614,6 +495,12 @@ describe("expression", () => {
             expect(await evaluate("ns.y", ctx)).to.equal(20);
             expect(await evaluate("ns.z", ctx)).to.equal(30);
         });
+
+        it("should see the function parameters in a function expressions", async () => {
+            var ctx = createContext({ns:{x:10, y:20}});
+            await evaluate("f = nsp -> nsp.(3*x+nsp.y)", ctx);
+            expect(await evaluate("f ns", ctx)).to.equal(50);
+        });
     
         it("should return a tuple obtained by sub-contexting each item of X if X is a tuple", async () => {
             var ctx = createContext({
@@ -910,6 +797,108 @@ describe("expression", () => {
         });
     });
     
+    describe("range(a,b)`", () => {
+    
+        it("should return the tuple of all the integers between a and b", async () => {
+            var ctx = createContext();
+            var range = await evaluate("range(2,6)", ctx);
+            expect(isTuple(range)).to.be.true;
+            expect(Array.from(range)).to.deep.equal([2,3,4,5,6]);            
+        });
+    
+        it("should work also if b < a", async () => {
+            var ctx = createContext();
+            var range = await evaluate("range(6,2)", ctx);
+            expect(isTuple(range)).to.be.true;
+            expect(Array.from(range)).to.deep.equal([6,5,4,3,2]);            
+        });
+    
+        it("should return a if a == b", async () => {
+            var ctx = createContext();
+            var range = await evaluate("range(2,2)", ctx);
+            expect(range).to.equal(2);
+        });
+    
+        it("should truncate the boundaries a and/or b if decimal", async () => {
+            var ctx = createContext();
+            var range = await evaluate("range(2.7,6.1)", ctx);
+            expect(isTuple(range)).to.be.true;
+            expect(Array.from(range)).to.deep.equal([2,3,4,5,6]);            
+    
+            var ctx = createContext();
+            var range = await evaluate("range(6.1,2.7)", ctx);
+            expect(isTuple(range)).to.be.true;
+            expect(Array.from(range)).to.deep.equal([6,5,4,3,2]);            
+        });
+    
+        it("should throw an exception if a and/or b are not numbers", async () => {
+            var ctx = createContext({fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false});
+            var expectRangeError = (expression, xType, yType) => expectException(() => evaluate(expression, ctx), `Range operation not defined between ${xType} and ${yType}`);
+    
+            var xType='Nothing'; ctx.x = null;
+            await expectRangeError("range(x,())",    'Nothing',   'Nothing');                                                
+            await expectRangeError("range(x,F)",     'Boolean',   'Nothing');                                    
+            await expectRangeError("range(x,1)",     'Number',    'Nothing');                                    
+            await expectRangeError("range(x,'abc')", 'String',    'Nothing');                                    
+            await expectRangeError("range(x,ls)",    'List',      'Nothing');                                    
+            await expectRangeError("range(x,ns)",    'Namespace', 'Nothing');                                    
+            await expectRangeError("range(x,fn)",    'Function',  'Nothing');                                                
+    
+            var xType='Boolean'; ctx.x = false;
+            await expectRangeError("range(x, ())",    xType, 'Nothing');                                                
+            await expectRangeError("range(x, F)",     xType, 'Boolean');                                    
+            await expectRangeError("range(x, 1)",     xType, 'Number');                                    
+            await expectRangeError("range(x, 'abc')", xType, 'String');                                    
+            await expectRangeError("range(x, ls)",    xType, 'List');                                    
+            await expectRangeError("range(x, ns)",    xType, 'Namespace');                                    
+            await expectRangeError("range(x, fn)",    xType, 'Function');                                                
+            
+            var xType='Number'; ctx.x = 1;
+            await expectRangeError("range(x, ())",    xType, 'Nothing');                                                
+            await expectRangeError("range(x, F)",     xType, 'Boolean');                                    
+            await expectRangeError("range(x, 'abc')", xType, 'String');                                    
+            await expectRangeError("range(x, ls)",    xType, 'List');                                    
+            await expectRangeError("range(x, ns)",    xType, 'Namespace');                                    
+            await expectRangeError("range(x, fn)",    xType, 'Function');                                                
+            
+            var xType='String'; ctx.x = "abc";
+            await expectRangeError("range(x, ())",    xType, 'Nothing');                                                
+            await expectRangeError("range(x, F)",     xType, 'Boolean');                                    
+            await expectRangeError("range(x, 1)",     xType, 'Number');                                    
+            await expectRangeError("range(x, 'abc')", xType, 'String');                                    
+            await expectRangeError("range(x, ls)",    xType, 'List');                                    
+            await expectRangeError("range(x, ns)",    xType, 'Namespace');                                    
+            await expectRangeError("range(x, fn)",    xType, 'Function');                                                
+            
+            var xType='List'; ctx.x = [1,2,3];
+            await expectRangeError("range(x, ())",    xType, 'Nothing');                                                
+            await expectRangeError("range(x, F)",     xType, 'Boolean');                                    
+            await expectRangeError("range(x, 1)",     xType, 'Number');                                    
+            await expectRangeError("range(x, 'abc')", xType, 'String');                                    
+            await expectRangeError("range(x, ls)",    xType, 'List');                                    
+            await expectRangeError("range(x, ns)",    xType, 'Namespace');                                    
+            await expectRangeError("range(x, fn)",    xType, 'Function');                                                
+            
+            var xType='Function'; ctx.x = x=>2*x;
+            await expectRangeError("range(x, ())",    xType, 'Nothing');                                                
+            await expectRangeError("range(x, F)",     xType, 'Boolean');                                    
+            await expectRangeError("range(x, 1)",     xType, 'Number');                                    
+            await expectRangeError("range(x, 'abc')", xType, 'String');                                    
+            await expectRangeError("range(x, ls)",    xType, 'List');                                    
+            await expectRangeError("range(x, ns)",    xType, 'Namespace');                                    
+            await expectRangeError("range(x, fn)",    xType, 'Function');                                                
+            
+            var xType='Namespace'; ctx.x = {a:1,b:2,c:3};
+            await expectRangeError("range(x, ())",    xType, 'Nothing');                                                
+            await expectRangeError("range(x, F)",     xType, 'Boolean');                                    
+            await expectRangeError("range(x, 1)",     xType, 'Number');                                    
+            await expectRangeError("range(x, 'abc')", xType, 'String');                                    
+            await expectRangeError("range(x, ls)",    xType, 'List');                                    
+            await expectRangeError("range(x, ns)",    xType, 'Namespace');                                    
+            await expectRangeError("range(x, fn)",    xType, 'Function');                                                            
+        });
+    });
+        
     describe("require <module-name>", () => {
         
         it("should load the `math` module", async () => {

@@ -55,17 +55,6 @@ A special type of tuple is the empty tuple `()` which is used in swan to
 represent the concept of nothingness.
 
 
-## Range operator
-The range operation `a:b` creates a numeric tuple containing all the integers
-between `a` and `b`, including also `a` and `b`. For example:
-
-* `3:7` is equivalent to `3,4,5,6,7`
-* `7:3` is equivalent to `7,6,5,4,3`
-* `2:2` is equivalent to `2`
-
-If a range boundary is a decimal, it will be truncated. For example `3.2:5.8` is equivalent to `3:5` and resolves to `3,4,5`.
-
-
 ## List data type
 A list is an ordered sequence of values, just like a tuple, but it behaves
 like a single value (uni-dimensional tuple). For this reason, it allows 
@@ -520,6 +509,18 @@ The `size` function taken a value `X` and returns:
 * The number of characters if X is a string
 * The number of items if X is a list
 * The number of own names if X is a namespace
+
+## range(a,v)
+The range function creates a numeric tuple containing all the integers
+between `a` and `b`, including also `a` and `b`. For example:
+
+* `range(3,7)` is equivalent to `3,4,5,6,7`
+* `range(7,3)` is equivalent to `7,6,5,4,3`
+* `range(2,2)` is equivalent to `2`
+
+If a range boundary is a decimal, it will be truncated. For example `range(3.2,5.8)` 
+is equivalent to `range(3,5)` and resolves to `3,4,5`.
+
 
 #### require <module_path>
 This function imports a module from the [standard swan library](./stdlib.d).
