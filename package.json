@@ -1,6 +1,6 @@
 {
   "name": "@onlabsorg/olojs",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "description": "javascript library that allows concurrent editing of JSON objects",
   "homepage": "https://github.com/onlabsorg/olojs#readme",
   "bugs": {
