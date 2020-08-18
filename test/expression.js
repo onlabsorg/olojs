@@ -551,16 +551,16 @@ describe("expression", () => {
             expect(await evaluate("ns.[x,y,z]", ctx)).to.deep.equal([10,20,30]);
         });
     
-        it("should restore the context in which X was created", async () => {
+        it("should see the global contexts", async () => {
             var ctx = createContext({x:10});
-            await evaluate("ns = {y=20}.{z=30}", ctx);
+            await evaluate("ns = {y=20}", ctx);
             expect(await evaluate("ns.x", ctx)).to.equal(10);
             expect(await evaluate("ns.y", ctx)).to.equal(20);
-            expect(await evaluate("ns.z", ctx)).to.equal(30);
         });
 
         it("should see the function parameters in a function expressions", async () => {
-            var ctx = createContext({ns:{x:10, y:20}});
+            var ctx = createContext({});
+            await evaluate("ns = {x=10, y=20}", ctx);            
             await evaluate("f = nsp -> nsp.(3*x+nsp.y)", ctx);
             expect(await evaluate("f ns", ctx)).to.equal(50);
         });

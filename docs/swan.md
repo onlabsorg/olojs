@@ -427,17 +427,6 @@ The subcontexting can be also used as an alternative way to access names defined
 inside a namespace. In the example above, the expression `ns.z` will indeed
 resolve to the value of `z` inside the namespace `ns`.
 
-When evaluating an expression in a namespace context, the context in which the
-namespace was create gets temporary restored. For example:
-
-```
-x = 10,
-ns = {y=20}.{z=30},
-ns.x,   # 10
-ns.y,   # 20
-ns.z    # 30    
-```
-
 
 ## Operators precedence
 
