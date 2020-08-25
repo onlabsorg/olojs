@@ -312,7 +312,7 @@ describe("expression", () => {
     
         it("return an object with the mapped names", async () => {
             var ctx = createContext();                    
-            expect(await evaluate("{x=1, y=2, z=3}", ctx)).to.deep.equal({x:1,y:2,z:3});
+            expect(await evaluate("{x=1, y:2, z=3}", ctx)).to.deep.equal({x:1,y:2,z:3});
         });
     
         it("should ignore the non-assignment operations", async () => {
