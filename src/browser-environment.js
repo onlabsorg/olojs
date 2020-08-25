@@ -34,10 +34,11 @@ class BrowserEnvironment extends Environment {
 
 const browser_environment_globals = Object.assign({}, Environment.globals, {
     $renderError (error) {
-        return `<pre class="runtime-error">
-                <div class="message">${error.message}</div>
-                <div class="source">${error.source}</div>
-            </pre>`;
+        return `<pre class="runtime-error">` +
+                    `<div class="message">${escape(error.message)}</div>` +
+                    `<br>` +
+                    `<div class="source">${escape(error.source)}</div>` +
+               `</pre>`;
     }    
 });
 
@@ -57,4 +58,13 @@ function normalizeHash () {
     }
     
     return location.hash.slice(1);
+}
+
+function escape (html) {
+    return html
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
