@@ -751,9 +751,9 @@ describe("expression", () => {
             expect(await evaluate("str[1,2,'abc']", ctx)).to.equal("[[List of 3 items]]")
         });
     
-        it("should return '[[Namespace with n names]]' when n is the number of items", async () => {
+        it("should return '[[Namespace of n items]]' when n is the number of items", async () => {
             var ctx = createContext({T:true, F:false});            
-            expect(await evaluate("str{a=1,b=2,c=3}", ctx)).to.equal("[[Namespace with 3 names]]");
+            expect(await evaluate("str{a=1,b=2,c=3}", ctx)).to.equal("[[Namespace of 3 items]]");
         });
     
         it("should return X.__str__ if it exists and it is a string", async () => {
