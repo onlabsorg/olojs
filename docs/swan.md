@@ -508,16 +508,16 @@ The `size` function taken a value `X` and returns:
 * The number of items if X is a list
 * The number of own names if X is a namespace
 
-## range(a,b)
+## range n
 The range function creates a numeric tuple containing all the integers
-between `a` and `b`, including also `a` and `b`. For example:
+between `0` and `n-1`. For example:
 
-* `range(3,7)` is equivalent to `3,4,5,6,7`
-* `range(7,3)` is equivalent to `7,6,5,4,3`
-* `range(2,2)` is equivalent to `2`
+* `range 3` is equivalent to `0,1,2`
+* `range -3` is equivalent to `0,-1,-2`
+* `range 0` is equivalent to the empty tuple `()`
 
-If a range boundary is a decimal, it will be truncated. For example `range(3.2,5.8)` 
-is equivalent to `range(3,5)` and resolves to `3,4,5`.
+If n is a decimal number, it will be truncated. For example `range 3.2` 
+is equivalent to `range 3` and resolves to `0,1,2`.
 
 
 #### require <module_path>
