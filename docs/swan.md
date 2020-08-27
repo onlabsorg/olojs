@@ -80,7 +80,7 @@ value `11`. After defining `x` we can reuse it as follows:
 which will resolve to `22`.
 
 Valid names can contain letters (`a..z` and `A..Z`), numbers (`0..9`) and the
-underscore character (`_`), but they cannot start with a number character.
+underscore character (`_`), but they cannot start with a numeric character.
 
 Every expression has a return value; in particular an assignment expression
 `x = 10` returns nothing (the empty tuple in swan, equivalent to `null` in
@@ -279,7 +279,8 @@ to be `()`. The empty tuple follows the rules listed below:
 
 
 ## Comparison operations
-The comparison operations are:
+The comparison operations compare two values and return `TRUE` or `FALSE`. 
+Swan defines the following comparison operators:
 * Equal: `==`
 * Not equal: `!=` 
 * Less than: `<`
@@ -439,7 +440,7 @@ resolve to the value of `z` inside the namespace `ns`.
 7. `?`
 8. `;`
 9. `->`
-10. `=`
+10. `=` , `:`
 11. `,`
 
 
@@ -507,7 +508,9 @@ The `size` function taken a value `X` and returns:
 * The number of items if X is a list
 * The number of own names if X is a namespace
 
-## range n
+It throws an error if X is of any other type.
+
+#### range n
 The range function creates a numeric tuple containing all the integers
 between `0` and `n-1`. For example:
 
@@ -517,6 +520,17 @@ between `0` and `n-1`. For example:
 
 If n is a decimal number, it will be truncated. For example `range 3.2` 
 is equivalent to `range 3` and resolves to `0,1,2`.
+
+#### type X
+Returns the type name of X:
+* `Nothing` if X is an empty tuple
+* `Boolean` if X is `TRUE` or `FALSE`
+* `Number` if X is a number
+* `String` if X is a string
+* `List` if X is a list
+* `Namespace` if X is a namespace
+* `Function` if X is a function
+* `Tuple` if X is a tuple with two or more items
 
 
 #### require <module_path>

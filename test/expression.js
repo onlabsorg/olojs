@@ -896,6 +896,42 @@ describe("expression", () => {
             await expectRangeError("range ns",    'Namespace');                                    
         });
     });
+    
+    describe("type x", () => {
+        
+        it("should return 'Nothing' if `x` is an empty tuple", async () => {
+            expect(await evaluate("type()", createContext())).to.equal("Nothing");
+        });
+        
+        it("should return 'Boolean' if `x` is a boolean value", async () => {
+            expect(await evaluate("type TRUE", createContext())).to.equal("Boolean");
+            expect(await evaluate("type FALSE", createContext())).to.equal("Boolean");
+        });
+        
+        it("should return 'Number' if `x` is a number", async () => {
+            expect(await evaluate("type 1", createContext())).to.equal("Number");
+        });
+        
+        it("should return 'String' if `x` is a string", async () => {
+            expect(await evaluate("type 'abc'", createContext())).to.equal("String");
+        });
+        
+        it("should return 'List' if `x` is a list", async () => {
+            expect(await evaluate("type [1,2,3]", createContext())).to.equal("List");
+        });
+        
+        it("should return 'Namespace' if `x` is a namespace", async () => {
+            expect(await evaluate("type {x:1}", createContext())).to.equal("Namespace");
+        });
+        
+        it("should return 'Function' if `x` is a function", async () => {
+            expect(await evaluate("type(()->())", createContext())).to.equal("Function");
+        });
+        
+        it("should return 'Tuple' if `x` is a tuple", async () => {
+            expect(await evaluate("type(1,2,3)", createContext())).to.equal("Tuple");
+        });
+    });
         
     describe("require <module-name>", () => {
         
