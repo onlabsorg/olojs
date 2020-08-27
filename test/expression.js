@@ -740,20 +740,20 @@ describe("expression", () => {
             expect(await evaluate("str 'abc'", ctx)).to.equal("abc");
         });
     
-        it("should return the UTF `f` character if X is a function", async () => {
+        it("should return '[[Function]]' if X is a function", async () => {
             var ctx = createContext({jsFn: x => 2*x});
-            expect(await evaluate("str(x -> 2)", ctx)).to.equal(String.fromCharCode(0x2A0D));
-            expect(await evaluate("str jsFn", ctx)).to.equal(String.fromCharCode(0x2A0D));
+            expect(await evaluate("str(x -> 2)", ctx)).to.equal("[[Function]]");
+            expect(await evaluate("str jsFn", ctx)).to.equal("[[Function]]");
         });
     
-        it("should return '[n]' when X is a list with n items", async () => {
+        it("should return '[[List of n items]]' when X is a list with n items", async () => {
             var ctx = createContext({T:true, F:false});            
-            expect(await evaluate("str[1,2,'abc']", ctx)).to.equal("[3]")
+            expect(await evaluate("str[1,2,'abc']", ctx)).to.equal("[[List of 3 items]]")
         });
     
-        it("should return '{n}' when n is the number of items", async () => {
+        it("should return '[[Namespace with n names]]' when n is the number of items", async () => {
             var ctx = createContext({T:true, F:false});            
-            expect(await evaluate("str{a=1,b=2,c=3}", ctx)).to.equal("{3}")
+            expect(await evaluate("str{a=1,b=2,c=3}", ctx)).to.equal("[[Namespace with 3 names]]");
         });
     
         it("should return X.__str__ if it exists and it is a string", async () => {

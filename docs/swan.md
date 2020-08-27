@@ -464,12 +464,12 @@ The `str` function convers `X` to a string as follows:
 * if `X` is `FALSE`, it resolves to `"FALSE"`
 * if `X` is a number, it stringifies the number (e.g. `str 1.23` resolves to `"1.23"`)
 * if `X` is a string, it resolves to `X` itself
-* if `X` is a list, it resolves to `"[n]"`, where `n` is the number of items in 
-  the list
-* if `X` is a namespace, it resolves to `"{n}"`, where `n` is the number of 
-  names contained in the namespace
+* if `X` is a list, it resolves to `"[[List of n items]]"`, where `n` is the number 
+  of items in the list
+* if `X` is a namespace, it resolves to `"[[Namespace with n names]]"`, where 
+  `n` is the number of names contained in the namespace
 * if `X` is a namespace and `X.__str__` is a string, it returns the latter
-* if `X` is a function, it resolves to `"&#2A0D;"`
+* if `X` is a function, it resolves to `"[[Function]]"`
 * if `X` is a tuple `(x1,x2,x3,...)`, it resolves to `(str x1) + (str x2) + 
   (str x3) + ...`
 
