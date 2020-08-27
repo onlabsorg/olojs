@@ -493,13 +493,12 @@ and the definition of `map` would be:
 map: f -> {mf = (x,xs) -> xs ; (f x, mf xs)}.mf
 ```
 
-#### enum X
-The `enum` function takes a value `X` and return its content as a tuple:
+#### names X
+The `names` function takes a namespace `X` and returns a tuple containing its
+names. For example, `names {x:1,y:2,z:3}` resolves to `('x','y','z')`.
 
-* If X is a string, it returns the tuple of its characters
-* If X is a list, it return the tuple of its items
-* If X is a namespace, it return the tuple of its names
-* If X is of any other type, it returns X itself
+It throws an error if `X` is not a namespace.
+
 
 #### size X
 The `size` function taken a value `X` and returns:

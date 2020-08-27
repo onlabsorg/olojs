@@ -788,40 +788,26 @@ describe("expression", () => {
         });
     });
     
-    describe("enum X", () => {
-    
-        it("should return the tuple of the X characters if X is a string", async () => {
-            var ctx = createContext();
-            var items = await evaluate("enum 'abc'", ctx);
-            expect(isTuple(items)).to.be.true;
-            expect(Array.from(items)).to.deep.equal(['a', 'b', 'c']);
-        });
-    
-        it("should return the tuple of the X items if X is a list", async () => {
-            var ctx = createContext();
-            var items = await evaluate("enum [10,11,12]", ctx);
-            expect(isTuple(items)).to.be.true;
-            expect(Array.from(items)).to.deep.equal([10, 11, 12]);
-        });
+    describe("names X", () => {
     
         it("should return the tuple of the X names if X is a namespace", async () => {
             var ctx = createContext();
             await evaluate("ns = {z=3, x=1, y=2}", ctx);
-            var items = await evaluate("enum ns", ctx);
+            var items = await evaluate("names ns", ctx);
             expect(isTuple(items)).to.be.true;
             expect(Array.from(items).sort()).to.deep.equal(['x','y','z']);
         });
     
-        it("should return X itself if it is of any other type", async () => {
-            var ctx = createContext({T:true, F:false, fn:x=>2*x});
-            expect(await evaluate("enum ()", ctx)).to.equal(null);
-            expect(await evaluate("enum T", ctx)).to.equal(true);
-            expect(await evaluate("enum F", ctx)).to.equal(false);
-            expect(await evaluate("enum fn", ctx)).to.equal(ctx.fn);
-    
-            var items = await evaluate("enum (1, 'abc', {x=10})", ctx);
-            expect(isTuple(items)).to.be.true;
-            expect(Array.from(items)).to.deep.equal([1,'abc',{x:10}]);
+        it("should throw an exception if X is of any other type", async () => {
+            var ctx = createContext({fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false});
+            var expectRangeError = (expression, xType) => expectException(() => evaluate(expression, ctx), `Names not defined for ${xType} type`);
+            await expectRangeError("names ()",    'Nothing');                                                
+            await expectRangeError("names T",     'Boolean');                                                
+            await expectRangeError("names F",     'Boolean');                                                
+            await expectRangeError("names 1",     'Number');                                                
+            await expectRangeError("names 'abc'", 'String');                                    
+            await expectRangeError("names ls",    'List');                                    
+            await expectRangeError("names fn",    'Function');                                                
         });
     });
     
