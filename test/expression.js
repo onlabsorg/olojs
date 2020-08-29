@@ -811,6 +811,80 @@ describe("expression", () => {
         });
     });
     
+    describe("enum X", () => {
+        
+        describe("wen X is a namespace", () => {
+            
+            it("should return the tuple of {name, value} pairs of the namspace", async () => {
+                var ctx = createContext();
+                await evaluate("ns = {z=3, x=1, y=2}", ctx);
+                var items = await evaluate("enum ns", ctx);
+                expect(isTuple(items)).to.be.true;
+                expect(Array.from(items)).to.deep.equal([
+                    {name:'x', value:1},
+                    {name:'y', value:2},
+                    {name:'z', value:3},
+                ]);
+            });
+
+            it("should return the same tuple for identical namespace", async () => {
+                var ctx = createContext();
+                
+                await evaluate("ns1 = {z=3, x=1, y=2}", ctx);
+                var items1 = await evaluate("enum ns1", ctx);
+
+                await evaluate("ns2 = {x=1, y=2, z=3}", ctx);
+                var items2 = await evaluate("enum ns2", ctx);
+                
+                expect(Array.from(items1)).to.deep.equal(Array.from(items2));
+            });
+        });
+
+        describe("wen X is a list", () => {
+            
+            it("should return the tuple of {index, value} items of the list", async () => {
+                var ctx = createContext();
+                await evaluate("ls = [10,20,30]", ctx);
+                var items = await evaluate("enum ls", ctx);
+                expect(isTuple(items)).to.be.true;
+                expect(Array.from(items)).to.deep.equal([
+                    {index:0, value:10},
+                    {index:1, value:20},
+                    {index:2, value:30},
+                ]);
+            });
+        });
+
+        describe("wen X is a string", () => {
+            
+            it("should return the tuple of {index, value} items of the list of characters)", async () => {
+                var ctx = createContext();
+                await evaluate("s = 'abc'", ctx);
+                var items = await evaluate("enum s", ctx);
+                expect(isTuple(items)).to.be.true;
+                expect(Array.from(items)).to.deep.equal([
+                    {index:0, value:'a'},
+                    {index:1, value:'b'},
+                    {index:2, value:'c'},
+                ]);
+            });
+        });
+        
+        describe("when X is of any other type", () => {
+            
+            it("should throw an error", async () =>{
+                var ctx = createContext({fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false});
+                var expectRangeError = (expression, xType) => expectException(() => evaluate(expression, ctx), `Enumeration not defined for ${xType} type`);
+                await expectRangeError("enum ()",      'Nothing');                                                
+                await expectRangeError("enum T",       'Boolean');                                                
+                await expectRangeError("enum F",       'Boolean');                                                
+                await expectRangeError("enum 1",       'Number');                                                
+                await expectRangeError("enum fn",      'Function');                                                                
+                await expectRangeError("enum (1,2,3)", 'Tuple');                                    
+            });
+        });
+    });
+    
     describe("size X", () => {
     
         it("should return the length if X is a string", async () => {

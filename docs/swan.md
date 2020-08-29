@@ -501,6 +501,18 @@ names. For example, `names {x:1,y:2,z:3}` resolves to `('x','y','z')`.
 It throws an error if `X` is not a namespace.
 
 
+#### enum X
+Returns the tuple of the items contained in X.
+* If X is a namespace, each item is a {name, value} namespace. For example, 
+  `enum {x:1,y:2}` returns `{name:'x', value:1}, {name:'y', value:2}`.
+* If X is a list, each item is a {index, value} namespace. For example,
+  `enum [10,20]` returns `{index:0, value:10}, {index:1, value:20}`.
+* If X is a string, it's treated as a list of characters. For example,
+  `enum "ab"` returns `{index:0, value:'a'}, {index:1, value:'b'}`.
+
+It throws an error if `X` is not a container.
+
+
 #### size X
 The `size` function taken a value `X` and returns:
 
