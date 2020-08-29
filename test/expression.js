@@ -788,29 +788,6 @@ describe("expression", () => {
         });
     });
     
-    describe("names X", () => {
-    
-        it("should return the tuple of the X names if X is a namespace", async () => {
-            var ctx = createContext();
-            await evaluate("ns = {z=3, x=1, y=2}", ctx);
-            var items = await evaluate("names ns", ctx);
-            expect(isTuple(items)).to.be.true;
-            expect(Array.from(items).sort()).to.deep.equal(['x','y','z']);
-        });
-    
-        it("should throw an exception if X is of any other type", async () => {
-            var ctx = createContext({fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false});
-            var expectRangeError = (expression, xType) => expectException(() => evaluate(expression, ctx), `Names not defined for ${xType} type`);
-            await expectRangeError("names ()",    'Nothing');                                                
-            await expectRangeError("names T",     'Boolean');                                                
-            await expectRangeError("names F",     'Boolean');                                                
-            await expectRangeError("names 1",     'Number');                                                
-            await expectRangeError("names 'abc'", 'String');                                    
-            await expectRangeError("names ls",    'List');                                    
-            await expectRangeError("names fn",    'Function');                                                
-        });
-    });
-    
     describe("enum X", () => {
         
         describe("wen X is a namespace", () => {

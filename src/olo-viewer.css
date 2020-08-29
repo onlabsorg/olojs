@@ -279,7 +279,6 @@
 
 .olo-viewer table th {
     padding-top: 9px;
-    text-transform: uppercase;
     vertical-align: middle;
 }
 
@@ -341,7 +340,6 @@
     display: table-caption;
     font-weight: 300;
     font-size: 1.3em;
-    text-transform: uppercase;
     letter-spacing: 2px;
     word-spacing: .2em;
     background: rgba(0,0,0,.75);

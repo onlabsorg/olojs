@@ -494,13 +494,6 @@ and the definition of `map` would be:
 map: f -> {mf = (x,xs) -> xs ; (f x, mf xs)}.mf
 ```
 
-#### names X
-The `names` function takes a namespace `X` and returns a tuple containing its
-names. For example, `names {x:1,y:2,z:3}` resolves to `('x','y','z')`.
-
-It throws an error if `X` is not a namespace.
-
-
 #### enum X
 Returns the tuple of the items contained in X.
 * If X is a namespace, each item is a {name, value} namespace. For example, 
