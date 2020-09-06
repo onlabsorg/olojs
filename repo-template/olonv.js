@@ -10,7 +10,7 @@ const Environment = require("@onlabsorg/olojs/lib/environment");
 const environment = new Environment({
     
     store: new Router({
-        "/": new FSStore(path.resolve(__dirname, "olors")),
+        "/": new FSStore(path.resolve(__dirname, "olocs")),
         "/http": new HTTPStore("http:/"),
         "/https": new HTTPStore("https:/")
     }),

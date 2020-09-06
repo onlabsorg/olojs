@@ -4,7 +4,7 @@ const HTTPStore = require("../lib/stores/http-store");
 
 window.olonv = new BrowserEnvironment({
     store: new Router({
-        "/": new HTTPStore(`${location.origin}/olors`),
+        "/": new HTTPStore(`${location.origin}/olocs`),
         "/http": new HTTPStore("http:/"),
         "/https": new HTTPStore("https:/"),
     })

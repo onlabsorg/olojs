@@ -20,14 +20,14 @@ describe("HTTPServer", () => {
             server.listen(8888, done);
         });            
         
-        describe("HTTP GET /olors/*", () => {
+        describe("HTTP GET /olocs/*", () => {
             
             it("should return the document source at path from the passed environment", async () => {
                 var docPath = "/path/to/doc1";
                 var docSource = "document source ...";
                 await environment.writeDocument(docPath, docSource);
                 
-                var response = await fetch(`http://localhost:8888/olors${docPath}`, {
+                var response = await fetch(`http://localhost:8888/olocs${docPath}`, {
                     method: 'get',
                     headers: {
                         'Accept': 'text/*'
@@ -55,12 +55,12 @@ describe("HTTPServer", () => {
             });
         });
         
-        describe("HTTP PUT /olors/*", () => {
+        describe("HTTP PUT /olocs/*", () => {
 
             it("should set the document source at path equal to the body", async () => {
                 var docPath = "/path/to/doc1";
                 var newSource = "new doc1 source";
-                var response = await fetch(`http://localhost:8888/olors/${docPath}`, {
+                var response = await fetch(`http://localhost:8888/olocs/${docPath}`, {
                     method: 'put',
                     headers: {
                         'Accept': 'text/olo',
@@ -73,7 +73,7 @@ describe("HTTPServer", () => {
             });
         });
 
-        describe("HTTP DELETE /olors/*", () => {
+        describe("HTTP DELETE /olocs/*", () => {
     
             it("should remove the document at path", async () => {
                 var docPath = "/path/to/doc1";
@@ -81,7 +81,7 @@ describe("HTTPServer", () => {
                 await environment.writeDocument(docPath, "some text ...");
                 expect(await environment.readDocument(docPath)).to.equal("some text ...");
                 
-                var response = await fetch(`http://localhost:8888/olors/${docPath}`, {
+                var response = await fetch(`http://localhost:8888/olocs/${docPath}`, {
                     method: 'delete',
                     headers: {
                         'Accept': 'text/olo'
@@ -118,7 +118,7 @@ describe("HTTPServer", () => {
             var docSource = "document source ...";
             await environment.writeDocument(docPath, docSource);
             
-            var response = await fetch(`http://localhost:8888/olors/${docPath}`, {
+            var response = await fetch(`http://localhost:8888/olocs/${docPath}`, {
                 method: 'get',
                 headers: {
                     'Accept': 'text/olo'
@@ -155,7 +155,7 @@ describe("HTTPServer", () => {
             var docPath = "/path/to/doc1";
             var docSource = "document source ...";
             await environment.writeDocument(docPath, docSource);
-            var response = await fetch(`http://localhost:8888/olors/${docPath}`, {
+            var response = await fetch(`http://localhost:8888/olocs/${docPath}`, {
                 method: 'get',
                 headers: {
                     'Accept': 'text/olo'
