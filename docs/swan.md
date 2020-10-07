@@ -539,7 +539,7 @@ Returns the type name of X:
 
 
 #### require <module_path>
-This function imports a module from the [standard swan library](./stdlib.d).
+This function imports a module from the [standard swan library](./stdlib.md).
 
 
 ## Comments
