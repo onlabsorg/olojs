@@ -123,7 +123,6 @@ server.listen(8010);
 * Learn the [expression](./docs/api/expression.md) module API
 * Learn the [document](./docs/api/document.md) module API
 * Learn the [environment](./docs/api/environment.md) module API
-* Learn the [http-server](./docs/api/http-server.md) module API
 * Learn the [protocols](./docs/api/protocols.md) module API
 * Learn the [servers](./docs/api/servers.md) module API
 
