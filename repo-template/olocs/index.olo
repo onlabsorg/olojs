@@ -1,4 +1,0 @@
-<% __render__ = require "markdown" %>
-
-# New olojs repository
-This is an empty olojs repository.

@@ -1,6 +1,6 @@
 {
   "name": "@onlabsorg/olojs",
-  "version": "0.9.9",
+  "version": "0.10.0",
   "description": "javascript library that allows concurrent editing of JSON objects",
   "homepage": "https://github.com/onlabsorg/olojs#readme",
   "bugs": {
@@ -13,46 +13,26 @@
     "type": "git",
     "url": "git+https://github.com/onlabsorg/olojs.git"
   },
-  "bin": {
-    "olojs": "./bin/olojs"
-  },
   "scripts": {
     "develop": "webpack --mode development --watch",
     "build": "webpack --mode production",
-    "test": "mocha test/index.js",
-    "expression-test": "mocha test/expression.js",
-    "stdlib-test": "mocha test/stdlib.js",
-    "document-test": "mocha test/document.js",
-    "fs-store-test": "mocha test/fs-store.js",
-    "http-store-test": "mocha test/http-store.js",
-    "router-test": "mocha test/router.js",
-    "environment-test": "mocha test/environment.js",
-    "http-server-test": "mocha test/http-server.js",
-    "repository-test": "mocha test/repository.js",
-    "test-server": "node test/backend-repo-server.js"
+    "test": "mocha test/index.js"
   },
   "devDependencies": {
     "chai": "^4.2.0",
     "css-loader": "^4.2.1",
     "mini-css-extract-plugin": "^0.10.0",
-    "strip-indent": "^3.0.0",
+    "mkdirp": "^1.0.4",
+    "rimraf": "^3.0.2",
     "webpack": "^4.42.0",
     "webpack-cli": "^3.3.11"
   },
   "dependencies": {
-    "body-parser": "^1.19.0",
-    "commander": "^6.0.0",
     "dompurify": "^2.0.8",
     "express": "^4.17.1",
     "isomorphic-fetch": "^2.2.1",
-    "js-logger": "^1.6.0",
     "marked": "^0.8.0",
-    "mkdirp": "^1.0.4",
-    "ncp": "^2.0.0",
-    "rimraf": "^3.0.2",
+    "uri-js": "^4.4.0",
     "vue": "^2.6.11"
-  },
-  "olojs": {
-    "Repository": "../lib/repository"
   }
 }

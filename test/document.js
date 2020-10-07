@@ -95,5 +95,4 @@ describe("document", () => {
             expect(ownProps).to.deep.equal(namespace);
         });
     });
-    
 });

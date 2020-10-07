@@ -1,29 +1,43 @@
 const expect = require("chai").expect;
+const Path = require('path');
+const olojs = require("..");
 
 
 describe("olojs", () => {
-    require("./path");
-    require("./expression");
-    require("./document");
-    require("./environment");
-    require("./fs-store");
-    require("./http-store");
-    require("./router");
-    require("./http-server");    
-    require("./stdlib");
     
-    describe("main exports", () => {
-        
-        it("should export the expression module", () => {
-            expect(require("../index").expression).to.equal(require("../lib/expression"));
-        });
-        
-        it("should export the document module", () => {
-            expect(require("../index").document).to.equal(require("../lib/document"));
-        });
-        
-        it("should export the Environment class", () => {
-            expect(require("../index").Environment).to.equal(require("../lib/environment"));
-        });
+    it("should export the `expression` module", () => {
+        expect(olojs.expression).to.equal(require("../lib/expression"));
     });
+
+    it("should export the `document` module", () => {
+        expect(olojs.expression).to.equal(require("../lib/expression"));
+    });
+    
+    it("should export the `protocols/file` module", () => {
+        expect(olojs.protocols.file).to.equal(require("../lib/protocols/file"));
+    });
+    
+    it("should export the `protocols/http` module exports", () => {
+        expect(olojs.protocols.http).to.equal(require("../lib/protocols/http"));
+        expect(olojs.protocols.https).to.equal(require("../lib/protocols/https"));
+    });
+
+    it("should export the `protocols/null` module", () => {
+        expect(olojs.protocols.null).to.equal(require("../lib/protocols/null"));
+    });
+
+    it("should export the `environment` module", () => {
+        expect(olojs.Environment).to.equal(require("../lib/environment"));
+    });
+    
+    it("should export the `servers/http` module", () => {
+        expect(olojs.servers.http).to.equal(require("../lib/servers/http"));
+    });
+    
+    require("./expression");
+    require("./stdlib");    
+    require("./document");
+    require("./protocols");
+    require("./environment");
+    require("./http-server");    
 });

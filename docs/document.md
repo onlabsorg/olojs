@@ -46,7 +46,7 @@ An olo-document source template can be rendered using the `document` module as
 shown in the following example:
 
 ```js
-const document = require("@onlabsorg/olojs/document");
+const {document} = require("@onlabsorg/olojs");
 
 const source = "<% y=2 %>x*y = <% x*y %>";
 const evaluate_doc = document.parse(source);
@@ -60,7 +60,7 @@ const doc_rendering = await document.render(doc_namespace); // "x*y = 20"
 For more details you can read the [document API](./api/document.md).
 
 Notice that the source gets evaluated in a context, which is an object with
-pre-defined names mapped to any javascript property.
+pre-defined names mapped to javascript values.
 
 
 ### Documents environment
@@ -72,11 +72,8 @@ template-based content management system.
 An [environment](./api/environment.md) is an object with the following
 functionalities:
 
-- It is bound to a CRUD document store, allowing to read, write and delete
-  documents. An environment store can be any object with a `read`, a `write` and 
-  a `delete` method; this means that it can be any possible type of store, local
-  or remote.
-- It defines a common context for all the documents contained in the store.
+- It allows to load documents from local and/or remote repositories
+- It defines a common context for all the documents contained in the repo.
 - It defines a `context.import` function that allows any document to load and
   re-use the content of other documents of the same environment.
   

@@ -93,7 +93,7 @@ npm install @onlabsorg/olojs --save
 Parse, evaluate and render an [olo-document](./docs/document.md):
 
 ```js
-const document = require("@onlabsorg/olojs/document");
+const {document} = require('@onlabsorg/olojs');
 
 const source = "<% y=2 %>x*y = <% x*y %>";
 const evaluate_doc = document.parse(source);
@@ -107,79 +107,57 @@ const doc_rendering = await document.render(doc_namespace); // "x*y = 20"
 Create a shared [environment](./docs/api/environment.md) for your documents:
 
 ```js
-const Environment = require("@onlabsorg/olojs/environment");
+const {Environment, protocols} = require('@onlabsorg/olojs');
 const environment = new Environment({
-    store: {    // any object with a read, write, delete API
-        read (path) {...},
-        write (path, source) {...},
-        delete (path) {...}
+    protocols: {
+        "file": protocols.file,
+        "http": protocols.http
     },
-    globals: {  // names shared by every document context
-        a: 1,
-        b: "hi",
-        // ...
+    routes: {
+        "/": "file:/home/username",
+        "/mnt/remote-repo": "http://remote-repo/docs"
     },
+    globals: {
+        // global names shared by all the documents in this environment
+    }
 });
-```
-
-> A store is any object containing the `read`, `write` and `delete` methods 
-> operating on an olo-docs archive. You can define your own store or you can use 
-> one of the predefined stores: [fs-store](./docs/api/fs-store.md), 
-> [http-store](./docs/api/http-store.md) or [router](./docs/api/router.md).
-
-Store a document to your environment:
-
-```js
-    const doc1_source = "<% y=2 %>x*y = <% x*y %>";
-    await environment.writeDocument("/path/to/doc1", doc1_source);
 ```
 
 Retrieve and render a document from your environment:
 
 ```js
-const doc1_source = await environment.readDocument("/path/to/doc1");
-const evaluate_doc1 = environment.parseDocument(doc1_source);
-const context = environment.createContext({x:10});
-const doc1_namespace = await evaluate_doc1(context); // {x:10, y:2}
-const doc1_rendering = await environment.render(doc1_namespace); // "x*y = 20
+const doc1 = await environment.loadDocument("/path/to/doc1");    // document at file:/home/username/path/to/doc1
+const doc1_context = doc1.createContext({x:10});
+const doc1_namespace = await doc1.evaluate(context);
+const doc1_rendering = await environment.render(doc1);
 ```
 
-Or use directly the `loadDocument` shortcut method which retrieves, parses an 
-evaluates a document:
+Let's say that we have the following two document in `environment`:
+
+* `/path/to/doc1`: `<% y=2 %>`
+* `/path/to/doc2`: `<% doc1 = import './doc1'%>x*y = <% x * doc1.y %>`
+
+Then once evaluated, doc2 will return the following namespace
 
 ```js
-const doc1_namespace = await environment.loadDocument("/path/to/doc1", {x:10});
-const doc1_rendering = await environment.render(doc1_namespace);
+{
+    x: 10, 
+    doc1: {y:2}
+}
 ```
 
-or, evan shorter:
+and it will render to the following text:
 
-```js
-const doc1_rendering = await environment.renderDocument("/path/to/doc1", {x:10});
 ```
-
-Reuse content across documents of the same environment:
-
-```js
-const doc1_source = "<% y=2 %>";
-await environment.writeDocument("/path/to/doc1", doc1_source);
-
-const doc2_source = "<% doc1 = import './doc1'%>x*y = <% x * doc1.y %>";
-await environment.writeDocument("/path/to/doc2", doc2_source);
-
-const doc2_namespace = await environment.loadDocument("/path/to/doc2", {x:10});
-// doc2_namespace: {x:10, doc1:{y:2}}
-
-const doc2_rendering = await environment.render(doc2_namespace);
-// doc2_rendering: "x*y = 20"
+x*y = 20
 ```
 
 Last but not least, you can serve your environment via HTTP and render documents 
 in the browser at URLs like `http://localhost:8010/#/path/to/doc`.
 
 ```js
-const HTTPServer = require("@onlabsorg/olojs/http-server");
-const server = HTTPServer(environment);
+const {servers} = require("@onlabsorg/olojs");
+const server = servers.http(environment);
 server.listen(8010);
 ```
 
@@ -191,17 +169,12 @@ server.listen(8010);
 * Learn the [document](./docs/api/document.md) module API
 * Learn the [environment](./docs/api/environment.md) module API
 * Learn the [http-server](./docs/api/http-server.md) module API
-* Learn the [fs-store](./docs/api/fs-store.md) module API
-* Learn the [fs-store](./docs/api/http-store.md) module API
-* Learn the [router](./docs/api/router.md) module API
-* Learn the [repository](./docs/api/repository.md) module API
-* Learn the [cli](./docs/cli.md) commands
+* Learn the [protocols](./docs/api/protocols.md) module API
+* Learn the [servers](./docs/api/servers.md) module API
 
 
 ### Test 
-* To run the test on your machine, enter `npm test` at the command line.  
-* To thest the browser client, enter `npm run test-server` and follow the
-  instructions.
+To run the test on your machine, enter `npm test` at the command line.  
 
 
 ### License

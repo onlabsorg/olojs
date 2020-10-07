@@ -3,99 +3,76 @@ This module exports the `Environment` class. An Environment is a set of
 olo-documents sharing a common global namespace and able to import each
 other's content.
 
-  
-### environment = new Environment(store, globals)
+
+### environment = new Environment(options)
 Create an Environment instance.
 
-###### environment
-An environment instance allows to read, write and delete documents from
-a store and provides them with a common global namespace and with the
-ability to import each other's content.
+##### environment
+An environment instance allows to:
+* create a new document, 
+* load a document from local and/or remote locations,
+* render document namespaces.
 
-###### config.store
-Any object exposing the following API:
-- a `store.read` method (synchronous or asynchronous) that maps a path 
-  to an olo-document source text. 
-- a `store.write` method that takes a path and a source as arguments and
-  modifies the document source mapped to the give path
-- a `store.delete` method that takes a path as argument and deletes the
-  document mapped to the given path
-  
-###### config.globals
+##### options.globals
 An object with all the properties and functions that will be added to 
-the document contexts.
+each document context.
 
-###### config.nocache
-If true, the documents will not be cached. False by default.
-  
+##### options.protocols
+An object with all the protocols available to the `environment.loadDocument`
+method.
 
-### doc_source = environment.readDocument(doc_path)
+Example:
+
+```js
+const env = olojs.Environment({
+    protocols: {
+        file: olojs.protocols.file
+    }
+});
+const doc = env.loadDocument("file:/home/username/path/to/doc");
+```
+
+##### options.routes 
+An object mapping protocol-less paths to locations. The protocols-less paths
+will be seen as shortcuts by the `environment.loadDocument` method.
+
+Example,
+
+```js
+const env = olojs.Environment({
+    protocols: {
+        file: olojs.protocols.file
+    },
+    routes: {
+        '/': "file:/home/username/"
+    }
+});
+const doc = env.loadDocument("/path/to/doc");   // equivalent to env.loadDocument("file:/home/username/path/to/doc")
+```
+
+### doc = environment.loadDocument(doc_URI)
 Retrieves the document source mapped to the given path in the environment store.
 If the `config.nocache` option is false or omitted, it will cache the
 source, loading it only once.
 
-###### doc_path
-The store path of the document to be retrieved.
+##### doc_URI
+The uri of the document to be retrieved.
 
-###### doc_source
-The document source mapped to the given path
+##### doc.URI
+The uri of the retrieved document.
 
-  
-### environment.writeDocument(doc_path, doc_source)
-Modifies the document source mapped to the given path.
+##### doc.source
+The document source mapped to the given uri
 
-###### doc_path
-The path of the document to be modified.
-
-###### doc_source
-The new source of the document.
-
-  
-### environment.deleteDocument(doc_path)
-Removes a document from the environment store.
-
-###### doc_path
-The path of the document to be removed.
-
-  
-### context = environment.createContext(doc_path, ...namespaces)
-Creates the evaluation context for a specific document. 
-
-###### doc_path
-The path of the document the context applies to.
-
-###### namespace
-A list of object whose key:value pairs will be added to the context.
-
-###### context
-Evaluation context for the document mapped to `doc_path`, containing:
-- all the names in `config.globals`
-- all the names in `namespace[0]`, `namespace[1]`, `...`
-- the `__path__` string, equal to `doc_path` 
+##### doc.createContext(...namespaces)
+Create a document context containing:
+- all the names in the environment `globals` parameter
+- all the names in `namespaces[0]`, `namespaces[1]`, `...`
 - the `import` function which, given a document path (relative to 
-  `__path___`, returns the mapped document namespace
-
+  `doc.URI`, returns the mapped document namespace
   
-### evaluate_doc = environment.parseDocument(source) 
-This is just an alias for `document.parse(source)`. 
-
+##### doc.evaluate(context)
+Evaluates the document source in the given context.
   
 ### value_rendering = environment.render(value)
 This just an alias for `document.render(value)`.
-
-  
-### doc_namespace = environment.loadDocument(path, ...namespaces)
-This function is a shortcut for the followin sequence of operations:
-- Retrieve the document source mapped to `path`
-- Parse the retrieved document
-- Create a document context using the given `namespaces`
-- Evaluate the document in the given context and return the resulting namespace
-
-  
-### doc_rendering = environment.renderDocument(doc_path, ...namespace)
-This function is a shortcut for the followin sequence of operations:
-- Retrieve the document source mapped to `path`
-- Parse the retrieved document
-- Create a document context using the given `namespaces`
-- Evaluate the document in the given context
-- Render the evaluated namespace and return the result

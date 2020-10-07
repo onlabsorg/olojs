@@ -15,7 +15,7 @@ just an expression context extended with document-specific global names and
 with all the passed namespaces as follows:
 
 ```js
-context = expression.createContext(document.globals, ...namespaces);
+context = expression.createContext(document_globals, ...namespaces);
 ```
   
 ### document.render(doc_namespace)

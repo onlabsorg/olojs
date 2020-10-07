@@ -1,5 +1,5 @@
 const DOMPurify = require("dompurify");
-const parseParams = require("../lib/tools/parameters-parser");
+const document = require("../lib/document");
 
 require("./olo-viewer.css");
 
@@ -21,7 +21,7 @@ module.exports = olonv => ({
         
         argns: function () {
             let args = this.src.split("?")[1];
-            return args ? parseParams(...args.split("&")) : {};                                
+            return args ? olonv.parseParameters(...args.split("&")) : {};                                
         }
     },
     
@@ -33,11 +33,10 @@ module.exports = olonv => ({
     
     methods: {
         async refresh () {
-            olonv.docSource = await olonv.readDocument(this.docPath);
-            olonv.context = olonv.createContext(this.docPath, {argns: this.argns});
-            olonv.evaluate = olonv.parseDocument(olonv.docSource);            
-            olonv.docns = await olonv.evaluate(olonv.context);
-            const rawHTML = await olonv.render(olonv.docns);
+            olonv.doc = await olonv.loadDocument(this.docPath);
+            olonv.doc.context = olonv.doc.createContext({argns: this.argns})
+            olonv.doc.namespace = await olonv.doc.evaluate(olonv.doc.context);
+            const rawHTML = await olonv.render(olonv.doc.namespace);
             this.html = DOMPurify.sanitize(rawHTML);
         }
     },
