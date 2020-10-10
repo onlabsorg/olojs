@@ -40,7 +40,7 @@ const context = olojs.document.createContext(...namespaces)
 - `context`: an object containing all the named values and function that
   will be visible to the document inline expressions.
   
-olojs.document.render
+olojs.document.render - async function
 ----------------------------------------------------------------------------
 This function exposes to javascript the serialization algorithm used in
 to convert the inline expression result values to text.

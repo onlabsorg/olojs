@@ -124,9 +124,9 @@ server.listen(8010);
 * Learn the [expression](./docs/api/expression.md) module API
 * Learn the [document](./docs/api/document.md) module API
 * Learn the [environment](./docs/api/environment.md) module API
-* Learn the [file protocols](./docs/api/file-protocol.md) module API
-* Learn the [http protocols](./docs/api/http-protocol.md) module API
-* Learn the [servers](./docs/api/http-server.md) module API
+* Learn the [file protocol](./docs/api/file-protocol.md) module API
+* Learn the [http protocol](./docs/api/http-protocol.md) module API
+* Learn the [http server](./docs/api/http-server.md) module API
 
 
 ### Test 

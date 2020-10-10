@@ -80,5 +80,6 @@ await environment.deleteDocument(uri)
   
 environment.render - async function
 --------------------------------------------------------------------
+This is just a stortcut to the `document.render` function.
   
 
