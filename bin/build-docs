@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+echo "Building API documentation for olojs.expression"
+bin/gen-doc lib/expression.js > docs/api/expression.md
+
+echo "Building API documentation for olojs.document"
+bin/gen-doc lib/document.js > docs/api/document.md
+
+echo "Building API documentation for olojs.Environment"
+bin/gen-doc lib/environment.js > docs/api/environment.md
+
+echo "Building API documentation for olojs.protocols.http(s)"
+bin/gen-doc lib/protocols/.http.js > docs/api/http-protocol.md
+
+echo "Building API documentation for olojs.protocols.file"
+bin/gen-doc lib/protocols/file.js > docs/api/file-protocol.md
+
+echo "Building API documentation for olojs.servers.http"
+bin/gen-doc lib/servers/http.js > docs/api/http-server.md

@@ -1,6 +1,6 @@
-# olo-document markup
+olojs documents
+================================================================================
 
-### The basics
 An olo-document is a text template like [Mustache](https://mustache.github.io/),
 [EJS](https://ejs.co/), [Handlebars](https://handlebarsjs.com/), etc. A document
 source template is just plain text containing [swan](./swan.md) expressions
@@ -41,20 +41,22 @@ a touring-complete expression language which can produce any kind of output you
 can imagine.
 
 
-### Rendering documents
+
+Rendering documents
+--------------------------------------------------------------------------------
 An olo-document source template can be rendered using the `document` module as 
 shown in the following example:
 
 ```js
-const {document} = require("@onlabsorg/olojs");
+document = require("@onlabsorg/olojs").document;
 
-const source = "<% y=2 %>x*y = <% x*y %>";
-const evaluate_doc = document.parse(source);
+source = "<% y=2 %>x*y = <% x*y %>";
+evaluate = document.parse(source);
 
-const context = document.createContext({x:10});
-const doc_namespace = await evaluate_doc(context);          // {x:10, y:2}
+context = document.createContext({x:10});
+namespace = await evaluate(context);          // {x:10, y:2}
 
-const doc_rendering = await document.render(doc_namespace); // "x*y = 20"
+rendering = await document.render(namespace); // "x*y = 20"
 ```
 
 For more details you can read the [document API](./api/document.md).
@@ -63,7 +65,9 @@ Notice that the source gets evaluated in a context, which is an object with
 pre-defined names mapped to javascript values.
 
 
-### Documents environment
+
+Documents environment
+--------------------------------------------------------------------------------
 What tells `olojs` apart from other template systems, is that its documents can
 live within shared environments and re-use each other's content. Therefore 
 `olojs`, rather than a template system, can be better described as a 
@@ -72,12 +76,24 @@ template-based content management system.
 An [environment](./api/environment.md) is an object with the following
 functionalities:
 
-- It allows to load documents from local and/or remote repositories
-- It defines a common context for all the documents contained in the repo.
+- It allows to r/w access to documents from local and/or remote repositories
+- It defines a common context for all the documents contained in the environment.
 - It defines a `context.import` function that allows any document to load and
   re-use the content of other documents of the same environment.
   
+In order to clarify how the `import` function works, let's assume we have the
+following two documents:
 
+- `/path/doc1`: `<% x=10 %>`
+- `/path/to/doc2`: `<% doc1 = import "../doc1" %>2 * x = <% 2 * doc1.x %>`
+
+When evaluating doc2, the `import` function will load the doc1 namespace 
+(`{x:10}`) and assign the name `doc1` to it. 
+
+The following expression will access the value of `x` defined in doc1 via
+`doc1.x`, double it and print the result.
+
+The final rendering of doc2 will therefore be: `2 * x = 20`.
 
 
 

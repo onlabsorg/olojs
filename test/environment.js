@@ -101,24 +101,24 @@ describe("Environment class", () => {
         });
     });
     
-    describe("doc = await environment.loadDocument([scheme:][//host][/path/to/doc])", () => {
+    describe("doc = await environment.readDocument([scheme:][//host][/path/to/doc])", () => {
         
         describe("doc.source", () => {
             
             it("should contain the source returned by the `scheme` handler with `//host/path/to/doc` as argument", async () => {
                 var env = Environment({
                     protocols: {
-                        ppp: (...paths) => `Doc source @ ppp:${Path.join('/',...paths)}`
+                        ppp: {get: path => `Doc source @ ppp:${Path.join('/',path)}`}
                     }
                 });
-                var doc = await env.loadDocument(`ppp:/path/to/doc`);
+                var doc = await env.readDocument(`ppp:/path/to/doc`);
                 expect(doc.source).to.equal("Doc source @ ppp:/path/to/doc");
             });
 
             it("should fall-back to the route shortcuts if no `scheme` is given", async () => {
                 var env = Environment({
                     protocols: {
-                        ppp: (...paths) => `Doc source @ ppp:${Path.join('/',...paths)}`
+                        ppp: {get: path => `Doc source @ ppp:${Path.join('/',path)}`}
                     },
                     routes: {
                         "/": "ppp:/root",
@@ -126,27 +126,27 @@ describe("Environment class", () => {
                     }
                 });
                 
-                var doc = await env.loadDocument(`/path/to/doc`);
+                var doc = await env.readDocument(`/path/to/doc`);
                 expect(doc.source).to.equal("Doc source @ ppp:/root/path/to/doc");
                 
-                var doc = await env.loadDocument(`/mydocs/doc1`);
+                var doc = await env.readDocument(`/mydocs/doc1`);
                 expect(doc.source).to.equal("Doc source @ ppp:/path/to/my/documents/doc1");
             });
             
             it("should be an empty string if no protocol nor route match is found", async () => {
                 var env = Environment({
                     protocols: {
-                        ppp: (...paths) => `Doc source @ ppp:${Path.join('/',...paths)}`
+                        ppp: {get: path => `Doc source @ ppp:${Path.join('/',path)}`}
                     },
                     routes: {
                         "/mydocs": "ppp:/path/to/my/documents"
                     }
                 });
                 
-                var doc = await env.loadDocument(`xxx:/path/to/doc`);
+                var doc = await env.readDocument(`xxx:/path/to/doc`);
                 expect(doc.source).to.equal("");
                 
-                var doc = await env.loadDocument(`/path/to/doc1`);
+                var doc = await env.readDocument(`/path/to/doc1`);
                 expect(doc.source).to.equal("");
             });
         });
@@ -155,20 +155,20 @@ describe("Environment class", () => {
             it("should return the full document URI", async () => {
                 var env = Environment({
                     protocols: {
-                        ppp: (...paths) => `Doc source @ ppp:${Path.join('/',...paths)}`
+                        ppp: {get: path => `Doc source @ ppp:${Path.join('/',path)}`}
                     },
                     routes: {
                         "/": "ppp:/root/route"
                     }
                 });
                 
-                var doc = await env.loadDocument(`ppp:/path/to/doc`);
+                var doc = await env.readDocument(`ppp:/path/to/doc`);
                 expect(doc.URI).to.equal("ppp:/path/to/doc");                
 
-                var doc = await env.loadDocument(`ppp:/path/to/dir/`);
+                var doc = await env.readDocument(`ppp:/path/to/dir/`);
                 expect(doc.URI).to.equal("ppp:/path/to/dir/");                
 
-                var doc = await env.loadDocument(`/path/to/doc`);
+                var doc = await env.readDocument(`/path/to/doc`);
                 expect(doc.URI).to.equal("/path/to/doc");                
             });
         });
@@ -178,10 +178,10 @@ describe("Environment class", () => {
             it("should contain the own property `import` mapping to a function", async () => {
                 var env = Environment({
                     protocols: {
-                        ppp: (...paths) => `Doc source @ ppp:${Path.join('/',...paths)}`
+                        ppp: {get: path => `Doc source @ ppp:${Path.join('/',path)}`}
                     }
                 });
-                var doc = await env.loadDocument(`ppp:/path/to/doc`);
+                var doc = await env.readDocument(`ppp:/path/to/doc`);
                 var context = doc.createContext();
                 expect(context.import).to.be.a("function");
             });
@@ -191,10 +191,10 @@ describe("Environment class", () => {
                 it("should load, evaluate and return the namespace of the olo-document mapped to `uri`", async () => {
                     var env = Environment({
                         protocols: {
-                            ppp: (...paths) => `<% u = "ppp:${Path.join('/',...paths)}" %>`
+                            ppp: {get: path => `<% u = "ppp:${Path.join('/',path)}" %>`}
                         }
                     });
-                    var doc1 = await env.loadDocument(`ppp:/path/to/doc1`);
+                    var doc1 = await env.readDocument(`ppp:/path/to/doc1`);
                     var context1 = doc1.createContext();
                     var doc2_ns = await context1.import("ppp:/path/to/doc2");
                     expect(doc2_ns.u).to.equal("ppp:/path/to/doc2");
@@ -203,10 +203,10 @@ describe("Environment class", () => {
                 it("should resolve `uri` relative to the calling document URI", async () => {
                     var env = Environment({
                         protocols: {
-                            ppp: (...paths) => `<% u = "ppp:${Path.join('/',...paths)}" %>`
+                            ppp: {get: path => `<% u = "ppp:${Path.join('/',path)}" %>`}
                         }
                     });
-                    var doc1 = await env.loadDocument(`ppp:/path/to/doc1`);
+                    var doc1 = await env.readDocument(`ppp:/path/to/doc1`);
                     var context1 = doc1.createContext();
                     
                     var doc2_ns = await context1.import("./doc2");
@@ -222,10 +222,10 @@ describe("Environment class", () => {
                 it("should evaluate the loaded document in a context containing the passed namespaces", async () => {
                     var env = Environment({
                         protocols: {
-                            ppp: (...paths) => `<% u = "ppp:${Path.join('/',...paths)}/" + leaf %>`
+                            ppp: {get: path => `<% u = "ppp:${Path.join('/',path)}/" + leaf %>`}
                         }
                     });
-                    var doc1 = await env.loadDocument(`ppp:/path/to/doc1`);
+                    var doc1 = await env.readDocument(`ppp:/path/to/doc1`);
                     var context1 = doc1.createContext();
                     
                     var doc2_ns = await context1.import("ppp:/path/to/doc2", {leaf:"leaf2"});
@@ -237,14 +237,14 @@ describe("Environment class", () => {
 
                     var env = Environment({
                         protocols: {
-                            ppp: (...paths) => {
+                            ppp: {get: path => {
                                 counter += 1;
-                                return `<% u = "ppp:${Path.join('/',...paths)}" %>`;
-                            }
+                                return `<% u = "ppp:${Path.join('/',path)}" %>`;
+                            }}
                         }
                     });
 
-                    var doc1 = await env.loadDocument(`ppp:/path/to/doc1`);
+                    var doc1 = await env.readDocument(`ppp:/path/to/doc1`);
                     var context1 = doc1.createContext();
                     expect(counter).to.equal(1);
 
@@ -268,5 +268,56 @@ describe("Environment class", () => {
                 });
             });        
         });        
+    });
+    
+    describe("await environment.updateDocument([scheme:][//host][/path/to/doc], source)", () => {
+        
+        it("should call the matching handler's set method", async () => {
+            var handlerPath, handlerSource;
+            
+            var env = Environment({
+                protocols: {
+                    ppp: {set: (path, source) => {
+                        handlerPath = path;
+                        handlerSource = source;
+                    }},
+                },
+                routes: {
+                    '/': "ppp:/root/dir"
+                }
+            });
+            
+            await env.updateDocument("ppp:/path/to/doc", "doc source");            
+            expect(handlerPath).to.equal("/path/to/doc");
+            expect(handlerSource).to.equal("doc source");
+
+            await env.updateDocument("/path/to/doc", "doc source 2");            
+            expect(handlerPath).to.equal("/root/dir/path/to/doc");
+            expect(handlerSource).to.equal("doc source 2");
+        });
+    });
+
+    describe("await environment.deleteDocument([scheme:][//host][/path/to/doc], options)", () => {
+        
+        it("should call the matching handler's delete method", async () => {
+            var handlerPath;
+            
+            var env = Environment({
+                protocols: {
+                    ppp: {delete: (path) => {
+                        handlerPath = path;
+                    }},
+                },
+                routes: {
+                    '/': "ppp:/root/dir"
+                }
+            });
+            
+            await env.deleteDocument("ppp:/path/to/doc");            
+            expect(handlerPath).to.equal("/path/to/doc");
+
+            await env.deleteDocument("/path/to/doc");            
+            expect(handlerPath).to.equal("/root/dir/path/to/doc");
+        });
     });
 });

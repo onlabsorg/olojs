@@ -33,7 +33,7 @@ module.exports = olonv => ({
     
     methods: {
         async refresh () {
-            olonv.doc = await olonv.loadDocument(this.docPath);
+            olonv.doc = await olonv.readDocument(this.docPath);
             olonv.doc.context = olonv.doc.createContext({argns: this.argns})
             olonv.doc.namespace = await olonv.doc.evaluate(olonv.doc.context);
             const rawHTML = await olonv.render(olonv.doc.namespace);

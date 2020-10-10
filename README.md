@@ -48,15 +48,15 @@ npm install @onlabsorg/olojs --save
 Parse, evaluate and render an [olo-document](./docs/document.md):
 
 ```js
-const {document} = require('@onlabsorg/olojs');
+{document} = require('@onlabsorg/olojs');
 
-const source = "<% y=2 %>x*y = <% x*y %>";
-const evaluate_doc = document.parse(source);
+source = "<% y=2 %>x*y = <% x*y %>";
+evaluate = document.parse(source);
 
-const context = document.createContext({x:10});
-const doc_namespace = await evaluate_doc(context);          // {x:10, y:2}
+context = document.createContext({x:10});
+namespace = await evaluate_doc(context);          // {x:10, y:2}
 
-const doc_rendering = await document.render(doc_namespace); // "x*y = 20"
+rendering = await document.render(doc_namespace); // "x*y = 20"
 ```
 
 Create a shared [environment](./docs/api/environment.md) for your documents:
@@ -117,14 +117,16 @@ server.listen(8010);
 ```
 
 ### Learn more
-* Learn the [olo-documents syntax](./docs/document.md)
+* Learn more about [olojs environments](./docs/environment.md)
+* Learn more about [olojs documents](./docs/document.md)
 * Learn the [swan expression language](./docs/swan.md)
-* Learn the [standard swan library](./docs/swan.md) API
+* Learn the [standard swan library](./docs/stdlib.md) swan API
 * Learn the [expression](./docs/api/expression.md) module API
 * Learn the [document](./docs/api/document.md) module API
 * Learn the [environment](./docs/api/environment.md) module API
-* Learn the [protocols](./docs/api/protocols.md) module API
-* Learn the [servers](./docs/api/servers.md) module API
+* Learn the [file protocols](./docs/api/file-protocol.md) module API
+* Learn the [http protocols](./docs/api/http-protocol.md) module API
+* Learn the [servers](./docs/api/http-server.md) module API
 
 
 ### Test 
@@ -132,5 +134,4 @@ To run the test on your machine, enter `npm test` at the command line.
 
 
 ### License
-
 [MIT](https://opensource.org/licenses/MIT)

@@ -1,26 +1,38 @@
-# expression module
-This module provides functions to parse and evaluate [swan](../swan.md)
-expressions.
-  
-### evaluate_exp = expression.parse(exp_source)
-Given an `exp_source` string containing a [swan](../swan.md) expression,
-returns an `evaluate_exp` asynchronous function that takes an expression context 
-as argument and resolves the value of the original expression.
-  
-### context = expression.createContext(...namespaces)
-Create an expression context by extending the base context with all the 
-passed namespaces as follows:
+olojs.expression
+============================================================================
+This module contains function for parsing and evaluation swan expressions.
+
+Example:
 ```js
-context = Object.assign(Object.create(context), namespace[0]);
-context = Object.assign(Object.create(context), namespace[1]);
-context = Object.assign(Object.create(context), namespace[2]);
-// ...
+evaluate = olojs.expression.parse( "3 * x" );
+context = olojs.expression.createContext({x:10});
+value = await evaluate(context);                        // 30
 ```
   
-### str = await expression.stringify(x)
-Converts any javascript value to a string, following the [swan](../swan.md) 
-string conversion rules.
+olojs.expression.parse - function
+----------------------------------------------------------------------------
+Parses a swan expression and returns a function that maps a context to an
+expression value.
+```js
+evaluate = olojs.expression.parse(expression);
+value = await evaluate(context);
+```
+
+- `espression` is a string containing any valid swan expression
+- `context` is a valid swan expression context
+- `value` is the value that expression result has in the given context
   
-### expression.apply(f, ...args)
-Exposes the [swan](../swan.md) apply operator to javascript.
+olojs.expression.createContext - function
+----------------------------------------------------------------------------
+Creates a valid expression context.
+
+```js
+context = olojs.expression.createContext(...namespaces)
+```
+
+- `namespaces` is a list of objects `ns1, ns2, ns3, ...` that will be merged
+  to the core swan context 
+- `context` is an object containing all the core context properties, plus 
+  all the properties of the passed namespace, added in order.
   
+

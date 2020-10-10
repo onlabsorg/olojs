@@ -4,6 +4,7 @@ var Path = require("path");
 var rimraf = require("rimraf");
 var mkdirp = require("mkdirp");
 var fs = require("fs");
+var protocolErrors = require("../lib/protocols/.errors");
 
 var ROOT_PATH = `${__dirname}/fs-store`;
 
@@ -12,134 +13,322 @@ var ROOT_PATH = `${__dirname}/fs-store`;
 describe("protocols", () => {
     
     describe("file:", () => {
-        var fetchFile = require("../lib/protocols/file");
+        var fileProtocol = require("../lib/protocols/file");
         
-        describe(`when a document path is passed`, () => {
+        before(() => {
+            initStore(ROOT_PATH);
+        });
+        
+        describe("source = await file.get(path)", () => {
             
-            it("should return the document stored at the given path", async () => {
-                var doc = await fetchFile(`${ROOT_PATH}/path/to/doc2`);
-                expect(doc).to.be.equal("doc2 @ /path/to/\n");
+            describe(`when a document path is passed`, () => {
+                
+                it("should return the document stored at the given path", async () => {
+                    var doc = await fileProtocol.get(`${ROOT_PATH}/path/to/doc2`);
+                    expect(doc).to.be.equal("doc2 @ /path/to/");
+                });
+
+                it("should return an empty string if the path doesn't exist", async () => {
+                    var doc = await fileProtocol.get(`${ROOT_PATH}/non/existing/doc`);
+                    expect(doc).to.equal("");            
+                });
             });
 
-            it("should return an empty string if the path doesn't exist", async () => {
-                var doc = await fetchFile(`${ROOT_PATH}/non/existing/doc`);
-                expect(doc).to.equal("");            
+            describe(`when a directory path is passed`, () => {
+                
+                it("should return the content of the `.../.olo` document", async () => {
+                    var doc = await fileProtocol.get(`${ROOT_PATH}/path/to/`);
+                    expect(doc).to.equal(".olo @ /path/to/")
+                });
+
+                it("should return an empty string if the .../.olo document doesn't exist", async () => {
+                    var doc = await fileProtocol.get(`${ROOT_PATH}/non/existing/dir/index/`);
+                    expect(doc).to.equal("");            
+                });
+            });    
+        });        
+
+        describe("await file.set(path, source)", () => {
+            
+            it("should change the source of the file at the given path", async () => {
+                expect(await fileProtocol.get(`${ROOT_PATH}/path/to/doc1`)).to.equal("doc1 @ /path/to/");
+                await fileProtocol.set(`${ROOT_PATH}/path/to/doc1`, "new doc1 @ /path/to/");
+                expect(await fileProtocol.get(`${ROOT_PATH}/path/to/doc1`)).to.equal("new doc1 @ /path/to/");
+            });
+            
+            it("should update the `.olo` file when a directory path is given", async () => {
+                expect(await fileProtocol.get(`${ROOT_PATH}/path/to/`)).to.equal(".olo @ /path/to/");
+                await fileProtocol.set(`${ROOT_PATH}/path/to/`, "new .olo @ /path/to/");
+                expect(await fileProtocol.get(`${ROOT_PATH}/path/to/`)).to.equal("new .olo @ /path/to/");
+            });
+            
+            it("should create the file it it doesn't exist", async () => {
+                expect(fs.existsSync(`${ROOT_PATH}/path/to/doc4.olo`)).to.be.false;
+                expect(await fileProtocol.get(`${ROOT_PATH}/path/to/doc4`)).to.equal("");
+                await fileProtocol.set(`${ROOT_PATH}/path/to/doc4`, "doc4 @ /path/to/");
+                expect(fs.existsSync(`${ROOT_PATH}/path/to/doc4.olo`)).to.be.true;
+                expect(await fileProtocol.get(`${ROOT_PATH}/path/to/doc4`)).to.equal("doc4 @ /path/to/");
+            });
+            
+            it("should create the entire file path if it doesn't exist", async () => {
+                expect(fs.existsSync(`${ROOT_PATH}/x/`)).to.be.false;
+                expect(fs.existsSync(`${ROOT_PATH}/x/y/`)).to.be.false;
+                expect(fs.existsSync(`${ROOT_PATH}/x/y/doc.olo`)).to.be.false;
+                expect(await fileProtocol.get(`${ROOT_PATH}/x/y/doc`)).to.equal("");
+                await fileProtocol.set(`${ROOT_PATH}/x/y/doc`, "doc @ /x/y/");
+                expect(fs.existsSync(`${ROOT_PATH}/x/`)).to.be.true;
+                expect(fs.existsSync(`${ROOT_PATH}/x/y/`)).to.be.true;
+                expect(fs.existsSync(`${ROOT_PATH}/x/y/doc.olo`)).to.be.true;
+                expect(await fileProtocol.get(`${ROOT_PATH}/x/y/doc`)).to.equal("doc @ /x/y/");
             });
         });
 
-        describe(`when a directory path is passed`, () => {
+        describe("await file.delete(path)", () => {
             
-            it("should return the content of the `.../.olo` document", async () => {
-                var doc = await fetchFile(`${ROOT_PATH}/path/to/`);
-                expect(doc).to.equal(".olo @ /path/to/\n")
+            it("should remove the file at path", async () => {
+                expect(fs.existsSync(`${ROOT_PATH}/path/to/doc1.olo`)).to.be.true;
+                await fileProtocol.delete(`${ROOT_PATH}/path/to/doc1`);
+                expect(fs.existsSync(`${ROOT_PATH}/path/to/doc1.olo`)).to.be.false;
+                expect(await fileProtocol.get(`${ROOT_PATH}/path/to/doc1`)).to.equal("");
             });
 
-            it("should return an empty string if the .../.olo document doesn't exist", async () => {
-                var doc = await fetchFile(`${ROOT_PATH}/non/existing/dir/index/`);
-                expect(doc).to.equal("");            
-            });
-        });    
-        
-        describe(`when multiple paths are passed`, () => {
-            
-            it("should merge the paths together", async () => {
-                var doc = await fetchFile(`${ROOT_PATH}/path/to/doc2`, "../..", "./../doc1");
-                expect(doc).to.be.equal("doc1 @ /\n");                
+            it("should return silentrly if the file already doesn't exist", async () => {
+                expect(fs.existsSync(`${ROOT_PATH}/path/to/doc1.olo`)).to.be.false;
+                await fileProtocol.delete(`${ROOT_PATH}/path/to/doc1`);
+                expect(fs.existsSync(`${ROOT_PATH}/path/to/doc1.olo`)).to.be.false;
+                expect(await fileProtocol.get(`${ROOT_PATH}/path/to/doc1`)).to.equal("");
             });
         });
     });
     
     describe("http:", () => {
-        var server, fetchHTTP = require("../lib/protocols/http");
+        var server, httpProtocol = require("../lib/protocols/http");
+        var fileProtocol = require("../lib/protocols/file");
         
         before((done) => {
+            initStore(ROOT_PATH);
+            
             var express = require("express");
+            var bodyParser = require("body-parser");
             var app = express();
-            app.get( "/error/*", (req, res, next) => {
+            app.all( "/private/*", (req, res, next) => {
+                res.status(403).send(`Permission denied for access to document at ${req.path}`);
+            });      
+            app.all( "/hidden/*", (req, res, next) => {
+                res.status(405).send(`Operation not define for document at ${req.path}`);
+            });                        
+            app.all( "/error/*", (req, res, next) => {
                 res.status(500).send(`An error occurred while retrieving the document at ${req.path}`);
+            });
+            app.delete( "*", async (req, res, next) => {
+                await fileProtocol.delete(`${ROOT_PATH}${req.path}`);
+                res.status(200).send();
+            });
+            app.use(bodyParser.text({
+                type: "text/*"
+            }));    
+            app.put( "*", async (req, res, next) => {
+                await fileProtocol.set(`${ROOT_PATH}${req.path}`, req.body);
+                res.status(200).send();
             });
             app.use( express.static(ROOT_PATH) );
             server = app.listen(8010, done);
         });
         
-        it("should return the content of the files fetched via HTTP", async () => {
-            var doc = await fetchHTTP("/localhost:8010/path/to/doc2.olo");
-            expect(doc).to.be.equal("doc2 @ /path/to/\n");            
+        describe("source = await http.get(path)", () => {
+            
+            it("should return the content of the files fetched via HTTP", async () => {
+                var doc = await httpProtocol.get("/localhost:8010/path/to/doc2.olo");
+                expect(doc).to.be.equal("doc2 @ /path/to/");            
+            });
+            
+            it("should throw a PermissionDenied error if the respose status is 403", async () => {
+                class NoError extends Error {};
+                try {
+                    await httpProtocol.get("/localhost:8010/private/path/to/doc");
+                    throw new NoError();
+                } catch (error) {
+                    expect(error).to.be.instanceof(protocolErrors.PermissionDenied);
+                    expect(error.message).to.equal("Permission denied: GET http://localhost:8010/private/path/to/doc");
+                }
+            });
+
+            it("should return an empty string if the respose status is 404", async () => {
+                var doc = await httpProtocol.get("/localhost:8010/path/to/non/existing/file");
+                expect(doc).to.equal("");
+            });
+
+            it("should throw an OperationNotAllowed error if the respose status is 405", async () => {
+                class NoError extends Error {};
+                try {
+                    await httpProtocol.get("/localhost:8010/hidden/path/to/doc");
+                    throw new NoError();
+                } catch (error) {
+                    expect(error).to.be.instanceof(protocolErrors.OperationNotAllowed);
+                    expect(error.message).to.equal("Operation not allowed: GET http://localhost:8010/hidden/path/to/doc");
+                }
+            });
+
+            it("should throw an error if the response code is not 2xx", async () => {
+                class NoError extends Error {};
+                try {
+                    await httpProtocol.get("/localhost:8010/error/path/to/doc");
+                    throw new NoError();
+                } catch (error) {
+                    expect(error).to.not.be.instanceof(NoError);
+                    expect(error.message).to.equal("An error occurred while retrieving the document at /error/path/to/doc");
+                }
+            });
+        });        
+        
+        describe("await http.set(path, source)", () => {
+            
+            it("should change the source of the file at the given http url", async () => {
+                expect(await fileProtocol.get(`${ROOT_PATH}/path/to/doc1`)).to.equal("doc1 @ /path/to/");
+                await httpProtocol.set(`/localhost:8010/path/to/doc1`, "new doc1 @ /path/to/");
+                expect(await fileProtocol.get(`${ROOT_PATH}/path/to/doc1`)).to.equal("new doc1 @ /path/to/");
+            });
+            
+            it("should throw a PermissionDenied error if the respose status is 403", async () => {
+                class NoError extends Error {};
+                try {
+                    await httpProtocol.set("/localhost:8010/private/path/to/doc");
+                    throw new NoError();
+                } catch (error) {
+                    expect(error).to.be.instanceof(protocolErrors.PermissionDenied);
+                    expect(error.message).to.equal("Permission denied: SET http://localhost:8010/private/path/to/doc");
+                }
+            });
+
+            it("should throw an OperationNotAllowed error if the respose status is 405", async () => {
+                class NoError extends Error {};
+                try {
+                    await httpProtocol.set("/localhost:8010/hidden/path/to/doc");
+                    throw new NoError();
+                } catch (error) {
+                    expect(error).to.be.instanceof(protocolErrors.OperationNotAllowed);
+                    expect(error.message).to.equal("Operation not allowed: SET http://localhost:8010/hidden/path/to/doc");
+                }
+            });
+
+            it("should throw an error if the response code is not 2xx", async () => {
+                class NoError extends Error {};
+                try {
+                    await httpProtocol.set("/localhost:8010/error/path/to/doc");
+                    throw new NoError();
+                } catch (error) {
+                    expect(error).to.not.be.instanceof(NoError);
+                    expect(error.message).to.equal("An error occurred while retrieving the document at /error/path/to/doc");
+                }
+            });
         });
         
-        it("should return an empty string if the respose status is 404", async () => {
-            var doc = await fetchHTTP("/localhost:8010/path/to/non/existing/file");
-            expect(doc).to.equal("");
+        describe("await http.delete(path)", () => {
+            
+            it("should remove the file at the given url path", async () => {
+                expect(fs.existsSync(`${ROOT_PATH}/path/to/doc1.olo`)).to.be.true;
+                await httpProtocol.delete(`/localhost:8010/path/to/doc1`);
+                expect(fs.existsSync(`${ROOT_PATH}/path/to/doc1.olo`)).to.be.false;
+                expect(await fileProtocol.get(`${ROOT_PATH}/path/to/doc1`)).to.equal("");
+            });
+            
+            it("should throw a PermissionDenied error if the respose status is 403", async () => {
+                class NoError extends Error {};
+                try {
+                    await httpProtocol.delete("/localhost:8010/private/path/to/doc");
+                    throw new NoError();
+                } catch (error) {
+                    expect(error).to.be.instanceof(protocolErrors.PermissionDenied);
+                    expect(error.message).to.equal("Permission denied: DELETE http://localhost:8010/private/path/to/doc");
+                }
+            });
+
+            it("should throw an OperationNotAllowed error if the respose status is 405", async () => {
+                class NoError extends Error {};
+                try {
+                    await httpProtocol.delete("/localhost:8010/hidden/path/to/doc");
+                    throw new NoError();
+                } catch (error) {
+                    expect(error).to.be.instanceof(protocolErrors.OperationNotAllowed);
+                    expect(error.message).to.equal("Operation not allowed: DELETE http://localhost:8010/hidden/path/to/doc");
+                }
+            });
+
+            it("should throw an error if the response code is not 2xx", async () => {
+                class NoError extends Error {};
+                try {
+                    await httpProtocol.delete("/localhost:8010/error/path/to/doc");
+                    throw new NoError();
+                } catch (error) {
+                    expect(error).to.not.be.instanceof(NoError);
+                    expect(error.message).to.equal("An error occurred while retrieving the document at /error/path/to/doc");
+                }
+            });
         });
 
-        it("should throw an error if the response code is not 2xx", async () => {
-            class NoError extends Error {};
-            try {
-                await fetchHTTP("/localhost:8010/error/path/to/doc");
-                throw new NoError();
-            } catch (error) {
-                expect(error).to.not.be.instanceof(NoError);
-                expect(error.message).to.equal("An error occurred while retrieving the document at /error/path/to/doc");
-            }
-        });
-        
         after(() => {
             server.close();
         });
     });
     
     describe("null:", () => {
-        var fetchNone = require("../lib/protocols/null");
+        var noneProtocol = require("../lib/protocols/null");
         
-        describe(`when a document path is passed`, () => {
-            it("should always return an empty string", async () => {
-                expect(await fetchNone("/pathh/to/doc1")).to.equal("");
-                expect(await fetchNone("/pathh/to/doc2")).to.equal("");
-                expect(await fetchNone("/pathh/to", "../to/doc3", "../doc4")).to.equal("");
+        describe("source = none.get(path)", () => {
+            
+            describe(`when a document path is passed`, () => {
+                it("should always return an empty string", async () => {
+                    expect(await noneProtocol.get("/pathh/to/doc1")).to.equal("");
+                    expect(await noneProtocol.get("/pathh/to/doc2")).to.equal("");
+                    expect(await noneProtocol.get("/pathh/to/../to/doc3/../doc4")).to.equal("");
+                });
             });
-        });
 
-        describe(`when a directory path is passed`, () => {            
-            it("should always return an empty string", async () => {
-                expect(await fetchNone("/pathh/to/dir1/")).to.equal("");
-                expect(await fetchNone("/pathh/to/dir2/")).to.equal("");
-                expect(await fetchNone("/pathh/to/", "../to/doc3", "../doc4")).to.equal("");
+            describe(`when a directory path is passed`, () => {            
+                it("should always return an empty string", async () => {
+                    expect(await noneProtocol.get("/pathh/to/dir1/")).to.equal("");
+                    expect(await noneProtocol.get("/pathh/to/dir2/")).to.equal("");
+                    expect(await noneProtocol.get("/pathh/to/../to/doc3/../dir4/")).to.equal("");
+                });
             });
-        });
+        });        
+
+        describe("none.set(path, source)", () => {
+            it("should throw an `OperationNotAllowed` error", async () => {
+                try {
+                    await noneProtocol.set("/path/to/doc1", "source of doc 1");
+                    throw new Error("Id didn't throw");
+                } catch (error) {
+                    expect(error).to.be.instanceof(protocolErrors.OperationNotAllowed);
+                    expect(error.message).to.equal("Operation not allowed: SET null:/path/to/doc1");
+                }
+            });
+        });        
+
+        describe("none.delete(path)", () => {
+            it("should throw an `OperationNotAllowed` error", async () => {
+                try {
+                    await noneProtocol.delete("/path/to/doc1");
+                    throw new Error("Id didn't throw");
+                } catch (error) {
+                    expect(error).to.be.instanceof(protocolErrors.OperationNotAllowed);
+                    expect(error.message).to.equal("Operation not allowed: DELETE null:/path/to/doc1");
+                }
+            });
+        });        
     });    
 });
 
 
 
-async function initStore (rootPath, content) {
-    
-    // clear the store
-    await new Promise((resolve, reject) => {
-        rimraf(`${rootPath}`, (err) => {
-            if (err) reject(err);
-            else resolve();
-        })
-    });
-    
-    fs.mkdirSync(rootPath);
-    
-    // document creation routine
-    var createDoc = (fullPath, content) => {
-        var ppath = Path.parse(fullPath);
-        if (!fs.existsSync(ppath.dir+"/")) {
-            mkdirp.sync(ppath.dir+"/");
-        }
-        return new Promise((resolve, reject) => {
-            fs.writeFile(fullPath+".olo", content, {encoding:'utf8'}, (err) => {
-                if (err) reject(err);
-                else resolve();
-            });            
-        });                        
-    }
-    
-    // create all the listed documents
-    for (let path in content) {
-        let fullPath = `${rootPath}${path}`;
-        await createDoc(fullPath, content[path]);
-    }    
+async function initStore (rootPath) {
+    rimraf.sync(`${rootPath}`);
+    mkdirp.sync(`${rootPath}/path/to`);
+    fs.writeFileSync(`${rootPath}/doc1.olo`, "doc1 @ /", 'utf8');
+    fs.writeFileSync(`${rootPath}/doc2.olo`, "doc2 @ /", 'utf8');
+    fs.writeFileSync(`${rootPath}/doc3.olo`, "doc3 @ /", 'utf8');
+    fs.writeFileSync(`${rootPath}/path/to/.olo`, ".olo @ /path/to/", 'utf8');
+    fs.writeFileSync(`${rootPath}/path/to/doc1.olo`, "doc1 @ /path/to/", 'utf8');
+    fs.writeFileSync(`${rootPath}/path/to/doc2.olo`, "doc2 @ /path/to/", 'utf8');
+    fs.writeFileSync(`${rootPath}/path/to/doc3.olo`, "doc3 @ /path/to/", 'utf8');
 }
