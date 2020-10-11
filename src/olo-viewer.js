@@ -34,10 +34,13 @@ module.exports = olonv => ({
     methods: {
         async refresh () {
             olonv.doc = await olonv.readDocument(this.docPath);
+            this.$emit('doc-loaded', olonv.doc);
             olonv.doc.context = olonv.doc.createContext({argns: this.argns})
             olonv.doc.namespace = await olonv.doc.evaluate(olonv.doc.context);
+            this.$emit('doc-evaluated', olonv.doc.namespace);
             const rawHTML = await olonv.render(olonv.doc.namespace);
             this.html = DOMPurify.sanitize(rawHTML);
+            this.$emit('doc-rendered', this.html);
         }
     },
     
