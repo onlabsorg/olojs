@@ -6,7 +6,7 @@
     </head>
 
     <body>
-        <olo-viewer id="olo-document" :src="hash"></olo-viewer>
+        <div id="olo-document" class="olo-viewer" v-html="html"></div>
         <script>
             document.addEventListener("DOMContentLoaded", () => olonv.init("#olo-document"));
         </script>

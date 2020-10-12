@@ -14,8 +14,16 @@ describe("Environment class", () => {
         
         it("should return an object", async () => {
             var env = Environment();
-            var doc = env.createDocument("source", {});
+            var doc = env.createDocument("/", "source");
             expect(doc).to.be.an("object");
+        });
+        
+        describe("doc.id", () => {
+            it("should contain the passed document id in normalized form", () => {
+                var env = Environment();
+                var doc = env.createDocument('file:/path/[ ] to/x/../doc?x=1&y=2', "...");
+                expect(doc.id).to.equal('file:/path/[ ] to/doc?x=1&y=2');
+            });
         });
         
         describe("doc.source", () => {
@@ -23,7 +31,7 @@ describe("Environment class", () => {
             it("should contain the document source", () => {
                 var env = Environment();
                 var source = "this is the document source";
-                var doc = env.createDocument(source);
+                var doc = env.createDocument('/', source);
                 expect(doc.source).to.equal(source);
                 
             });
@@ -33,7 +41,7 @@ describe("Environment class", () => {
             
             it("should contain the function returned by document.parse(doc.source)", async () => {
                 var env = Environment();
-                var doc = env.createDocument("<% y = 2*x %>");
+                var doc = env.createDocument('/', "<% y = 2*x %>");
                 expect(doc.evaluate).to.be.a("function");
                 
                 var context = document.createContext({x:10});
@@ -43,7 +51,7 @@ describe("Environment class", () => {
             
             it("should return always the same function (parse only once)", async () => {
                 var env = Environment();
-                var doc = env.createDocument("...");
+                var doc = env.createDocument('/', "...");
                 expect(doc.evaluate).to.equal(doc.evaluate);
             });
         });
@@ -52,7 +60,7 @@ describe("Environment class", () => {
             
             it("should return a context", async () => {
                 var env = Environment();
-                var doc = env.createDocument("...");
+                var doc = env.createDocument('/', "...");
                 var docContext = doc.createContext();
 
                 var rootContext = Object.getPrototypeOf(document.expression.createContext());
@@ -61,32 +69,99 @@ describe("Environment class", () => {
             
             it("should contain the names contained in the passed namespaces", async () => {
                 var env = Environment();
-                var doc = env.createDocument("...");
+                var doc = env.createDocument('/', "...");
                 var context = doc.createContext({x:10, y:20}, {y:30});
                 expect(context.x).to.equal(10);
                 expect(context.y).to.equal(30);
             });
             
-            it("should contain the names contained in the `presets` namespace passed to `createDocument`", async () => {
-                var env = Environment();
-                var doc = env.createDocument("...", {x:10, y:20});
-                var context = doc.createContext({x:10, y:20}, {y:30});
-                var context = doc.createContext({y:21, z:31});
-                expect(context.x).to.equal(10);
-                expect(context.y).to.equal(20);
-                expect(context.z).to.equal(31);
-            });
-
-            it("should contain the names contained in the `globals` namespaces passed to the environment constructor", async () => {
+            it("should contain the names contained in the `globals` namespaces passed to the environment constructor", () => {
                 var env = Environment({
                     globals: {x:10, y:20}
                 });
-                var doc = env.createDocument("...");
+                var doc = env.createDocument('/', "...");
                 var context = doc.createContext({y:30});
                 expect(context.x).to.equal(10);
                 expect(context.y).to.equal(30);
             });
+            
+            it("should contain a `argns` object with all the parameters defined in the id query string", () => {
+                var env = Environment();
+                var doc = env.createDocument('/path/to/doc?x=10&s=abc', "...");
+                var context = doc.createContext();
+                expect(context.argns).to.deep.equal({x:10, s:'abc'});
+            });
+            
+            it("should contain the property `import` mapping to a function", async () => {
+                var env = Environment({
+                    protocols: {
+                        ppp: {get: path => `Doc source @ ppp:${Path.join('/',path)}`}
+                    }
+                });
+                var doc = await env.createDocument(`/`, "...");
+                var context = doc.createContext();
+                expect(context.import).to.be.a("function");
+            });
+            
+            describe("docNS = context.import(uri, ...namespaces)", () => {
+                
+                it("should load, evaluate and return the namespace of the olo-document mapped to `uri`", async () => {
+                    var env = Environment({
+                        protocols: {
+                            ppp: {get: path => `<% u = "ppp:${Path.join('/',path)}" %>`}
+                        }
+                    });
+                    var doc1 = env.createDocument(`ppp:/path/to/doc1`, '...');
+                    var context1 = doc1.createContext();
+                    var doc2_ns = await context1.import("ppp:/path/to/doc2");
+                    expect(doc2_ns.u).to.equal("ppp:/path/to/doc2");
+                });                    
+                
+                it("should resolve `uri` relative to the calling document URI", async () => {
+                    var env = Environment({
+                        protocols: {
+                            ppp: {get: path => `<% u = "ppp:${Path.join('/',path)}" %>`}
+                        }
+                    });
+                    var doc1 = await env.createDocument(`ppp:/path/to/doc1`, "...");
+                    var context1 = doc1.createContext();
+                    
+                    var doc2_ns = await context1.import("./doc2");
+                    expect(doc2_ns.u).to.equal("ppp:/path/to/doc2");
 
+                    var doc3_ns = await context1.import("../to_doc3");
+                    expect(doc3_ns.u).to.equal("ppp:/path/to_doc3");
+
+                    var doc4_ns = await context1.import("/path_to/doc4");
+                    expect(doc4_ns.u).to.equal("ppp:/path_to/doc4");
+                });
+                
+                it("should cache the imported documents", async () => {
+                    var counter = 0;
+
+                    var env = Environment({
+                        protocols: {
+                            ppp: {get: path => {
+                                counter += 1;
+                                return `<% u = "ppp:${Path.join('/',path)}" %>`;
+                            }}
+                        }
+                    });
+
+                    var doc1 = await env.createDocument(`ppp:/path/to/doc1`);
+                    var context1 = doc1.createContext();
+                    expect(counter).to.equal(0);
+
+                    var doc2_NS = await context1.import("/path/to/doc2");
+                    expect(counter).to.equal(1);
+                    
+                    var doc2_NS = await context1.import("/path/to/doc2");
+                    expect(counter).to.equal(1);
+                    
+                    var doc3_NS = await context1.import("/path/to/doc3");
+                    expect(counter).to.equal(2);
+                });
+            });        
         });        
     });
     
@@ -103,170 +178,55 @@ describe("Environment class", () => {
     
     describe("doc = await environment.readDocument([scheme:][//host][/path/to/doc])", () => {
         
-        describe("doc.source", () => {
+        it("should call the matching handler's get method", async () => {
+            var handlerPath, handlerSource;
             
-            it("should contain the source returned by the `scheme` handler with `//host/path/to/doc` as argument", async () => {
-                var env = Environment({
-                    protocols: {
-                        ppp: {get: path => `Doc source @ ppp:${Path.join('/',path)}`}
-                    }
-                });
-                var doc = await env.readDocument(`ppp:/path/to/doc`);
-                expect(doc.source).to.equal("Doc source @ ppp:/path/to/doc");
+            var env = Environment({
+                protocols: {
+                    ppp: {get: (path) => {
+                        handlerPath = path;
+                    }},
+                },
+                routes: {
+                    '/': "ppp:/root/dir"
+                }
             });
+            
+            await env.readDocument("ppp:/path/to/doc");            
+            expect(handlerPath).to.equal("/path/to/doc");
 
-            it("should fall-back to the route shortcuts if no `scheme` is given", async () => {
-                var env = Environment({
-                    protocols: {
-                        ppp: {get: path => `Doc source @ ppp:${Path.join('/',path)}`}
-                    },
-                    routes: {
-                        "/": "ppp:/root",
-                        "/mydocs": "ppp:/path/to/my/documents"
-                    }
-                });
-                
-                var doc = await env.readDocument(`/path/to/doc`);
-                expect(doc.source).to.equal("Doc source @ ppp:/root/path/to/doc");
-                
-                var doc = await env.readDocument(`/mydocs/doc1`);
-                expect(doc.source).to.equal("Doc source @ ppp:/path/to/my/documents/doc1");
+            await env.readDocument("/path/to/doc");            
+            expect(handlerPath).to.equal("/root/dir/path/to/doc");
+        });        
+        
+        it("should return a document with source given by the proper protocol get handler", async () => {
+            var env = Environment({
+                protocols: {
+                    ppp: {get: path => `Doc source @ ppp:${Path.join('/',path)}`}
+                }
             });
-            
-            it("should be an empty string if no protocol nor route match is found", async () => {
-                var env = Environment({
-                    protocols: {
-                        ppp: {get: path => `Doc source @ ppp:${Path.join('/',path)}`}
-                    },
-                    routes: {
-                        "/mydocs": "ppp:/path/to/my/documents"
-                    }
-                });
-                
-                var doc = await env.readDocument(`xxx:/path/to/doc`);
-                expect(doc.source).to.equal("");
-                
-                var doc = await env.readDocument(`/path/to/doc1`);
-                expect(doc.source).to.equal("");
-            });
+            var doc = await env.readDocument(`ppp:/path/to/doc`);
+            expect(doc.id).to.equal(`ppp:/path/to/doc`);
+            expect(doc.source).to.equal("Doc source @ ppp:/path/to/doc");
         });
         
-        describe("doc.URI", () => {
-            it("should return the full document URI", async () => {
-                var env = Environment({
-                    protocols: {
-                        ppp: {get: path => `Doc source @ ppp:${Path.join('/',path)}`}
-                    },
-                    routes: {
-                        "/": "ppp:/root/route"
-                    }
-                });
-                
-                var doc = await env.readDocument(`ppp:/path/to/doc`);
-                expect(doc.URI).to.equal("ppp:/path/to/doc");                
-
-                var doc = await env.readDocument(`ppp:/path/to/dir/`);
-                expect(doc.URI).to.equal("ppp:/path/to/dir/");                
-
-                var doc = await env.readDocument(`/path/to/doc`);
-                expect(doc.URI).to.equal("/path/to/doc");                
-            });
-        });
-        
-        describe("context = doc.createContext()", () => {
-            
-            it("should contain the own property `import` mapping to a function", async () => {
-                var env = Environment({
-                    protocols: {
-                        ppp: {get: path => `Doc source @ ppp:${Path.join('/',path)}`}
-                    }
-                });
-                var doc = await env.readDocument(`ppp:/path/to/doc`);
-                var context = doc.createContext();
-                expect(context.import).to.be.a("function");
+        it("should return an empty document if no protocol nor route match is found", async () => {
+            var env = Environment({
+                protocols: {
+                    ppp: {get: path => `Doc source @ ppp:${Path.join('/',path)}`}
+                },
+                routes: {
+                    "/mydocs": "ppp:/path/to/my/documents"
+                }
             });
             
-            describe("docNS = context.import(uri, ...namespaces)", () => {
-                
-                it("should load, evaluate and return the namespace of the olo-document mapped to `uri`", async () => {
-                    var env = Environment({
-                        protocols: {
-                            ppp: {get: path => `<% u = "ppp:${Path.join('/',path)}" %>`}
-                        }
-                    });
-                    var doc1 = await env.readDocument(`ppp:/path/to/doc1`);
-                    var context1 = doc1.createContext();
-                    var doc2_ns = await context1.import("ppp:/path/to/doc2");
-                    expect(doc2_ns.u).to.equal("ppp:/path/to/doc2");
-                });                    
-                
-                it("should resolve `uri` relative to the calling document URI", async () => {
-                    var env = Environment({
-                        protocols: {
-                            ppp: {get: path => `<% u = "ppp:${Path.join('/',path)}" %>`}
-                        }
-                    });
-                    var doc1 = await env.readDocument(`ppp:/path/to/doc1`);
-                    var context1 = doc1.createContext();
-                    
-                    var doc2_ns = await context1.import("./doc2");
-                    expect(doc2_ns.u).to.equal("ppp:/path/to/doc2");
-
-                    var doc3_ns = await context1.import("../to_doc3");
-                    expect(doc3_ns.u).to.equal("ppp:/path/to_doc3");
-
-                    var doc4_ns = await context1.import("/path_to/doc4");
-                    expect(doc4_ns.u).to.equal("ppp:/path_to/doc4");
-                });
-                
-                it("should evaluate the loaded document in a context containing the passed namespaces", async () => {
-                    var env = Environment({
-                        protocols: {
-                            ppp: {get: path => `<% u = "ppp:${Path.join('/',path)}/" + leaf %>`}
-                        }
-                    });
-                    var doc1 = await env.readDocument(`ppp:/path/to/doc1`);
-                    var context1 = doc1.createContext();
-                    
-                    var doc2_ns = await context1.import("ppp:/path/to/doc2", {leaf:"leaf2"});
-                    expect(doc2_ns.u).to.equal("ppp:/path/to/doc2/leaf2");
-                });
-                
-                it("should cache the imported documents", async () => {
-                    var counter = 0;
-
-                    var env = Environment({
-                        protocols: {
-                            ppp: {get: path => {
-                                counter += 1;
-                                return `<% u = "ppp:${Path.join('/',path)}" %>`;
-                            }}
-                        }
-                    });
-
-                    var doc1 = await env.readDocument(`ppp:/path/to/doc1`);
-                    var context1 = doc1.createContext();
-                    expect(counter).to.equal(1);
-
-                    var doc2_NS = await context1.import("/path/to/doc2");
-                    expect(counter).to.equal(2);
-                    
-                    var doc2_NS = await context1.import("/path/to/doc2");
-                    expect(counter).to.equal(2);
-                    
-                    var doc3_NS = await context1.import("/path/to/doc3");
-                    expect(counter).to.equal(3);
-                    
-                    // valid also for the parent document itself
-                    var doc4_NS = await context1.import("./doc1");
-                    expect(counter).to.equal(3);                   
-                    expect(doc4_NS.u).to.equal(doc1.URI);
-
-                    var doc5_NS = await context1.import(doc1.URI);
-                    expect(counter).to.equal(3);                   
-                    expect(doc5_NS.u).to.equal(doc1.URI);
-                });
-            });        
+            var doc = await env.readDocument(`xxx:/path/to/doc`);
+            expect(doc.id).to.equal(`xxx:/path/to/doc`);
+            expect(doc.source).to.equal("");
+            
+            var doc = await env.readDocument(`/path/to/doc1`);
+            expect(doc.id).to.equal(`/path/to/doc1`);
+            expect(doc.source).to.equal("");
         });        
     });
     

@@ -81,7 +81,7 @@ const environment = new Environment({
 Retrieve and render a document from your environment:
 
 ```js
-const doc1 = await environment.loadDocument("/path/to/doc1");    // document at file:/home/username/path/to/doc1
+const doc1 = await environment.readDocument("/path/to/doc1");    // document at file:/home/username/path/to/doc1
 const doc1_context = doc1.createContext({x:10});
 const doc1_namespace = await doc1.evaluate(context);
 const doc1_rendering = await environment.render(doc1);
