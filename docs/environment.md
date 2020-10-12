@@ -60,6 +60,6 @@ If the protocol allows it, you can modify a document content or delete it as
 follows.
 
 ```js
-await environment.updateDocument('/path/to/doc', "new doc source");
+await environment.writeDocument('/path/to/doc', "new doc source");
 await environment.deleteDocument('file:/home/user/env-demo-documents/path/to/doc'");
 ```

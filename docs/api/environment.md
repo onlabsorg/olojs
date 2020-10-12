@@ -56,12 +56,12 @@ the `createDocument` method differ in that their context contains a
 `import` method, which is able to load the namespace of other 
 documents.
   
-environment.updateDocument - async function
+environment.writeDocument - async function
 --------------------------------------------------------------------
 Changes the content of the document mapped to the given uri in this
 environment.
 ```js
-await environment.updateDocument(uri, source)
+await environment.writeDocument(uri, source)
 ```
 
 - `uri` is an URI that identifies the targt document inside this

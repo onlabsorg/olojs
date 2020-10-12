@@ -270,7 +270,7 @@ describe("Environment class", () => {
         });        
     });
     
-    describe("await environment.updateDocument([scheme:][//host][/path/to/doc], source)", () => {
+    describe("await environment.writeDocument([scheme:][//host][/path/to/doc], source)", () => {
         
         it("should call the matching handler's set method", async () => {
             var handlerPath, handlerSource;
@@ -287,11 +287,11 @@ describe("Environment class", () => {
                 }
             });
             
-            await env.updateDocument("ppp:/path/to/doc", "doc source");            
+            await env.writeDocument("ppp:/path/to/doc", "doc source");            
             expect(handlerPath).to.equal("/path/to/doc");
             expect(handlerSource).to.equal("doc source");
 
-            await env.updateDocument("/path/to/doc", "doc source 2");            
+            await env.writeDocument("/path/to/doc", "doc source 2");            
             expect(handlerPath).to.equal("/root/dir/path/to/doc");
             expect(handlerSource).to.equal("doc source 2");
         });

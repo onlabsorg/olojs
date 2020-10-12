@@ -18,7 +18,7 @@ On `GET /` requsts it will respond with a single page application that
 loads and fetches the document mapped to the hash.
 
 On `PUT /env/paht/to/doc` requsts it will execute the 
-`environment.updateDocument("/path/to/doc", body)` method.
+`environment.writeDocument("/path/to/doc", body)` method.
 
 On `DELETE /env/paht/to/doc` requsts it will execute the 
 `environment.deleteDocument("/path/to/doc", body)` method.
@@ -35,7 +35,7 @@ expressApp.use(mountPath, middleware);
 - On `GET /env/paht/to/doc` requsts it will respond with the source of the 
   document loaded via `environment.readDocument("/path/to/doc")`.
 - On `PUT /env/paht/to/doc` requsts it will execute the 
-  `environment.updateDocument("/path/to/doc", body)` method.
+  `environment.writeDocument("/path/to/doc", body)` method.
 - On `DELETE /env/paht/to/doc` requsts it will execute the 
   `environment.deleteDocument("/path/to/doc", body)` method.
   
