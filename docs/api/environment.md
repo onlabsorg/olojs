@@ -18,6 +18,10 @@ const environment = olojs.Environment({globals, protocols, routes})
 - `routes` is an object mapping paths to URIs, so that the path can be used
   as shortcut for the full URI. For example, the mapping `"/a/b": "ppp:/path/to/dir"`
   makes the uri `/a/b/x/doc` equivalent to `ppp:/path/to/dir/x/doc`.
+
+Upon creation of the environment, the `globals` namespace will be augumented
+with a `globals.import` function that can be used by document expressions to 
+load and evaluate other documents of this environment.
   
 environment.createDocument - function
 --------------------------------------------------------------------
@@ -25,12 +29,14 @@ Creates a document object containing the document source and
 methods to evaluate that source to a namespace.
 
 ```js
-const doc = environment.createDocument(source, presets)
+const doc = environment.createDocument(id, source)
 ```
 
+- `id` is an uri identifying the document in this environment
 - `source` is the un-parsed content of the document
 - `presets` is an object containing predefined name to be added to
   the context
+- `doc.id` contains the document id in normalized form
 - `doc.source` contain the un-parsed content of the document
 - `doc.createContext` is a function that takes a list of namespaces
   as input and returns a context that contains a) the environment
@@ -43,28 +49,23 @@ environment.readDocument - async function
 Returns the document mapped to a given uri in this environment.
 
 ```js
-const doc = await environment.readDocument(uri)
+const doc = await environment.readDocument(id)
 ```
 
-- `uri` is an URI that identifies the required document inside this
+- `id` is an URI that identifies the required document inside this
   environment.
 - `doc` is the document object returned by the `createDocument`
   method.
-
-The documents loaded with this method and the documents created by 
-the `createDocument` method differ in that their context contains a 
-`import` method, which is able to load the namespace of other 
-documents.
   
 environment.writeDocument - async function
 --------------------------------------------------------------------
 Changes the content of the document mapped to the given uri in this
 environment.
 ```js
-await environment.writeDocument(uri, source)
+await environment.writeDocument(id, source)
 ```
 
-- `uri` is an URI that identifies the targt document inside this
+- `id` is an URI that identifies the targt document inside this
   environment.
 - `source` is the new value to be assigned to the document source
   
@@ -72,10 +73,10 @@ environment.deleteDocument - async function
 --------------------------------------------------------------------
 Erases the document mapped to the given uri in this environment.
 ```js
-await environment.deleteDocument(uri)
+await environment.deleteDocument(id)
 ```
 
-- `uri` is an URI that identifies the targt document inside this
+- `id` is an URI that identifies the targt document inside this
   environment.
   
 environment.render - async function
