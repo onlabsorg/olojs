@@ -17,6 +17,10 @@ describe("olojs", () => {
         expect(olojs.protocols.file).to.equal(require("../lib/protocols/file"));
     });
     
+    it("should export the `protocols/fs` module", () => {
+        expect(olojs.protocols.fs).to.equal(require("../lib/protocols/fs"));
+    });
+
     it("should export the `protocols/http` module exports", () => {
         expect(olojs.protocols.http).to.equal(require("../lib/protocols/http"));
         expect(olojs.protocols.https).to.equal(require("../lib/protocols/https"));

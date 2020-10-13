@@ -101,6 +101,119 @@ describe("protocols", () => {
         });
     });
     
+    describe("fs:", () => {
+        var fsProtocol = require("../lib/protocols/fs");
+        
+        before(() => {
+            initStore(ROOT_PATH);
+            fs.writeFileSync(`${ROOT_PATH}/path/to/file.txt`, "file.txt @ /path/to/", 'utf8');
+            fs.mkdirSync(`${ROOT_PATH}/path/to/dir`);
+        });
+        
+        describe("source = await fs.get(path)", () => {
+            
+            describe(`when a document path is passed`, () => {
+                
+                it("should return the document stored at the given path", async () => {
+                    var doc = await fsProtocol.get(`${ROOT_PATH}/path/to/doc2`);
+                    expect(doc).to.be.equal("doc2 @ /path/to/");
+                });
+
+                it("should return an empty string if the path doesn't exist", async () => {
+                    var doc = await fsProtocol.get(`${ROOT_PATH}/non/existing/doc`);
+                    expect(doc).to.equal("");            
+                });
+            });
+
+            describe(`when a directory path is passed`, () => {
+                
+                it("should return the a document containing the `children` list of the directory child-item names", async () => {
+                    var doc = await fsProtocol.get(`${ROOT_PATH}/`);
+                    var docns = await document.parse(doc)(document.createContext());
+                    expect(docns.children.sort()).to.deep.equal(["doc1", "doc2", "doc3", "path/"]);
+                });
+                
+                it("should discard files that are not .olo documents", async () => {
+                    var doc = await fsProtocol.get(`${ROOT_PATH}/path/to/`);
+                    var docns = await document.parse(doc)(document.createContext());
+                    expect(docns.children.sort()).to.deep.equal(["", "dir/", "doc1", "doc2", "doc3"]);
+                });
+
+                it("should return an empty `children` list if the directory doesn't exist", async () => {
+                    var doc = await fsProtocol.get(`${ROOT_PATH}/non/existing/dir/index/`);
+                    var docns = await document.parse(doc)(document.createContext());
+                    expect(docns.children.sort()).to.deep.equal([]);
+                });
+            });    
+        });        
+
+        describe("await fs.set(path, source)", () => {
+            
+            it("should change the source of the file at the given path", async () => {
+                expect(await fsProtocol.get(`${ROOT_PATH}/path/to/doc1`)).to.equal("doc1 @ /path/to/");
+                await fsProtocol.set(`${ROOT_PATH}/path/to/doc1`, "new doc1 @ /path/to/");
+                expect(await fsProtocol.get(`${ROOT_PATH}/path/to/doc1`)).to.equal("new doc1 @ /path/to/");
+            });
+            
+            it("should throw an OperationNotAllowed error when a directory path is given", async () => {
+                try {
+                    await fsProtocol.set(`${ROOT_PATH}/path/to/`, "new .olo @ /path/to/");
+                    throw new Error("It did not throw");
+                } catch (error) {
+                    expect(error).to.be.instanceof(protocolErrors.OperationNotAllowed);
+                    expect(error.message).to.equal(`Operation not allowed: SET fs:${ROOT_PATH}/path/to/`);
+                }
+            });
+            
+            it("should create the file it it doesn't exist", async () => {
+                expect(fs.existsSync(`${ROOT_PATH}/path/to/doc4.olo`)).to.be.false;
+                expect(await fsProtocol.get(`${ROOT_PATH}/path/to/doc4`)).to.equal("");
+                await fsProtocol.set(`${ROOT_PATH}/path/to/doc4`, "doc4 @ /path/to/");
+                expect(fs.existsSync(`${ROOT_PATH}/path/to/doc4.olo`)).to.be.true;
+                expect(await fsProtocol.get(`${ROOT_PATH}/path/to/doc4`)).to.equal("doc4 @ /path/to/");
+            });
+            
+            it("should create the entire file path if it doesn't exist", async () => {
+                expect(fs.existsSync(`${ROOT_PATH}/x/`)).to.be.false;
+                expect(fs.existsSync(`${ROOT_PATH}/x/y/`)).to.be.false;
+                expect(fs.existsSync(`${ROOT_PATH}/x/y/doc.olo`)).to.be.false;
+                expect(await fsProtocol.get(`${ROOT_PATH}/x/y/doc`)).to.equal("");
+                await fsProtocol.set(`${ROOT_PATH}/x/y/doc`, "doc @ /x/y/");
+                expect(fs.existsSync(`${ROOT_PATH}/x/`)).to.be.true;
+                expect(fs.existsSync(`${ROOT_PATH}/x/y/`)).to.be.true;
+                expect(fs.existsSync(`${ROOT_PATH}/x/y/doc.olo`)).to.be.true;
+                expect(await fsProtocol.get(`${ROOT_PATH}/x/y/doc`)).to.equal("doc @ /x/y/");
+            });
+        });
+
+        describe("await fs.delete(path)", () => {
+            
+            it("should remove the file at path", async () => {
+                expect(fs.existsSync(`${ROOT_PATH}/path/to/doc1.olo`)).to.be.true;
+                await fsProtocol.delete(`${ROOT_PATH}/path/to/doc1`);
+                expect(fs.existsSync(`${ROOT_PATH}/path/to/doc1.olo`)).to.be.false;
+                expect(await fsProtocol.get(`${ROOT_PATH}/path/to/doc1`)).to.equal("");
+            });
+
+            it("should return silentrly if the file already doesn't exist", async () => {
+                expect(fs.existsSync(`${ROOT_PATH}/path/to/doc1.olo`)).to.be.false;
+                await fsProtocol.delete(`${ROOT_PATH}/path/to/doc1`);
+                expect(fs.existsSync(`${ROOT_PATH}/path/to/doc1.olo`)).to.be.false;
+                expect(await fsProtocol.get(`${ROOT_PATH}/path/to/doc1`)).to.equal("");
+            });
+            
+            it("should throw an OperationNotAllowed error when a directory path is given", async () => {
+                try {
+                    await fsProtocol.delete(`${ROOT_PATH}/path/to/`, "new .olo @ /path/to/");
+                    throw new Error("It did not throw");
+                } catch (error) {
+                    expect(error).to.be.instanceof(protocolErrors.OperationNotAllowed);
+                    expect(error.message).to.equal(`Operation not allowed: DELETE fs:${ROOT_PATH}/path/to/`);
+                }
+            });
+        });
+    });
+
     describe("http:", () => {
         var server, httpProtocol = require("../lib/protocols/http");
         var fileProtocol = require("../lib/protocols/file");

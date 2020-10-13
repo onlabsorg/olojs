@@ -15,5 +15,8 @@ bin/gen-doc lib/protocols/.http.js > docs/api/http-protocol.md
 echo "Building API documentation for olojs.protocols.file"
 bin/gen-doc lib/protocols/file.js > docs/api/file-protocol.md
 
+echo "Building API documentation for olojs.protocols.fs"
+bin/gen-doc lib/protocols/fs.js > docs/api/fs-protocol.md
+
 echo "Building API documentation for olojs.servers.http"
 bin/gen-doc lib/servers/http.js > docs/api/http-server.md
