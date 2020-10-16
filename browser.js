@@ -7,7 +7,8 @@ module.exports = {
     Environment: require("./lib/environment"),
     
     stores: {
+        "Null":   require('./lib/stores/null'),
+        "Memory": require('./lib/stores/memory'),
         "HTTP":  require('./lib/stores/http'),
-        "Null":  require('./lib/stores/null'),
     },
 };

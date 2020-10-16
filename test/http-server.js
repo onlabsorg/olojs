@@ -4,7 +4,7 @@ var pathlib = require("path");
 var document = require("../lib/document");
 var Environment = require("../lib/environment");
 var HTTPServer = require("../lib/servers/http");
-var protocolErrors = require("../lib/protocols/.errors");
+var storeErrors = require("../lib/stores/store-errors");
 require("isomorphic-fetch");
 
 describe("HTTPServer", () => {
@@ -22,14 +22,14 @@ describe("HTTPServer", () => {
                         delete: (path, source) => store.delete(pathlib.join('/', path)),
                     } ,
                     prv: {
-                        get: path => {throw new protocolErrors.PermissionDenied('GET', path)},
-                        set: path => {throw new protocolErrors.PermissionDenied('SET', path)},
-                        delete: path => {throw new protocolErrors.PermissionDenied('DELETE', path)},
+                        get: path => {throw new storeErrors.PermissionDenied('GET', path)},
+                        set: path => {throw new storeErrors.PermissionDenied('SET', path)},
+                        delete: path => {throw new storeErrors.PermissionDenied('DELETE', path)},
                     } ,
                     hid: {
-                        get: path => {throw new protocolErrors.OperationNotAllowed('GET', path)},
-                        set: path => {throw new protocolErrors.OperationNotAllowed('SET', path)},
-                        delete: path => {throw new protocolErrors.OperationNotAllowed('DELETE', path)},
+                        get: path => {throw new storeErrors.OperationNotAllowed('GET', path)},
+                        set: path => {throw new storeErrors.OperationNotAllowed('SET', path)},
+                        delete: path => {throw new storeErrors.OperationNotAllowed('DELETE', path)},
                     } ,
                     err: {
                         get: path => {throw new Error()},

@@ -13,6 +13,14 @@ describe("olojs", () => {
         expect(olojs.expression).to.equal(require("../lib/expression"));
     });
     
+    it("should export the `stores/null` module", () => {
+        expect(olojs.stores.Null).to.equal(require("../lib/stores/null"));
+    });
+
+    it("should export the `stores/memory` module", () => {
+        expect(olojs.stores.Memory).to.equal(require("../lib/stores/memory"));
+    });
+
     it("should export the `stores/file` module", () => {
         expect(olojs.stores.File).to.equal(require("../lib/stores/file"));
     });
@@ -23,10 +31,6 @@ describe("olojs", () => {
 
     it("should export the `stores/http` module exports", () => {
         expect(olojs.stores.HTTP).to.equal(require("../lib/stores/http"));
-    });
-
-    it("should export the `stores/null` module", () => {
-        expect(olojs.stores.Null).to.equal(require("../lib/stores/null"));
     });
 
     it("should export the `environment` module", () => {
@@ -41,6 +45,6 @@ describe("olojs", () => {
     require("./stdlib");    
     require("./document");
     require("./stores");
-    //require("./environment");
-    //require("./http-server");    
+    require("./environment");
+    // require("./http-server");    
 });
