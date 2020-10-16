@@ -6,12 +6,11 @@ module.exports = {
     
     get Environment () {return require("./lib/environment")},
     
-    protocols: {
-        get file    () {return require('./lib/protocols/file')},
-        get fs      () {return require('./lib/protocols/fs')},
-        get http    () {return require('./lib/protocols/http')},
-        get https   () {return require('./lib/protocols/https')},
-        get null    () {return require('./lib/protocols/null')},
+    stores: {
+        get File    () {return require('./lib/stores/file')},
+        get FS      () {return require('./lib/stores/fs')},
+        get HTTP    () {return require('./lib/stores/http')},
+        get Null    () {return require('./lib/stores/null')},
     },
     
     servers: {

@@ -13,21 +13,20 @@ describe("olojs", () => {
         expect(olojs.expression).to.equal(require("../lib/expression"));
     });
     
-    it("should export the `protocols/file` module", () => {
-        expect(olojs.protocols.file).to.equal(require("../lib/protocols/file"));
+    it("should export the `stores/file` module", () => {
+        expect(olojs.stores.File).to.equal(require("../lib/stores/file"));
     });
     
-    it("should export the `protocols/fs` module", () => {
-        expect(olojs.protocols.fs).to.equal(require("../lib/protocols/fs"));
+    it("should export the `stores/fs` module", () => {
+        expect(olojs.stores.FS).to.equal(require("../lib/stores/fs"));
     });
 
-    it("should export the `protocols/http` module exports", () => {
-        expect(olojs.protocols.http).to.equal(require("../lib/protocols/http"));
-        expect(olojs.protocols.https).to.equal(require("../lib/protocols/https"));
+    it("should export the `stores/http` module exports", () => {
+        expect(olojs.stores.HTTP).to.equal(require("../lib/stores/http"));
     });
 
-    it("should export the `protocols/null` module", () => {
-        expect(olojs.protocols.null).to.equal(require("../lib/protocols/null"));
+    it("should export the `stores/null` module", () => {
+        expect(olojs.stores.Null).to.equal(require("../lib/stores/null"));
     });
 
     it("should export the `environment` module", () => {
@@ -41,7 +40,7 @@ describe("olojs", () => {
     require("./expression");
     require("./stdlib");    
     require("./document");
-    require("./protocols");
-    require("./environment");
-    require("./http-server");    
+    require("./stores");
+    //require("./environment");
+    //require("./http-server");    
 });

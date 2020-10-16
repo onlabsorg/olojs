@@ -54,9 +54,9 @@ source = "<% y=2 %>x*y = <% x*y %>";
 evaluate = document.parse(source);
 
 context = document.createContext({x:10});
-namespace = await evaluate_doc(context);          // {x:10, y:2}
+namespace = await evaluate(context);              // {x:10, y:2}
 
-rendering = await document.render(doc_namespace); // "x*y = 20"
+rendering = await document.render(namespace);     // "x*y = 20"
 ```
 
 Create a shared [environment](./docs/api/environment.md) for your documents:
