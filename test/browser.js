@@ -1,5 +1,5 @@
 const expect = require("chai").expect;
-const olojs = require("..");
+const olojs = require("../browser");
 
 
 describe("olojs", () => {
@@ -20,14 +20,6 @@ describe("olojs", () => {
         expect(olojs.stores.Memory).to.equal(require("../lib/stores/memory"));
     });
 
-    it("should export the `stores/file` module", () => {
-        expect(olojs.stores.File).to.equal(require("../lib/stores/file"));
-    });
-    
-    it("should export the `stores/fs` module", () => {
-        expect(olojs.stores.FS).to.equal(require("../lib/stores/fs"));
-    });
-
     it("should export the `stores/http` module exports", () => {
         expect(olojs.stores.HTTP).to.equal(require("../lib/stores/http"));
     });
@@ -41,21 +33,15 @@ describe("olojs", () => {
     });
     
     require("./expression");
-    require("./stdlib");    
+    //require("./stdlib");    
     require("./document");
     
     describe("stores", () => {
         require("./empty-store");
         require("./memory-store");
-        require("./file-store");
-        require("./fs-store");
-        require("./http-store");
+        //require("./http-store");
         require("./router-store");
     });
     
     require("./environment");
-    
-    describe("servers", () => {
-        require("./http-server");
-    });
 });

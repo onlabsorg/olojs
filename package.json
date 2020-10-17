@@ -16,6 +16,8 @@
   "scripts": {
     "develop": "webpack --mode development --watch",
     "test": "mocha test/index.js",
+    "test-server": "node test/server.js",
+    "browser-tests": "node test/browser/run-tests.js",
     "build": "webpack --mode production",
     "build-docs": "bin/build-docs"
   },

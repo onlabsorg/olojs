@@ -126,8 +126,9 @@ server.listen(8010);
 
 
 ### Test 
-To run the test on your machine, enter `npm test` at the command line.  
-
+* Test olojs in nodejs: `npm test`  
+* Test olojs in the browser: `npm run browser-tests`  
+* Test the browser rendering app: `npm run test-server`
 
 ### License
 [MIT](https://opensource.org/licenses/MIT)

@@ -25,6 +25,9 @@ const defaultGlobals = {
 };
 
 
+module.exports = BrowserEnvironment;
+
+
 
 // -----------------------------------------------------------------------------
 //  UTILITY FUNCTIONS
