@@ -1,15 +1,24 @@
-olojs.protocols.fs
+FSStore
 ============================================================================
-This protocol handles read/write operations on the local file system. It
-differs from the `file` protocol in that it returns a directory content
-in case of get requests of paths ending with a `/`.
+This store handles read/write operations on the local file system. It
+differs from `FileStore` in that it returns a directory content in case of 
+get requests of paths ending with a `/`.
+
+```js
+fsStore = new FSStore(rootPath)
+```
+
+- `rootPath` is the base path that will be prepended to the paths passed to
+  the `get`, `set` and `delete` methods.
+- `fileStore` is an object that exposes the standard olojs store API: `get`,
+  `set` and `delete`. 
   
-olojs.protocols.fs.get
+FSStore.prototype.get - async method
 ----------------------------------------------------------------------------
 Retrieves a `.olo` file given its absolute path. If the path ends with a
 '/' returns a document containing info about the directory content.
 ```js
-const source = await olojs.protocols.fs.get("/path/to/doc");
+const source = await fsStore.get("/path/to/doc");
 ```
 
 - When requesting `/path/to/doc`, the content of `/path/to/doc.olo` will
@@ -27,12 +36,12 @@ the returned document will contain the following swan expression:
 <% children = ["dir1/", "dir2/", "doc1", "doc2"] %>
 ```
   
-olojs.protocols.fs.set
+FsStore.prototype.set - async method
 ----------------------------------------------------------------------------
 Modifies the content of a `.olo` file given its absolute path. If the path
 ends with a `/` it throws an error.
 ```js
-await olojs.protocols.fs.set("/path/to/doc", source);
+await fsStore.set("/path/to/doc", source);
 ```
 
 - If path is `/path/to/doc`, the content of `/path/to/doc.olo` will
@@ -40,12 +49,12 @@ await olojs.protocols.fs.set("/path/to/doc", source);
 - When the file that doesn't exist, it will be created
 - If path is `/path/to/dir/`, it throws an `OperationNotAllowed` error
   
-olojs.protocols.fs.delete
+FSStore.prototype.delete - async method
 ----------------------------------------------------------------------------
 Deletes a `.olo` file given its absolute path. If the path ends with a `/`,
 it throws an error.
 ```js
-await olojs.protocols.fs.delete("/path/to/doc");
+await fsStore.delete("/path/to/doc");
 ```
 
 - If path is `/path/to/doc`, the file `/path/to/doc.olo` will be deleted

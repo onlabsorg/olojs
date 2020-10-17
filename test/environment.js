@@ -5,7 +5,7 @@ const Path = require('path');
 var expression = require("../lib/expression");
 var document = require("../lib/document");
 var Environment = require("../lib/environment");
-var NullStore = require("../lib/stores/null");
+var EmptyStore = require("../lib/stores/empty");
 var MemoryStore = require("../lib/stores/memory");
 
 
@@ -27,7 +27,7 @@ describe("Environment class", () => {
     });
     
     it("should contains the passed options.scope or MemoryStore", () => {
-        var store = new NullStore;
+        var store = new EmptyStore;
         var env = new Environment({store});
         expect(env.store).to.equal(store);
         
@@ -155,7 +155,7 @@ describe("Environment class", () => {
                 
                 it("should load, evaluate and return the namespace of the olo-document mapped to `uri`", async () => {
                     
-                    class TestStore extends NullStore {
+                    class TestStore extends EmptyStore {
                         get (path) {
                             return `<% i = "${Path.join('/',path)}" %>`;
                         }
@@ -172,7 +172,7 @@ describe("Environment class", () => {
                 
                 it("should resolve `uri` relative to the calling document URI", async () => {
 
-                    class TestStore extends NullStore {
+                    class TestStore extends EmptyStore {
                         get (path) {
                             return `<% i = "${Path.join('/',path)}" %>`;
                         }
@@ -209,7 +209,7 @@ describe("Environment class", () => {
                 it("should cache the imported documents", async () => {
                     var counter = 0;
 
-                    class TestStore extends NullStore {
+                    class TestStore extends EmptyStore {
                         get (path) {
                             counter += 1;
                             return `<% i = "${Path.join('/',path)}" %>`;
@@ -254,7 +254,7 @@ describe("Environment class", () => {
         it("should call the store.get method", async () => {
             var pathParameter;
             
-            class TestStore extends NullStore {
+            class TestStore extends EmptyStore {
                 get (path) {
                     pathParameter = path;
                 }
@@ -269,7 +269,7 @@ describe("Environment class", () => {
         });        
         
         it("should return a document with source given by the proper protocol get handler", async () => {
-            class TestStore extends NullStore {
+            class TestStore extends EmptyStore {
                 get (path) {
                     return `Doc source @ ${path}`;
                 }
@@ -290,7 +290,7 @@ describe("Environment class", () => {
         it("should call the store.set method", async () => {
             var writtenSource;
             
-            class TestStore extends NullStore {
+            class TestStore extends EmptyStore {
                 set (path, source) {
                     writtenSource = source;
                 }
@@ -310,7 +310,7 @@ describe("Environment class", () => {
         it("should call the store.get method", async () => {
             var pathParameter;
             
-            class TestStore extends NullStore {
+            class TestStore extends EmptyStore {
                 delete (path) {
                     pathParameter = path;
                 }

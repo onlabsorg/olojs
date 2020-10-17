@@ -13,8 +13,8 @@ describe("olojs", () => {
         expect(olojs.expression).to.equal(require("../lib/expression"));
     });
     
-    it("should export the `stores/null` module", () => {
-        expect(olojs.stores.Null).to.equal(require("../lib/stores/null"));
+    it("should export the `stores/empty` module", () => {
+        expect(olojs.stores.Empty).to.equal(require("../lib/stores/empty"));
     });
 
     it("should export the `stores/memory` module", () => {
@@ -31,6 +31,10 @@ describe("olojs", () => {
 
     it("should export the `stores/http` module exports", () => {
         expect(olojs.stores.HTTP).to.equal(require("../lib/stores/http"));
+    });
+
+    it("should export the `stores/http` module exports", () => {
+        expect(olojs.stores.Router).to.equal(require("../lib/stores/router"));
     });
 
     it("should export the `environment` module", () => {

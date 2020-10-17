@@ -7,11 +7,12 @@ module.exports = {
     get Environment () {return require("./lib/environment")},
     
     stores: {
-        get Null    () {return require('./lib/stores/null')},
+        get Empty   () {return require('./lib/stores/empty')},
         get Memory  () {return require('./lib/stores/memory')},
         get File    () {return require('./lib/stores/file')},
         get FS      () {return require('./lib/stores/fs')},
         get HTTP    () {return require('./lib/stores/http')},
+        get Router  () {return require('./lib/stores/router')},
     },
     
     servers: {

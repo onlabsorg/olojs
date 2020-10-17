@@ -1,14 +1,24 @@
-olojs.protocols.http & olojs.protocols.https
+HTTPStore
 ============================================================================
-This protocol handles read/write operations on remote olo-documents
+This store handles read/write operations on remote olo-documents
 via HTTP(S).
+```js
+httpStore = new HTTPStore(rootURL, options)
+```
+
+- `rootURL` is the base URL that will be prepended to the paths passed to
+  the `get`, `set` and `delete` methods.
+- `options.headers` are custom headers that will be added to every HTTP
+  request.
+- `httpStore` is an object that exposes the standard olojs store API: `get`,
+  `set` and `delete`.
   
-olojs.protocols.http.get & olojs.protocols.https.get
+HTTPStore.prototype.get - async method
 ------------------------------------------------------------------------
 Retrieves a remote olo-document via HTTP GET (HTTPS GET).
 
 ```js
-const source = await olojs.protocols.http.get("//hostname/path/to/doc")
+const source = await httpStore.get("/path/to/doc")
 ```
 
 - On 200 status code, returns the response body as string
@@ -17,12 +27,12 @@ const source = await olojs.protocols.http.get("//hostname/path/to/doc")
 - On 405 status code, throws an OperationNotAllowed error
 - On any other status code, throws a generic error
   
-olojs.protocols.http.set & olojs.protocols.https.set
+HTTPStore.prototype.set - async method
 ------------------------------------------------------------------------
 Modifies a remote olo-document via HTTP PUT (HTTPS PUT).
 
 ```js
-await olojs.protocols.http.set("//hostname/path/to/doc", source)
+await httpStore.set("/path/to/doc", source)
 ```
 
 - On 200 and 201 status code, returns
@@ -30,12 +40,12 @@ await olojs.protocols.http.set("//hostname/path/to/doc", source)
 - On 405 status code, throws an OperationNotAllowed error
 - On any other status code, throws a generic error
   
-olojs.protocols.http.delete & olojs.protocols.https.delete
+HTTPStore.prototype.delete - async method
 ------------------------------------------------------------------------
 Modifies a remote olo-document via HTTP DELETE (HTTPS DELETE).
 
 ```js
-await olojs.protocols.http.delete("//hostname/path/to/doc")
+await httpStore.delete("/path/to/doc")
 ```
 
 - On 200 status code, returns
