@@ -1,5 +1,5 @@
 const BrowserEnvironment = require('./browser-environment');
-const olonv = window.olonv = BrowserEnvironment({
+const olonv = window.olonv = new BrowserEnvironment({
     origin: location.origin,
     globals: {}
 });

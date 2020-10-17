@@ -1,13 +1,16 @@
 const olojs = require("../browser");
 
 
-module.exports = (options={}) => olojs.Environment({
-    protocols: olojs.protocols,
-    routes: {
-        '/': `${options.origin}/env`
-    },
-    globals: Object.assign({}, defaultGlobals, Object(options.globals))
-});
+
+class BrowserEnvironment extends olojs.Environment {
+    
+    constructor (options={}) {
+        super({
+            store: new olojs.stores.HTTP(`${options.origin}/env`),
+            globals: Object.assign({}, defaultGlobals, Object(options.globals))
+        })
+    }
+}
 
 
 const defaultGlobals = {

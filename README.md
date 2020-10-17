@@ -62,16 +62,9 @@ rendering = await document.render(namespace);     // "x*y = 20"
 Create a shared [environment](./docs/api/environment.md) for your documents:
 
 ```js
-const {Environment, protocols} = require('@onlabsorg/olojs');
+const {Environment, stores} = require('@onlabsorg/olojs');
 const environment = new Environment({
-    protocols: {
-        "file": protocols.file,
-        "http": protocols.http
-    },
-    routes: {
-        "/": "file:/home/username",
-        "/mnt/remote-repo": "http://remote-repo/docs"
-    },
+    store: new olojs.stores.FileStore('/home/username'),   // where the documents are stored
     globals: {
         // global names shared by all the documents in this environment
     }
@@ -81,7 +74,7 @@ const environment = new Environment({
 Retrieve and render a document from your environment:
 
 ```js
-const doc1 = await environment.readDocument("/path/to/doc1");    // document at file:/home/username/path/to/doc1
+const doc1 = await environment.readDocument("/path/to/doc1");    // document at /home/username/path/to/doc1
 const doc1_context = doc1.createContext({x:10});
 const doc1_namespace = await doc1.evaluate(context);
 const doc1_rendering = await environment.render(doc1);
@@ -124,9 +117,11 @@ server.listen(8010);
 * Learn the [expression](./docs/api/expression.md) module API
 * Learn the [document](./docs/api/document.md) module API
 * Learn the [environment](./docs/api/environment.md) module API
-* Learn the [file protocol](./docs/api/file-protocol.md) module API
-* Learn the [fs protocol](./docs/api/fs-protocol.md) module API
-* Learn the [http protocol](./docs/api/http-protocol.md) module API
+* Learn the [file store](./docs/api/file-store.md) module API
+* Learn the [fs store](./docs/api/fs-store.md) module API
+* Learn the [http store](./docs/api/http-store.md) module API
+* Learn the [memory store](./docs/api/memory-store.md) module API
+* Learn the [router store](./docs/api/router-store.md) module API
 * Learn the [http server](./docs/api/http-server.md) module API
 
 

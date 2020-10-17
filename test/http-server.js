@@ -4,45 +4,45 @@ var pathlib = require("path");
 var document = require("../lib/document");
 var Environment = require("../lib/environment");
 var HTTPServer = require("../lib/servers/http");
+var EmptyStore = require("../lib/stores/empty");
+var MemoryStore = require("../lib/stores/memory");
+var Router = require("../lib/stores/router");
 var storeErrors = require("../lib/stores/store-errors");
 require("isomorphic-fetch");
 
 describe("HTTPServer", () => {
     
     describe("Default HTTP server", () => {
-        var store, env, server;
+        var homeStore, env, server;
         
         before((done) => {
-            store = new Map();
-            env = Environment({
-                protocols: {
-                    home: {
-                        get: path => store.get(pathlib.join('/', path)) || "",
-                        set: (path, source) => store.set(pathlib.join('/', path), source),
-                        delete: (path, source) => store.delete(pathlib.join('/', path)),
-                    } ,
-                    prv: {
-                        get: path => {throw new storeErrors.PermissionDenied('GET', path)},
-                        set: path => {throw new storeErrors.PermissionDenied('SET', path)},
-                        delete: path => {throw new storeErrors.PermissionDenied('DELETE', path)},
-                    } ,
-                    hid: {
-                        get: path => {throw new storeErrors.OperationNotAllowed('GET', path)},
-                        set: path => {throw new storeErrors.OperationNotAllowed('SET', path)},
-                        delete: path => {throw new storeErrors.OperationNotAllowed('DELETE', path)},
-                    } ,
-                    err: {
-                        get: path => {throw new Error()},
-                        set: path => {throw new Error()},
-                        delete: path => {throw new Error()},
-                    } ,
-                },
-                routes: {
-                    '/': "home:/",
-                    '/private': "prv:/",
-                    '/hidden': "hid:/",
-                    '/error': "err:/",
-                }
+            
+            class PrivateStore extends EmptyStore {
+                get (path) {throw new storeErrors.PermissionDenied('GET', path)}
+                set (path,src) {throw new storeErrors.PermissionDenied('SET', path)}
+                delete (path) {throw new storeErrors.PermissionDenied('DELETE', path)}
+            }
+            
+            class NotAllowedStore extends EmptyStore {
+                get (path) {throw new storeErrors.OperationNotAllowed('GET', path)}
+                set (path, src) {throw new storeErrors.OperationNotAllowed('SET', path)}
+                delete (path) {throw new storeErrors.OperationNotAllowed('DELETE', path)}
+            }
+            
+            class ErrorStore extends EmptyStore {
+                get (path) {throw new Error()}
+                set (path, src) {throw new Error()}
+                delete (path) {throw new Error()}
+            }
+            
+
+            env = new Environment({
+                store: new Router({
+                    home: (homeStore = new MemoryStore()),
+                    private: new PrivateStore(),
+                    hidden: new NotAllowedStore(),
+                    error: new ErrorStore(),
+                })
             });
             server = HTTPServer(env);
             server.listen(8888, done);
@@ -53,9 +53,9 @@ describe("HTTPServer", () => {
             it("should return the document source mapped to path by the passed loader", async () => {
                 var docPath = "/path/to/doc1";
                 var docSource = "document source ...";
-                store.set(docPath, docSource);
+                await homeStore.set(docPath, docSource);
                 
-                var response = await fetch(`http://localhost:8888/env${docPath}`, {
+                var response = await fetch(`http://localhost:8888/env/home/${docPath}`, {
                     method: 'get',
                     headers: {
                         'Accept': 'text/*'
@@ -101,9 +101,9 @@ describe("HTTPServer", () => {
             it("should modify the resource and return 200", async () => {
                 var docPath = "/path/to/doc1";
                 var docSource = "document source ...";
-                store.set(docPath, docSource);
+                homeStore.set(docPath, docSource);
                 
-                var response = await fetch(`http://localhost:8888/env${docPath}`, {
+                var response = await fetch(`http://localhost:8888/env/home/${docPath}`, {
                     method: 'put',
                     headers: {
                         'Accept': 'text/*',
@@ -113,7 +113,7 @@ describe("HTTPServer", () => {
                 });
                 
                 expect(response.status).to.equal(200);
-                expect(store.get(docPath)).to.equal("new document source ...")
+                expect(homeStore.get(docPath)).to.equal("new document source ...")
             });
             
             it("should return the status code 403 if the backend environment throws PermissionDenied", async () => {
@@ -158,9 +158,9 @@ describe("HTTPServer", () => {
             it("should remove the resource and return 200", async () => {
                 var docPath = "/path/to/doc1";
                 var docSource = "document source ...";
-                store.set(docPath, docSource);
+                homeStore.set(docPath, docSource);
                 
-                var response = await fetch(`http://localhost:8888/env${docPath}`, {
+                var response = await fetch(`http://localhost:8888/env/home/${docPath}`, {
                     method: 'delete',
                     headers: {
                         'Accept': 'text/*',
@@ -169,7 +169,7 @@ describe("HTTPServer", () => {
                 });
                 
                 expect(response.status).to.equal(200);
-                expect(store.has(docPath)).to.be.false;
+                expect(homeStore.get(docPath)).to.equal("");
             });
             
             it("should return the status code 403 if the backend environment throws PermissionDenied", async () => {
@@ -234,14 +234,8 @@ describe("HTTPServer", () => {
         before((done) => {
             customPublicPath = pathlib.resolve(__dirname, "./public");
 
-            store = new Map();
-            env = Environment({
-                protocols: {
-                    home: (...paths) => store.get(pathlib.join('/', ...paths)) || "" ,
-                },
-                routes: {
-                    '/': "home:/"
-                }
+            env = new Environment({
+                store: (store = new MemoryStore())
             });
             server = HTTPServer(env, {
                 publicPath: customPublicPath

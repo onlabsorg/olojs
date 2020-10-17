@@ -50,5 +50,5 @@ describe("olojs", () => {
     require("./document");
     require("./stores");
     require("./environment");
-    // require("./http-server");    
+    require("./http-server");    
 });
