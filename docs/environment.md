@@ -14,12 +14,14 @@ parameters:
 - A store object
 
 >   Stores are objects that expose a simple `get`, `set`, `delete` interface.
+>     
 >   olojs comes with a few predefined stores: 
 >   * [olojs.stores.Memory](./api/memory-store.md)
 >   * [olojs.stores.File](./api/file-store.md)
 >   * [olojs.stores.FS](./api/fs-store.md)
 >   * [olojs.stores.HTTP](./api/http-store.md)
 >   * [olojs.stores.Router](./api/router-store.md)
+>     
 >   You can create your own stores by extending `olojs.stores.Empty`.
 
 Example:
