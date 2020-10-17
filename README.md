@@ -76,7 +76,7 @@ Retrieve and render a document from your environment:
 ```js
 const doc1 = await environment.readDocument("/path/to/doc1");    // document at /home/username/path/to/doc1
 const doc1_context = doc1.createContext({x:10});
-const doc1_namespace = await doc1.evaluate(context);
+const doc1_namespace = await doc1.evaluate(doc1_context);
 const doc1_rendering = await environment.render(doc1);
 ```
 
@@ -85,7 +85,7 @@ Let's say that we have the following two document in `environment`:
 * `/path/to/doc1`: `<% y=2 %>`
 * `/path/to/doc2`: `<% doc1 = import './doc1'%>x*y = <% x * doc1.y %>`
 
-Then once evaluated, doc2 will return the following namespace
+Once evaluated, doc2 will return the following namespace
 
 ```js
 {

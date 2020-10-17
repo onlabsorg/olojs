@@ -11,8 +11,16 @@ In order to create an environment, you need to provide the following
 parameters:
 
 - A global context to be shared by all the documents
-- One or more protocols for accessing documents
-- Optionally, one or more shortcut routes for document locations
+- A store object
+
+>   Stores are objects that expose a simple `get`, `set`, `delete` interface.
+>   olojs comes with a few predefined stores: 
+>   * [olojs.stores.Memory](./api/memory-store.md)
+>   * [olojs.stores.File](./api/file-store.md)
+>   * [olojs.stores.FS](./api/fs-store.md)
+>   * [olojs.stores.HTTP](./api/http-store.md)
+>   * [olojs.stores.Router](./api/router-store.md)
+>   You can create your own stores by extending `olojs.stores.Empty`.
 
 Example:
 
@@ -22,12 +30,7 @@ environment = olojs.Environment({
     globals: {
         environmentName = "demo"
     },
-    protocols: {
-        file: olojs.protocols.file
-    },
-    routes: {
-        '/': 'file:/home/user/env-demo-documents'
-    }
+    store: new olojs.stores.File('/home/username')
 });
 ```
 
