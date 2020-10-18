@@ -42,7 +42,7 @@ olonv.init = rootElement => new Vue({
 function normalizeHash () {
 
     if (!location.hash || location.hash === "#") {
-        location.hash = "/index"
+        location.hash = "/home/index"
     }
     
     let [docPath, docArgs] = location.hash.slice(1).split("?"); 

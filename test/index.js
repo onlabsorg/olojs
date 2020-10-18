@@ -39,7 +39,7 @@ describe("olojs", () => {
     it("should export the `environment` module", () => {
         expect(olojs.Environment).to.equal(require("../lib/environment"));
     });
-    
+
     require("./expression");
     require("./stdlib");    
     require("./document");

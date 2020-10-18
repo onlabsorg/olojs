@@ -4,7 +4,7 @@ module.exports = {
     get expression      () {return require("./lib/expression")},
     get document        () {return require("./lib/document")},
     
-    get Environment () {return require("./lib/environment")},
+    get Environment     () {return require("./lib/environment")},
     
     stores: {
         get Empty   () {return require('./lib/stores/empty')},
