@@ -1,8 +1,5 @@
-const BrowserEnvironment = require('./browser-environment');
-const olonv = window.olonv = new BrowserEnvironment({
-    origin: location.origin,
-    globals: {}
-});
+const BrowserEnvironment = require('../lib/browser-environment');
+const olonv = window.olonv = new BrowserEnvironment(`${location.origin}/env`);
 
 const Vue = require("vue/dist/vue.js");
 const DOMPurify = require("dompurify");

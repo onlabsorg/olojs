@@ -9,5 +9,5 @@ const server = olojs.servers.http(env);
 
 server.listen(8888, () => {
     console.log("olojs http server listening on port 8888");
-    console.log("visit http://localhost:8888/ in your browser");
+    console.log("visit http://localhost:8888/#/home/index in your browser");
 });

@@ -15,7 +15,7 @@ parameters:
 
 >   Stores are objects that expose a simple `get`, `set`, `delete` interface.
 >     
->   olojs comes with a few predefined stores: 
+>   olojs comes with a few predefined stores:
 >   * [olojs.stores.Memory](./api/memory-store.md)
 >   * [olojs.stores.File](./api/file-store.md)
 >   * [olojs.stores.FS](./api/fs-store.md)
