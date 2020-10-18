@@ -1,5 +1,19 @@
-const BrowserEnvironment = require('../lib/browser-environment');
-const olonv = window.olonv = new BrowserEnvironment(`${location.origin}/env`);
+const olojs = require('../browser');
+
+const olonv = window.olonv = new olojs.Environment ({
+    
+    store: new olojs.stores.HTTP(`${location.origin}/env`),
+    
+    globals: {
+        $renderError (error) {
+            return `<pre class="runtime-error">` +
+                        `<div class="message">${escape(error.message)}</div>` +
+                        `<br>` +
+                        `<div class="source">${escape(error.source)}</div>` +
+                   `</pre>`;
+        }                    
+    }
+});
 
 const Vue = require("vue/dist/vue.js");
 const DOMPurify = require("dompurify");
@@ -39,10 +53,23 @@ olonv.init = rootElement => new Vue({
 });
 
 
+
+// -----------------------------------------------------------------------------
+//  SERVICE FUNCTIONS
+// -----------------------------------------------------------------------------
+
+const escape = html => html
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+
 function normalizeHash () {
 
     if (!location.hash || location.hash === "#") {
-        location.hash = "/home/index"
+        location.hash = "/index"
     }
     
     let [docPath, docArgs] = location.hash.slice(1).split("?"); 

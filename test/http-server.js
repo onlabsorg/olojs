@@ -265,30 +265,4 @@ describe("HTTPServer", () => {
             server.close(done);
         });        
     });
-
-    describe("HTTPServer with custom `options.envRoute` path", () => {
-        var store, env, server, customPublicPath;
-        
-        before((done) => {
-            customPublicPath = pathlib.resolve(__dirname, "./public");
-
-            env = new Environment({
-                store: (store = new MemoryStore())
-            });
-            server = HTTPServer(env, {
-                envRoute: '/e'
-            });
-            server.listen(8888, done);
-        });                    
-        
-        it("should delegate tho the environment the requests with path starting with `envPath`", async () => {
-            await store.set('/path/to/doc', "doc source @ /path/to/doc");
-            var response = await fetch(`http://localhost:8888/e/path/to/doc`);
-            expect(response.status).to.equal(200);
-            expect(await response.text()).to.equal("doc source @ /path/to/doc");
-        });
-        after((done) => {
-            server.close(done);
-        });        
-    });
 });
