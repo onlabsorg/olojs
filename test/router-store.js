@@ -15,6 +15,7 @@ describe("RouterStore", () => {
         
         it("should delegate to the matching mounted store", async () => {
             var store1 = new MemoryStore();
+            store1.set('/', "doc @ /")
             store1.set('/path/to/doc', "doc @ store1");
             var store2 = new MemoryStore();
             store2.set('/path/to/doc', "doc @ store2");
@@ -24,6 +25,7 @@ describe("RouterStore", () => {
             });
             expect(await router.get('/s1/path/to/doc')).to.equal("doc @ store1");
             expect(await router.get('/s2/path/to/doc')).to.equal("doc @ store2");
+            expect(await router.get('/s1/')).to.equal("doc @ /");
         });
         
         it("should return an empty document if no match is found", async () => {
