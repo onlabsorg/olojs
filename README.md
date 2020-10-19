@@ -132,3 +132,11 @@ server.listen(8010);
 
 ### License
 [MIT](https://opensource.org/licenses/MIT)
+
+### Related projects
+* [olojs-cli] is a command line interface for managing olojs repositories. It 
+  allows creating a new local repo, mounting external (local or remote) repos 
+  and serving the repo via internet. 
+
+
+[olojs-cli]: https://github.com/onlabsorg/olojs-cli

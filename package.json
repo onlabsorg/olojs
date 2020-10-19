@@ -1,6 +1,6 @@
 {
   "name": "@onlabsorg/olojs",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "description": "javascript library that allows concurrent editing of JSON objects",
   "homepage": "https://github.com/onlabsorg/olojs#readme",
   "bugs": {
@@ -16,8 +16,8 @@
   "scripts": {
     "develop": "webpack --mode development --watch",
     "test": "mocha test/index.js",
-    "test-server": "node test/server.js",
     "browser-tests": "node test/browser/run-tests.js",
+    "client-test": "node test/client.js",
     "build": "webpack --mode production",
     "build-docs": "bin/build-docs"
   },
