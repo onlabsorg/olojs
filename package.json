@@ -36,6 +36,7 @@
     "isomorphic-fetch": "^3.0.0",
     "marked": "^0.8.0",
     "mkdirp": "^1.0.4",
+    "trash": "^6.1.1",
     "uri-js": "^4.4.0",
     "vue": "^2.6.11"
   }
