@@ -113,14 +113,9 @@ describe("FSStore", () => {
             expect(await fsStore.get(`/path/to/doc1`)).to.equal("");
         });
         
-        it("should throw an OperationNotAllowed error when a directory path is given", async () => {
-            try {
-                await fsStore.delete(`/path/to/`, "new .olo @ /path/to/");
-                throw new Error("It did not throw");
-            } catch (error) {
-                expect(error).to.be.instanceof(errors.OperationNotAllowed);
-                expect(error.message).to.equal(`Operation not allowed: DELETE /path/to/`);
-            }
+        it("should remove the entire directory if the path ends with a '/'", async () => {
+            await fsStore.delete(`/path/to/`, "new .olo @ /path/to/");
+            expect(fs.existsSync(`${ROOT_PATH}/path/to/`)).to.be.false;
         });
     });
 });
