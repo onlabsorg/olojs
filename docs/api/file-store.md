@@ -37,8 +37,8 @@ await fileStore.set("/path/to/doc", source);
 - When the file that doesn't exist, it will be created
   
 fileStore.delete - async method
-----------------------------------------------------------------------------
-Deletes a `.olo` file given its absolute path.
+------------------------------------------------------------------------
+Moves a `.olo` file to the trash bin, given its absolute path.
 ```js
 await fileStore.delete("/path/to/doc");
 ```

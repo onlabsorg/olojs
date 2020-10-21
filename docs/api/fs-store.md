@@ -59,6 +59,7 @@ await fsStore.delete("/path/to/doc");
 
 - If path is `/path/to/doc`, the file `/path/to/doc.olo` will be deleted
 - When the file that doesn't exist, it will return silently
-- If path is `/path/to/dir/`, it trows an `OperationNotAllowed` error.
+- If path is `/path/to/dir/`, will move the entire directory to the
+  trash bin.
   
 
