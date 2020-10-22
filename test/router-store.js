@@ -51,7 +51,7 @@ describe("RouterStore", () => {
             });
             var doc = await router.get(`/`);
             var docns = await document.parse(doc)(document.createContext());
-            expect(docns.children.sort()).to.deep.equal(["/s1/", "/s2/"]);
+            expect(docns.children.sort()).to.deep.equal(["s1/", "s2/"]);
             
         });
     });
