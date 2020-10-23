@@ -798,9 +798,9 @@ describe("expression", () => {
                 var items = await evaluate("enum ns", ctx);
                 expect(isTuple(items)).to.be.true;
                 expect(Array.from(items)).to.deep.equal([
+                    {name:'z', value:3},
                     {name:'x', value:1},
                     {name:'y', value:2},
-                    {name:'z', value:3},
                 ]);
             });
 
@@ -810,7 +810,7 @@ describe("expression", () => {
                 await evaluate("ns1 = {z=3, x=1, y=2}", ctx);
                 var items1 = await evaluate("enum ns1", ctx);
 
-                await evaluate("ns2 = {x=1, y=2, z=3}", ctx);
+                await evaluate("ns2 = {z=3, x=1, y=2}", ctx);
                 var items2 = await evaluate("enum ns2", ctx);
                 
                 expect(Array.from(items1)).to.deep.equal(Array.from(items2));
