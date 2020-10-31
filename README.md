@@ -1,16 +1,15 @@
 # olojs
 
-`olojs` is a distributed content management framework whose unit of content is
-called an `olo-document`.
+`olojs` is a content management system based on a distributed network of
+interdependent documents called `olo-documents` or `olo-docs`.
 
-An olo-document is a template with [swan](./docs/swan.md) inline expressions: it 
-renders to the text obtained by replacing the inline expressions with their
-values.
+An olo-document contains both narrative content and data. The document source is 
+a template with [swan] inline expressions that can be evaluated and rendered;
 
-A particular type of expression is the assignment `<% name = value %>` which
-renders to an empty string and maps a name to a value (a number, a string, 
-a function, etc.). Names can be reused within the same document or imported and 
-then used by other documents.
+- once the document is evaluated, it returns the swan namespace, which is an 
+  object containing all the variables defined by the inline expressions;
+- once the document is rendered, it returns the text obtained by replacing the 
+  inline expressions with their result values
 
 The following example of olo-document may clarify the concept:
 
@@ -34,7 +33,8 @@ software movement.
 <% einstein = import("./albert-einstein") %>
 
 Three centuries later <% einstein.name %> could freely use Newton's work and the
-work of many other scientists like him to formulate his well known relativity theory.
+work of many other scientists like him to formulate his well known theory of
+relativity.
 ```
 
 ### Getting started
@@ -80,7 +80,7 @@ const doc1_namespace = await doc1.evaluate(doc1_context);
 const doc1_rendering = await environment.render(doc1);
 ```
 
-Let's say that we have the following two document in `environment`:
+Let's say that we have the following two documents in `environment`:
 
 * `/path/to/doc1`: `<% y=2 %>`
 * `/path/to/doc2`: `<% doc1 = import './doc1'%>x*y = <% x * doc1.y %>`
@@ -112,7 +112,6 @@ server.listen(8010);
 ### Learn more
 * Learn more about [olojs environments](./docs/environment.md)
 * Learn more about [olojs documents](./docs/document.md)
-* Learn the [swan expression language](./docs/swan.md)
 * Learn the [standard swan library](./docs/stdlib.md) swan API
 * Learn the [expression](./docs/api/expression.md) module API
 * Learn the [document](./docs/api/document.md) module API
@@ -128,7 +127,7 @@ server.listen(8010);
 ### Test 
 * Test olojs in nodejs: `npm test`  
 * Test olojs in the browser: `npm run browser-tests`  
-* Test the browser rendering app: `npm run test-server`
+* Test the browser rendering app: `npm run client-test`
 
 ### License
 [MIT](https://opensource.org/licenses/MIT)
@@ -140,3 +139,4 @@ server.listen(8010);
 
 
 [olojs-cli]: https://github.com/onlabsorg/olojs-cli
+[swan]: https://github.com/onlabsorg/swan-js/blob/main/docs/swan.md

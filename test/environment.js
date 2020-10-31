@@ -98,13 +98,15 @@ describe("Environment class", () => {
         
         describe("context = doc.createContext(...namespace)", () => {
             
-            it("should return a context", async () => {
+            it("should return a document context", async () => {
                 var env = new Environment();
                 var doc = env.createDocument('/', "...");
+                var docContextPrototype = document.createContext();
                 var docContext = doc.createContext();
-
-                var rootContext = Object.getPrototypeOf(document.expression.createContext());
-                expect(rootContext.isPrototypeOf(docContext)).to.be.true;
+                
+                for (let name in docContextPrototype) {
+                    expect(docContext[name]).to.equal(docContextPrototype[name]);
+                }
             });
             
             it("should contain the names contained in the passed namespaces", async () => {

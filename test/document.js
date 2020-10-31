@@ -29,7 +29,8 @@ describe("document", () => {
                 var evaluate = document.parse(source);
                 var context = expression.createContext({});
                 var docNS = await evaluate(context);
-                expect(docNS).to.deep.equal({a:10, b:20, __str__:"a + b = 30"});                
+                expect(docNS.__str__).to.be.a("function");
+                expect(docNS).to.deep.equal({a:10, b:20, __str__:docNS.__str__});
             });
             
             it("should stringify to a text obtained replacing the swan expressions with their return value", async () => {
@@ -37,7 +38,7 @@ describe("document", () => {
                 var evaluate = document.parse(source);
                 var context = expression.createContext();
                 var docNS = await evaluate(context);
-                expect(expression.stringify(docNS)).to.equal("a + b = 30");                
+                expect(await expression.stringify(docNS)).to.equal("a + b = 30");                
             });
 
             it("should return context.$renderError when an expression throws an error", async () => {
@@ -48,7 +49,8 @@ describe("document", () => {
                     $renderError: error => "<ERR!>"
                 }).$extend({});
                 var docNS = await evaluate(context);
-                expect(docNS).to.deep.equal({a:10, __str__:"<ERR!>"})
+                expect(docNS.a).to.equal(10);
+                expect(await docNS.__str__(docNS)).to.equal("<ERR!>");
             });            
         });        
     });
@@ -78,9 +80,11 @@ describe("document", () => {
     describe("context = document.createContext(namespace)", () => {
         
         it("should be an expression context", () => {
-            var expContext = Object.getPrototypeOf(expression.createContext());
+            var expContext = expression.createContext();
             var docContext = document.createContext();
-            expect(expContext.isPrototypeOf(docContext)).to.equal(true);
+            for (let name in expContext) {
+                expect(docContext[name]).to.equal(expContext[name]);
+            }
         });
         
         it("should contain a $renderError function", () => {

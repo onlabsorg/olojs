@@ -1,6 +1,6 @@
 olojs.expression
 ============================================================================
-This module contains function for parsing and evaluation swan expressions.
+This module contains functions for parsing and evaluation swan expressions.
 
 Example:
 ```js

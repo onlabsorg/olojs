@@ -3,7 +3,7 @@ olojs documents
 
 An olo-document is a text template like [Mustache](https://mustache.github.io/),
 [EJS](https://ejs.co/), [Handlebars](https://handlebarsjs.com/), etc. A document
-source template is just plain text containing [swan](./swan.md) expressions
+source template is just plain text containing [swan] expressions
 enclosed between `<%` and `%>` which gets replaced with the expression result
 value once the document is rendered.  
 
@@ -19,27 +19,24 @@ will render to
 The sum of 1 and 2 is 3.
 ```
 
-A particular type of expression is the assignment `<% name = value %>` which
-renders to an empty string but maps a name to a value (a number, a string, a 
-function, etc.). Once defined, names can be reused within the same document.
+A particular type of [swan] expression is the assignment `<% name = value %>` 
+which renders to an empty string but maps a name to a value (a number, a string, 
+a function, etc.). Once defined, names can be reused within the same document.
 
 For example, the following template
 
 ```
-<% x=2 %>The sum of 1 and <% x %> is <% 1+x %>.
+<% x=20 %>The sum of 10 and <% x %> is <% 10+x %>.
 ```
 
 will render to
 
 ```
-The sum of 1 and 2 is 3.
+The sum of 10 and 20 is 30.
 ```
 
 This is almost all you need to know about the olo-documents markup. It's pretty
-straight forward, but yet powerful due to the fact that [swan] is
-a touring-complete expression language which can produce any kind of output you
-can imagine.
-
+straight forward and yet powerful, due to the flexibility of the [swan] language.
 
 
 Rendering documents
@@ -97,4 +94,4 @@ The final rendering of doc2 will therefore be: `2 * x = 20`.
 
 
 
-[swan]: ./swan.md
+[swan]: https://github.com/onlabsorg/swan-js/blob/main/docs/swan.md
