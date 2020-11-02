@@ -27,6 +27,7 @@ html, body {
 
 .olo-viewer .runtime-error .source {
     font-size: 0.8em;
+    padding-bottom: 1em;
 }
 
 @media (max-width: 480px) { 

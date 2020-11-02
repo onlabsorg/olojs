@@ -1,3 +1,42 @@
+html, body {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: block;
+    margin: 0 auto;
+    background-color: #FFFFFF;
+    line-height: 1.4;
+}
+
+.olo-viewer {
+    display: block;
+    padding: 2em 20%;
+}
+
+.olo-viewer .runtime-error {
+    font-family: "monospace";
+    border: 1px solid #D32F2F;
+    color: #D32F2F;
+}
+
+.olo-viewer .runtime-error .message {
+    font-size: 1em;
+}
+
+.olo-viewer .runtime-error .source {
+    font-size: 0.8em;
+    padding-bottom: 1em;
+}
+
+@media (max-width: 480px) { 
+    .olo-viewer {
+        padding-left: 3%;
+        padding-right: 3%;
+    }
+}
+
 
 @font-face {
     font-family: "Ubuntu";
