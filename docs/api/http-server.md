@@ -20,7 +20,6 @@ respond with the JSON-serialized array returned by
 
 On `GET /env/paht/to/doc` requsts accepting neither `text/*` nor
 `application/json`, it will respond with a `415` error code.
-`environment.listEntries("/path/to/doc")`.
   
 On `GET /` requsts it will respond with a single page application that 
 loads and fetches the document mapped to the hash.
@@ -47,7 +46,6 @@ expressApp.use(mountPath, middleware);
   `environment.listEntries("/path/to/doc")`.
 - On `GET /env/paht/to/doc` requsts accepting neither `text/*` nor
   `application/json`, it will respond with a `415` error code.
-  `environment.listEntries("/path/to/doc")`.
 - On `PUT /env/paht/to/doc` requsts it will execute the 
   `environment.writeDocument("/path/to/doc", body)` method.
 - On `DELETE /env/paht/to/doc` requsts it will execute the 
