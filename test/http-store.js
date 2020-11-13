@@ -25,31 +25,38 @@ describe("HTTPStore", () => {
         var express = require("express");
         var bodyParser = require("body-parser");
         var app = express();
-        app.all( "/private/*", (req, res, next) => {
+        app.all("/private/*", (req, res, next) => {
             res.status(403).send(`Permission denied for access to document at ${req.path}`);
         });      
-        app.all( "/hidden/*", (req, res, next) => {
+        app.all("/hidden/*", (req, res, next) => {
             res.status(405).send(`Operation not define for document at ${req.path}`);
         });                        
-        app.all( "/error/*", (req, res, next) => {
+        app.all("/error/*", (req, res, next) => {
             res.status(500).send(`An error occurred while retrieving the document at ${req.path}`);
         });
-        app.all( "/echo-hdr/*", (req, res, next) => {
+        app.all("/echo-hdr/*", (req, res, next) => {
             TestHeader = req.get('Test');
             res.status(200).send();
         })
-        app.delete( "*", async (req, res, next) => {
+        app.get("*", async (req, res, next) => {
+            if (req.accepts('application/json')) {
+                res.status(200).json(await fileStore.list(req.path));
+            } else {
+                res.status(200).send(await fileStore.get(req.path))
+            }
+        });
+        app.delete("*", async (req, res, next) => {
             await fileStore.delete(req.path);
             res.status(200).send();
         });
         app.use(bodyParser.text({
             type: "text/*"
         }));    
-        app.put( "*", async (req, res, next) => {
+        app.put("*", async (req, res, next) => {
             await fileStore.set(req.path, req.body);
             res.status(200).send();
         });
-        app.use( express.static(ROOT_PATH) );
+        app.use(express.static(ROOT_PATH) );
         server = app.listen(8010, done);
     });
     
@@ -57,7 +64,7 @@ describe("HTTPStore", () => {
         
         it("should return the content of the files fetched via HTTP", async () => {
             var httpStore = new HTTPStore("http://localhost:8010");
-            var doc = await httpStore.get("/path/to/doc2.olo");
+            var doc = await httpStore.get("/path/to/doc2");
             expect(doc).to.be.equal("doc2 @ /path/to/");            
         });
         
@@ -104,6 +111,58 @@ describe("HTTPStore", () => {
         });
     });        
     
+    describe("source = await httpStore.list(path)", () => {
+        
+        it("should return the list of the entries under the given path", async () => {
+            var httpStore = new HTTPStore("http://localhost:8010");
+            var entries = await httpStore.list("/path/to/");
+            expect(entries).to.be.an("array");
+            expect(entries.sort()).to.deep.equal(["", "dir/", "doc1", "doc2", "doc3"]);            
+        });
+        
+        it("should throw a PermissionDenied error if the response status is 403", async () => {
+            var httpStore = new HTTPStore("http://localhost:8010");
+            class NoError extends Error {};
+            try {
+                await httpStore.list("/private/path/to/doc");
+                throw new NoError("It did not throw");
+            } catch (error) {
+                expect(error).to.be.instanceof(errors.PermissionDenied);
+                expect(error.message).to.equal("Permission denied: LIST http://localhost:8010/private/path/to/doc");
+            }
+        });
+
+        it("should return an empty array if the response status is 404", async () => {
+            var httpStore = new HTTPStore("http://localhost:8010");
+            var entries = await httpStore.list("/path/to/non/existing/file");
+            expect(entries).to.deep.equal([]);
+        });
+
+        it("should throw an OperationNotAllowed error if the response status is 405", async () => {
+            var httpStore = new HTTPStore("http://localhost:8010");
+            class NoError extends Error {};
+            try {
+                await httpStore.list("/hidden/path/to/doc");
+                throw new NoError();
+            } catch (error) {
+                expect(error).to.be.instanceof(errors.OperationNotAllowed);
+                expect(error.message).to.equal("Operation not allowed: LIST http://localhost:8010/hidden/path/to/doc");
+            }
+        });
+
+        it("should throw an error if the response code is not 2xx", async () => {
+            var httpStore = new HTTPStore("http://localhost:8010");
+            class NoError extends Error {};
+            try {
+                await httpStore.list("/error/path/to/doc");
+                throw new NoError();
+            } catch (error) {
+                expect(error).to.not.be.instanceof(NoError);
+                expect(error.message).to.equal("An error occurred while retrieving the document at /error/path/to/doc");
+            }
+        });
+    });        
+
     describe("await httpStore.set(path, source)", () => {
         
         it("should change the source of the file at the given http url", async () => {
@@ -245,6 +304,7 @@ describe("HTTPStore", () => {
 async function initStore (rootPath) {
     rimraf.sync(`${rootPath}`);
     mkdirp.sync(`${rootPath}/path/to`);
+    mkdirp.sync(`${rootPath}/path/to/dir`);
     fs.writeFileSync(`${rootPath}/doc1.olo`, "doc1 @ /", 'utf8');
     fs.writeFileSync(`${rootPath}/doc2.olo`, "doc2 @ /", 'utf8');
     fs.writeFileSync(`${rootPath}/doc3.olo`, "doc3 @ /", 'utf8');

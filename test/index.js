@@ -24,10 +24,6 @@ describe("olojs", () => {
         expect(olojs.stores.File).to.equal(require("../lib/stores/file"));
     });
     
-    it("should export the `stores/fs` module", () => {
-        expect(olojs.stores.FS).to.equal(require("../lib/stores/fs"));
-    });
-
     it("should export the `stores/http` module exports", () => {
         expect(olojs.stores.HTTP).to.equal(require("../lib/stores/http"));
     });
@@ -48,7 +44,6 @@ describe("olojs", () => {
         require("./empty-store");
         require("./memory-store");
         require("./file-store");
-        require("./fs-store");
         require("./http-store");
         require("./router-store");
     });

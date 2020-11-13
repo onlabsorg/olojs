@@ -14,45 +14,100 @@ describe("RouterStore", () => {
     describe(`source = router.get(path)`, () => {
         
         it("should delegate to the matching mounted store", async () => {
-            var store1 = new MemoryStore();
-            store1.set('/', "doc @ /")
-            store1.set('/path/to/doc', "doc @ store1");
-            var store2 = new MemoryStore();
-            store2.set('/path/to/doc', "doc @ store2");
             var router = new RouterStore({
-                s1: store1,
-                s2: store2
+                "path/to": new MemoryStore({
+                    "/"    : "doc @ store1:/",
+                    "doc"  : "doc @ store1:/path/to/doc"
+                }),
+                "/path/to/store2": new MemoryStore({
+                    "/"             : "doc @ store2:/",
+                    "/path/to/doc"  : "doc @ store2:/path/to/doc"
+                }),
+                "/": new MemoryStore({
+                    "/path/to/doc"  : "doc @ root:/path/to/doc",
+                    "/path_to/doc"  : "doc @ root:/path_to/doc"                    
+                })
             });
-            expect(await router.get('/s1/path/to/doc')).to.equal("doc @ store1");
-            expect(await router.get('/s2/path/to/doc')).to.equal("doc @ store2");
-            expect(await router.get('/s1/')).to.equal("doc @ /");
+            expect(await router.get('/path/to/')).to.equal("doc @ store1:/");
+            expect(await router.get('/path/to/doc')).to.equal("doc @ store1:/path/to/doc");
+            expect(await router.get('/path/to/store2/path/to/doc')).to.equal("doc @ store2:/path/to/doc");
+            expect(await router.get('/path/to/store2/')).to.equal("doc @ store2:/");
+            expect(await router.get('/path_to/doc')).to.equal("doc @ root:/path_to/doc");
         });
         
         it("should return an empty document if no match is found", async () => {
-            var store1 = new MemoryStore();
-            store1.set('/path/to/doc', "doc @ store1");
-            var store2 = new MemoryStore();
-            store2.set('/path/to/doc', "doc @ store2");
             var router = new RouterStore({
-                s1: store1,
-                s2: store2
+                "path/to": new MemoryStore({
+                    "/"    : "doc @ store1:/",
+                    "doc"  : "doc @ store1:/path/to/doc"
+                }),
+                "/path/to/store2": new MemoryStore({
+                    "/"             : "doc @ store2:/",
+                    "/path/to/doc"  : "doc @ store2:/path/to/doc"
+                }),
             });
-            expect(await router.get('/s3/path/to/doc')).to.equal("");
+            expect(await router.get('/path_to/doc')).to.equal("");
         })
-
-        it("should return a document containing the `__children__` list when asking for `/`", async () => {
-            var store1 = new MemoryStore();
-            store1.set('/path/to/doc', "doc @ store1");
-            var store2 = new MemoryStore();
-            store2.set('/path/to/doc', "doc @ store2");
-            var router = new RouterStore({
-                s1: store1,
-                s2: store2
+    });
+    
+    describe(`entries = router.list(path)`, () => {
+        
+        it("should delegate to the matching mounted store", async () => {
+            var memStore = new MemoryStore({
+                "/path/to/doc1": "...",
+                "/path/to/doc2": "...",
+                "/path/to/dir1/": "...",
+                "/path/to/dir1/doc1": "...",
+                "/path/to/dir1/doc2": "...",
+                "/path/to/dir2/": "...",
             });
-            var doc = await router.get(`/`);
-            var docns = await document.parse(doc)(document.createContext());
-            expect(docns.children.sort()).to.deep.equal(["s1/", "s2/"]);
+            var router = new RouterStore({
+                '/stores/mem': memStore
+            })
             
+            expect((await router.list("/stores/mem/path/to/")).sort()).to.deep.equal(['dir1/', 'dir2/', 'doc1', 'doc2']);
+            expect(await router.list("/stores/mem/path/")).to.deep.equal(['to/']);
+            expect(await router.list("/stores/mem/")).to.deep.equal(['path/']);
+            expect(await router.list("/stores/mem")).to.deep.equal(['path/']);
+        });
+
+        it("should return an empty array if no match is found", async () => {
+            var memStore = new MemoryStore({
+                "/path/to/doc1": "...",
+                "/path/to/doc2": "...",
+                "/path/to/dir1/": "...",
+                "/path/to/dir1/doc1": "...",
+                "/path/to/dir1/doc2": "...",
+                "/path/to/dir2/": "...",
+            });
+            var router = new RouterStore({
+                '/stores/mem': memStore
+            })
+            expect(await router.list("/path/to/dir")).to.deep.equal([]);            
+        });
+        
+        it("should include mounted routes in the entries list", async () => {
+            var router = new RouterStore({
+                '/store': new MemoryStore({
+                    "/path/to/doc1": "...",
+                    "/path/to/doc2": "...",
+                }),
+                '/store/path': new MemoryStore({
+                    "/to/doc1": "...",
+                    "/to/doc3": "...",
+                    "/to/dir1/doc": "...",
+                }),
+                '/': new MemoryStore({
+                    "/store/path/to/doc1": "...",
+                    "/store/path/to/doc4": "...",
+                    "/doc5": "...",
+                }),
+                '/store/path/to/dir2/': new MemoryStore(),
+                '/store/path/to/dir2/dir/': new MemoryStore(),
+                '/path/to/dir3': new MemoryStore(),
+            })
+            expect((await router.list("/store/path/to/")).sort()).to.deep.equal(['dir1/', 'dir2/', 'doc1', 'doc2', 'doc3', 'doc4']);                        
+            expect((await router.list("/")).sort()).to.deep.equal(['doc5', 'path/', 'store/']);                        
         });
     });
     
@@ -81,17 +136,6 @@ describe("RouterStore", () => {
                 expect(error.message).to.equal('Operation not allowed: SET /s1/path/to/doc')
             }
         });
-        
-        it("should throw an error if trying to set the root path", async () => {
-            var router = new RouterStore({s1: new MemoryStore()});
-            try {
-                await router.set('/', "...");
-                throw new Error("Id did not throw");
-            } catch (error) {
-                expect(error).to.be.instanceof(errors.OperationNotAllowed);
-                expect(error.message).to.equal('Operation not allowed: SET /')
-            }                                
-        });
     });
     
     describe(`source = router.get(path)`, () => {
@@ -118,16 +162,5 @@ describe("RouterStore", () => {
                 expect(error.message).to.equal('Operation not allowed: DELETE /s1/path/to/doc')
             }                
         })
-
-        it("should throw an error if trying to delete the root path", async () => {
-            var router = new RouterStore({s1: new MemoryStore()});
-            try {
-                await router.delete('/');
-                throw new Error("Id did not throw");
-            } catch (error) {
-                expect(error).to.be.instanceof(errors.OperationNotAllowed);
-                expect(error.message).to.equal('Operation not allowed: DELETE /')
-            }                                
-        });
     });
 });

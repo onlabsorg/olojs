@@ -45,7 +45,28 @@ describe("FileStore", () => {
                 expect(doc).to.equal("");            
             });
         });    
-    });        
+    });       
+    
+    describe("entries = await fileStore.list(path)", () => {
+            
+        it("should return the arrays of the child names of passed path", async () => {
+            var fileStore = new FileStore(ROOT_PATH);
+            var items = await fileStore.list(`/`);
+            expect(items.sort()).to.deep.equal(["doc1", "doc2", "doc3", "path/"]);
+        });
+        
+        it("should discard files that are not .olo documents", async () => {
+            var fileStore = new FileStore(ROOT_PATH);
+            var items = await fileStore.list(`/path/to/`);
+            expect(items.sort()).to.deep.equal(["", "dir/", "doc1", "doc2", "doc3"]);
+        });
+
+        it("should return an empty array if the directory doesn't exist", async () => {
+            var fileStore = new FileStore(ROOT_PATH);
+            var items = await fileStore.list(`/non/existing/dir/index/`);
+            expect(items.sort()).to.deep.equal([]);
+        });
+    }); 
 
     describe("await fileStore.set(path, source)", () => {
         
@@ -111,6 +132,7 @@ describe("FileStore", () => {
 async function initStore (rootPath) {
     rimraf.sync(`${rootPath}`);
     mkdirp.sync(`${rootPath}/path/to`);
+    mkdirp.sync(`${rootPath}/path/to/dir`);
     fs.writeFileSync(`${rootPath}/doc1.olo`, "doc1 @ /", 'utf8');
     fs.writeFileSync(`${rootPath}/doc2.olo`, "doc2 @ /", 'utf8');
     fs.writeFileSync(`${rootPath}/doc3.olo`, "doc3 @ /", 'utf8');
