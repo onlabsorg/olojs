@@ -33,13 +33,13 @@ describe("olojs", () => {
     });
     
     require("./expression");
-    //require("./stdlib");    
+    require("./stdlib");    
     require("./document");
     
     describe("stores", () => {
         require("./empty-store");
         require("./memory-store");
-        //require("./http-store");
+        // require("./http-store");
         require("./router-store");
     });
     

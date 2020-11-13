@@ -2,7 +2,7 @@
 var olojs = require('..');
 
 var env = new olojs.Environment({
-    store: new olojs.stores.FS(`${__dirname}/backend`)
+    store: new olojs.stores.File(`${__dirname}/backend`)
 })
 
 const server = olojs.servers.http(env);

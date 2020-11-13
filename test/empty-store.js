@@ -5,7 +5,7 @@ var errors = require("../lib/stores/store-errors");
 
 describe("EmptyStore", () => {
     
-    describe("source = nullStore.get(path)", () => {
+    describe("source = await nullStore.get(path)", () => {
         
         describe(`when a document path is passed`, () => {
             it("should always return an empty string", async () => {
@@ -25,8 +25,17 @@ describe("EmptyStore", () => {
             });
         });
     });        
+    
+    describe("entries = await nullStore.list(path)", () => {
+        it("should return an empty array", async () => {
+            var nullStore = new EmptyStore();
+            expect(await nullStore.list("/pathh/to/dir1/")).to.deep.equal([]);
+            expect(await nullStore.list("/pathh/to/dir2/")).to.deep.equal([]);
+            expect(await nullStore.list("/pathh/to/../to/doc3/../dir4/")).to.deep.equal([]);            
+        });
+    });
 
-    describe("nullStore.set(path, source)", () => {
+    describe("await nullStore.set(path, source)", () => {
         it("should throw an `OperationNotAllowed` error", async () => {
             var nullStore = new EmptyStore();
             try {
@@ -39,7 +48,7 @@ describe("EmptyStore", () => {
         });
     });        
 
-    describe("nullStore.delete(path)", () => {
+    describe("await nullStore.delete(path)", () => {
         it("should throw an `OperationNotAllowed` error", async () => {
             var nullStore = new EmptyStore();
             try {

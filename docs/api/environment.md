@@ -14,7 +14,7 @@ const environment = olojs.Environment({globals, store})
   the documents repository; it defaults to olojs.stores.Memory.
   
 environment.createDocument - function
---------------------------------------------------------------------
+------------------------------------------------------------------------
 Creates a document object containing the document source and
 methods to evaluate that source to a namespace.
 
@@ -36,7 +36,7 @@ const doc = environment.createDocument(id, source)
   input and returns the document namespace computed in that context
   
 environment.readDocument - async function
---------------------------------------------------------------------
+------------------------------------------------------------------------
 Returns the document mapped to a given id in this environment.
 
 ```js
@@ -49,8 +49,20 @@ const doc = await environment.readDocument(id)
 - `doc` is the document object returned by the `createDocument`
   method.
   
+environment.listEntries - async function
+------------------------------------------------------------------------
+Returns an array containing the entry names of the given directory
+path.
+```js
+entries = await environment.listEntries(id)
+```
+
+- `id` is an URI that identifies the required directory inside this
+  environment.
+- `entries` is the return value of `await environment.store.list(id)`
+  
 environment.writeDocument - async function
---------------------------------------------------------------------
+------------------------------------------------------------------------
 Changes the content of the document mapped to the given id in this
 environment.
 ```js
@@ -63,7 +75,7 @@ await environment.writeDocument(id, source)
 - `source` is the new value to be assigned to the document source
   
 environment.deleteDocument - async function
---------------------------------------------------------------------
+------------------------------------------------------------------------
 Erases the document mapped to the given uri in this environment.
 ```js
 await environment.deleteDocument(id)

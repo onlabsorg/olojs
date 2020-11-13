@@ -1,6 +1,6 @@
 {
   "name": "@onlabsorg/olojs",
-  "version": "0.14.1",
+  "version": "0.15.0",
   "description": "a document-based distributed content management framework",
   "homepage": "https://github.com/onlabsorg/olojs#readme",
   "bugs": {

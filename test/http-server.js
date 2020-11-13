@@ -94,6 +94,31 @@ describe("HTTPServer", () => {
                 });
                 expect(response.status).to.equal(500);                
             });
+
+            it("should respond with the JSON-stringified entries list if the accepted MimeType is `apprication/json`", async () => {
+                var docPath = "/path/to/doc1";
+                var docSource = "document source ...";
+                await homeStore.set(docPath, docSource);
+                
+                var response = await fetch(`http://localhost:8888/env/`, {
+                    method: 'get',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                });
+                expect(response.status).to.equal(200);
+                expect((await response.json()).sort()).to.deep.equal(['error/', 'hidden/', 'home/', 'private/']);
+            });
+
+            it("should return the status code 413 if the accepted MimeType is neither `text/*` nor `application/json`", async () => {
+                var response = await fetch(`http://localhost:8888/env/path/to/img`, {
+                    method: 'get',
+                    headers: {
+                        'Accept': 'image/bmp'
+                    },
+                });
+                expect(response.status).to.equal(415);
+            });
         });
             
         describe("HTTP PUT /env/*", () => {

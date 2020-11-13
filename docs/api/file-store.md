@@ -23,6 +23,19 @@ const source = await fileStore.get("/path/to/doc");
   be returned
 - When requesting a file that doesn't exist, and empty string will be returned
   
+fileStore.list - async method
+----------------------------------------------------------------------------
+Retruns the list of the entry names of a given directory.
+```js
+entries = await fileStore.list("/path/to/dir/");
+```
+
+- If `/path/to/dir` contains the items `doc1.olo`, `doc2.olo` and 
+  `dir/`, then `entries` will be `['doc1', 'doc2', 'dir/']`.
+- The files with an extension different that `.olo` are ignored.
+- A files named `.olo` will result in the entry name `""`
+- When the given directory doesn't exist, `entries` is `[]`
+  
 fileStore.set - async method
 ----------------------------------------------------------------------------
 Modifies the content of a `.olo` file given its absolute path.

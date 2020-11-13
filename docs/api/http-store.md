@@ -27,6 +27,21 @@ const source = await httpStore.get("/path/to/doc")
 - On 405 status code, throws an OperationNotAllowed error
 - On any other status code, throws a generic error
   
+HTTPStore.prototype.list - async method
+------------------------------------------------------------------------
+Retrieves a remote directory content via an HTTP GET requests that
+accepts only JSON as response.
+
+```js
+entries = await httpStore.list("/path/to/doc")
+```
+
+- On 200 status code, returns the response body as json array
+- On 403 status code, throws a PermissionDenied error
+- On 404 status code, return an empty array
+- On 405 status code, throws an OperationNotAllowed error
+- On any other status code, throws a generic error
+  
 HTTPStore.prototype.set - async method
 ------------------------------------------------------------------------
 Modifies a remote olo-document via HTTP PUT (HTTPS PUT).

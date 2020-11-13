@@ -117,7 +117,6 @@ server.listen(8010);
 * Learn the [document](./docs/api/document.md) module API
 * Learn the [environment](./docs/api/environment.md) module API
 * Learn the [file store](./docs/api/file-store.md) module API
-* Learn the [fs store](./docs/api/fs-store.md) module API
 * Learn the [http store](./docs/api/http-store.md) module API
 * Learn the [memory store](./docs/api/memory-store.md) module API
 * Learn the [router store](./docs/api/router-store.md) module API

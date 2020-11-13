@@ -18,7 +18,6 @@ parameters:
 >   olojs comes with a few predefined stores:
 >   * [olojs.stores.Memory](./api/memory-store.md)
 >   * [olojs.stores.File](./api/file-store.md)
->   * [olojs.stores.FS](./api/fs-store.md)
 >   * [olojs.stores.HTTP](./api/http-store.md)
 >   * [olojs.stores.Router](./api/router-store.md)
 >     
