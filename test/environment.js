@@ -287,6 +287,24 @@ describe("Environment class", () => {
         });
     });
     
+    describe("await environment.listEntries(path)", () => {
+        
+        it("should delegate to the store.list method", async () => {
+            class TestStore extends EmptyStore {
+                list (path) {
+                    return path.split('/');
+                }
+            }
+            
+            var env = new Environment({
+                store: new TestStore()
+            });
+            
+            var entries = await env.listEntries("path/to/doc");            
+            expect(entries).to.deep.equal(['path', 'to', 'doc']);
+        });        
+    });
+
     describe("await environment.writeDocument(path, source)", () => {
         
         it("should call the store.set method", async () => {
