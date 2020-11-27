@@ -9,8 +9,7 @@ const olonv = window.olonv = new olojs.Environment ({
             return `<pre class="runtime-error">` +
                         `<div class="message">${escape(error.message)}</div>` +
                         `<br>` +
-                        `<div class="source">${escape(error.source)}</div>` +
-                        `<div class="source">${escape(error.swanStackStr)}</div>` +
+                        `<div class="source">${escape(error.swanStack)}</div>` +
                    `</pre>`;
         }                    
     }
