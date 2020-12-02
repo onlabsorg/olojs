@@ -13,12 +13,6 @@ describe("expression", () => {
                 expect(expContext[name]).to.equal(swanContext[name]);
             }
         });
-        
-        it("should expose the `require` function to load `stdlib` modules", async () => {
-            var context = expression.createContext();
-            expect(context.require).to.be.a("function");
-            expect(await context.require("math")).to.equal(require('../lib/expression/stdlib/math'));
-        });
     });
     
     describe("expression.parse", () => {
