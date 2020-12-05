@@ -30,7 +30,7 @@
     "webpack-cli": "^3.3.12"
   },
   "dependencies": {
-    "@onlabsorg/swan-js": "0.3.x",
+    "@onlabsorg/swan-js": "file:../../../../shortcuts/swan-js",
     "body-parser": "^1.19.0",
     "dompurify": "^2.2.2",
     "express": "^4.17.1",

@@ -10,35 +10,7 @@ var MemoryStore = require("../lib/stores/memory");
 
 
 
-describe("Environment class", () => {
-    
-    it("should contain the passed options.globals object or {}", () => {
-        var globals = {};
-        var env = new Environment({globals});
-        expect(globals.isPrototypeOf(env.globals)).to.be.true;
-        
-        var env = new Environment();
-        expect(Object.keys(env.globals).length).to.equal(1);
-        
-        var globals = [1,2,3];
-        var env = new Environment({globals});
-        expect(globals.isPrototypeOf(env.globals)).to.be.false;
-        expect(Object.keys(env.globals).length).to.equal(1);
-    });
-    
-    it("should contains the passed options.scope or MemoryStore", () => {
-        var store = new EmptyStore;
-        var env = new Environment({store});
-        expect(env.store).to.equal(store);
-        
-        var env = new Environment();
-        expect(env.store).to.be.instanceof(MemoryStore);
-        
-        var store = {get:()=>""};
-        var env = new Environment({store});
-        expect(env.store).to.be.instanceof(MemoryStore);
-        
-    });
+describe("environment = new Environment({store, protocols, globals})", () => {
     
     describe("doc = environment.createDocument(source, presets)", () => {
         
@@ -56,13 +28,22 @@ describe("Environment class", () => {
                 expect(doc.id).to.equal('/path/[ ] to/doc?x=1&y=2');
 
                 var doc = env.createDocument('path/to/./doc?x=1&y=2#ha', "...");
-                expect(doc.id).to.equal('/path/to/doc?x=1&y=2#ha');
+                expect(doc.id).to.equal('/path/to/doc?x=1&y=2');
 
                 var doc = env.createDocument('path/to/./doc#ha', "...");
-                expect(doc.id).to.equal('/path/to/doc#ha');
+                expect(doc.id).to.equal('/path/to/doc');
 
                 var doc = env.createDocument('path/to/./doc/', "...");
                 expect(doc.id).to.equal('/path/to/doc/');
+
+                var doc = env.createDocument('file:/path/to/doc', "...");
+                expect(doc.id).to.equal('file:/path/to/doc');
+
+                var doc = env.createDocument('file:/path/to/doc/../doc2/', "...");
+                expect(doc.id).to.equal('file:/path/to/doc2/');
+
+                var doc = env.createDocument('file:/path/to/doc?x=10', "...");
+                expect(doc.id).to.equal('file:/path/to/doc?x=10');
             });
         });
         
@@ -94,148 +75,6 @@ describe("Environment class", () => {
                 var doc = env.createDocument('/', "...");
                 expect(doc.evaluate).to.equal(doc.evaluate);
             });
-        });
-        
-        describe("context = doc.createContext(...namespace)", () => {
-            
-            it("should return a document context", async () => {
-                var env = new Environment();
-                var doc = env.createDocument('/', "...");
-                var docContextPrototype = document.createContext();
-                var docContext = doc.createContext();
-                
-                for (let name in docContextPrototype) {
-                    expect(docContext[name]).to.equal(docContextPrototype[name]);
-                }
-            });
-            
-            it("should contain the names contained in the passed namespaces", async () => {
-                var env = new Environment();
-                var doc = env.createDocument('/', "...");
-                var context = doc.createContext({x:10, y:20}, {y:30});
-                expect(context.x).to.equal(10);
-                expect(context.y).to.equal(30);
-            });
-            
-            it("should contain the names contained in the `globals` namespaces passed to the environment constructor", () => {
-                var env = new Environment({
-                    globals: {x:10, y:20}
-                });
-                var doc = env.createDocument('/', "...");
-                var context = doc.createContext({y:30});
-                expect(context.x).to.equal(10);
-                expect(context.y).to.equal(30);
-            });
-            
-            it("should contain the names contained in the `presets` namespace", () => {
-                var env = new Environment();
-                var doc = env.createDocument('/', "...", {x:10, y:20});
-                var context = doc.createContext({y:30});
-                expect(context.x).to.equal(10);
-                expect(context.y).to.equal(20);
-            });
-            
-            it("should contain a `argns` object with all the parameters defined in the id query string", () => {
-                var env = new Environment();
-                var doc = env.createDocument('/path/to/doc?x=10&s=abc', "...");
-                var context = doc.createContext();
-                expect(context.argns).to.deep.equal({x:10, s:'abc'});
-            });
-            
-            it("should contain the property `import` mapping to a function", async () => {
-                var env = new Environment({
-                    protocols: {
-                        ppp: {get: path => `Doc source @ ppp:${Path.join('/',path)}`}
-                    }
-                });
-                var doc = await env.createDocument(`/`, "...");
-                var context = doc.createContext();
-                expect(context.import).to.be.a("function");
-            });
-            
-            describe("docNS = context.import(uri, ...namespaces)", () => {
-                
-                it("should load, evaluate and return the namespace of the olo-document mapped to `uri`", async () => {
-                    
-                    class TestStore extends EmptyStore {
-                        get (path) {
-                            return `<% i = "${Path.join('/',path)}" %>`;
-                        }
-                    }                    
-                    
-                    var env = new Environment({
-                        store: new TestStore()
-                    });
-                    var doc1 = env.createDocument(`/path/to/doc1`, '...');
-                    var context1 = doc1.createContext();
-                    var doc2_ns = await context1.import("/path/to/doc2");
-                    expect(doc2_ns.i).to.equal("/path/to/doc2");
-                });                    
-                
-                it("should resolve `uri` relative to the calling document URI", async () => {
-
-                    class TestStore extends EmptyStore {
-                        get (path) {
-                            return `<% i = "${Path.join('/',path)}" %>`;
-                        }
-                    }                    
-
-                    var env = new Environment({
-                        store: new TestStore()
-                    });
-                    var doc1 = await env.createDocument(`/path/to/doc1`, "...");
-                    var context1 = doc1.createContext();
-                    
-                    var doc2_ns = await context1.import("./doc2");
-                    expect(doc2_ns.i).to.equal("/path/to/doc2");
-
-                    var doc3_ns = await context1.import("../to_doc3");
-                    expect(doc3_ns.i).to.equal("/path/to_doc3");
-
-                    var doc4_ns = await context1.import("/path_to/doc4");
-                    expect(doc4_ns.i).to.equal("/path_to/doc4");
-                    
-                    var dir = await env.createDocument(`/path/to/`, "...");
-                    var context2 = dir.createContext();
-                    
-                    var doc5_ns = await context2.import("./doc5");
-                    expect(doc5_ns.i).to.equal("/path/to/doc5");
-
-                    var doc6_ns = await context2.import("../to_doc6");
-                    expect(doc6_ns.i).to.equal("/path/to_doc6");
-
-                    var doc7_ns = await context2.import("/path_to/doc7");
-                    expect(doc7_ns.i).to.equal("/path_to/doc7");
-                });
-                
-                it("should cache the imported documents", async () => {
-                    var counter = 0;
-
-                    class TestStore extends EmptyStore {
-                        get (path) {
-                            counter += 1;
-                            return `<% i = "${Path.join('/',path)}" %>`;
-                        }
-                    }                    
-
-                    var env = new Environment({
-                        store: new TestStore()
-                    });
-
-                    var doc1 = await env.createDocument(`ppp:/path/to/doc1`);
-                    var context1 = doc1.createContext();
-                    expect(counter).to.equal(0);
-
-                    var doc2_NS = await context1.import("/path/to/doc2");
-                    expect(counter).to.equal(1);
-                    
-                    var doc2_NS = await context1.import("/path/to/doc2");
-                    expect(counter).to.equal(1);
-                    
-                    var doc3_NS = await context1.import("/path/to/doc3");
-                    expect(counter).to.equal(2);
-                });
-            });        
         });        
     });
     
@@ -253,7 +92,7 @@ describe("Environment class", () => {
     
     describe("doc = await environment.readDocument(id)", () => {
         
-        it("should call the store.get method", async () => {
+        it("should call the store.get method if the id doesn't specify a protocol", async () => {
             var pathParameter;
             
             class TestStore extends EmptyStore {
@@ -270,6 +109,57 @@ describe("Environment class", () => {
             expect(pathParameter).to.equal("/path/to/doc");
         });        
         
+        it("should call the protocol.name.get method if the id specifies a protocol name", async () => {
+            var pathParameter;
+            
+            class TestStore extends EmptyStore {
+                get (path) {
+                    pathParameter = path;
+                }
+            }
+            
+            var env = new Environment({
+                protocols: {
+                    ppp: new TestStore()
+                }
+            });
+            
+            await env.readDocument("ppp:/path/to/doc");            
+            expect(pathParameter).to.equal("/path/to/doc");
+        });        
+        
+        it("should throw an error if the id's protocol is not defined", async () => {
+            var env = new Environment({
+                protocols: {
+                    ppp: new EmptyStore(),
+                    "inv.prot": new EmptyStore(), 
+                }
+            });
+            
+            try {
+                await env.readDocument("boo:/path/to/doc");            
+                throw new Error("Id did not throw!");
+            } catch (e) {
+                expect(e.message).to.equal("Unknown protocol: boo");
+            }
+        });
+
+        it("should throw an error if the id's protocol is defined but doesn't have a valid name", async () => {
+            var env = new Environment({
+                protocols: {
+                    ppp: new EmptyStore(),
+                    "inv.prot": new EmptyStore(), 
+                }
+            });
+            
+            try {
+                await env.readDocument("inv.prot:/path/to/doc");            
+                throw new Error("Id did not throw!");
+            } catch (e) {
+                expect(e.message).to.equal("Unknown protocol: inv.prot");
+            }
+        });
+
         it("should return a document with source given by the proper protocol get handler", async () => {
             class TestStore extends EmptyStore {
                 get (path) {
@@ -287,7 +177,7 @@ describe("Environment class", () => {
         });
     });
     
-    describe("await environment.listEntries(path)", () => {
+    describe("await environment.listEntries(id)", () => {
         
         it("should delegate to the store.list method", async () => {
             class TestStore extends EmptyStore {
@@ -300,12 +190,63 @@ describe("Environment class", () => {
                 store: new TestStore()
             });
             
-            var entries = await env.listEntries("path/to/doc");            
-            expect(entries).to.deep.equal(['path', 'to', 'doc']);
+            var entries = await env.listEntries("/path/to/doc");            
+            expect(entries).to.deep.equal(['', 'path', 'to', 'doc']);
         });        
+
+        it("should call the protocol.name.list method if the id specifies a protocol name", async () => {
+            var pathParameter;
+            
+            class TestStore extends EmptyStore {
+                list (path) {
+                    pathParameter = path;
+                }
+            }
+            
+            var env = new Environment({
+                protocols: {
+                    ppp: new TestStore()
+                }
+            });
+            
+            await env.listEntries("ppp:/path/to/doc");            
+            expect(pathParameter).to.equal("/path/to/doc");
+        });        
+        
+        it("should throw an error if the id's protocol is not defined", async () => {
+            var env = new Environment({
+                protocols: {
+                    ppp: new EmptyStore(),
+                    "inv.prot": new EmptyStore(), 
+                }
+            });
+            
+            try {
+                await env.listEntries("boo:/path/to/doc");            
+                throw new Error("Id did not throw!");
+            } catch (e) {
+                expect(e.message).to.equal("Unknown protocol: boo");
+            }
+        });
+
+        it("should throw an error if the id's protocol is defined but doesn't have a valid name", async () => {
+            var env = new Environment({
+                protocols: {
+                    ppp: new EmptyStore(),
+                    "inv.prot": new EmptyStore(), 
+                }
+            });
+            
+            try {
+                await env.listEntries("inv.prot:/path/to/doc");            
+                throw new Error("Id did not throw!");
+            } catch (e) {
+                expect(e.message).to.equal("Unknown protocol: inv.prot");
+            }
+        });
     });
 
-    describe("await environment.writeDocument(path, source)", () => {
+    describe("await environment.writeDocument(id, source)", () => {
         
         it("should call the store.set method", async () => {
             var writtenSource;
@@ -323,11 +264,62 @@ describe("Environment class", () => {
             await env.writeDocument("/path/to/doc", "Doc source @ /path/to/doc");            
             expect(writtenSource).to.equal("Doc source @ /path/to/doc");
         });        
+
+        it("should call the protocol.name.set method if the id specifies a protocol name", async () => {
+            var pathParameter;
+            
+            class TestStore extends EmptyStore {
+                set (path) {
+                    pathParameter = path;
+                }
+            }
+            
+            var env = new Environment({
+                protocols: {
+                    ppp: new TestStore()
+                }
+            });
+            
+            await env.writeDocument("ppp:/path/to/doc");            
+            expect(pathParameter).to.equal("/path/to/doc");
+        });        
+        
+        it("should throw an error if the id's protocol is not defined", async () => {
+            var env = new Environment({
+                protocols: {
+                    ppp: new EmptyStore(),
+                    "inv.prot": new EmptyStore(), 
+                }
+            });
+            
+            try {
+                await env.writeDocument("boo:/path/to/doc");            
+                throw new Error("Id did not throw!");
+            } catch (e) {
+                expect(e.message).to.equal("Unknown protocol: boo");
+            }
+        });
+
+        it("should throw an error if the id's protocol is defined but doesn't have a valid name", async () => {
+            var env = new Environment({
+                protocols: {
+                    ppp: new EmptyStore(),
+                    "inv.prot": new EmptyStore(), 
+                }
+            });
+            
+            try {
+                await env.writeDocument("inv.prot:/path/to/doc");            
+                throw new Error("Id did not throw!");
+            } catch (e) {
+                expect(e.message).to.equal("Unknown protocol: inv.prot");
+            }
+        });
     });
 
-    describe("await environment.deleteDocument(path)", () => {
+    describe("await environment.deleteDocument(id)", () => {
         
-        it("should call the store.get method", async () => {
+        it("should call the store.delete method", async () => {
             var pathParameter;
             
             class TestStore extends EmptyStore {
@@ -343,5 +335,247 @@ describe("Environment class", () => {
             await env.deleteDocument("/path/to/doc");            
             expect(pathParameter).to.equal("/path/to/doc");
         });        
-    });
+
+        it("should call the protocol.name.delete method if the id specifies a protocol name", async () => {
+            var pathParameter;
+            
+            class TestStore extends EmptyStore {
+                delete (path) {
+                    pathParameter = path;
+                }
+            }
+            
+            var env = new Environment({
+                protocols: {
+                    ppp: new TestStore()
+                }
+            });
+            
+            await env.deleteDocument("ppp:/path/to/doc");            
+            expect(pathParameter).to.equal("/path/to/doc");
+        });        
+        
+        it("should throw an error if the id's protocol is not defined", async () => {
+            var env = new Environment({
+                protocols: {
+                    ppp: new EmptyStore(),
+                    "inv.prot": new EmptyStore(), 
+                }
+            });
+            
+            try {
+                await env.deleteDocument("boo:/path/to/doc");            
+                throw new Error("Id did not throw!");
+            } catch (e) {
+                expect(e.message).to.equal("Unknown protocol: boo");
+            }
+        });
+
+        it("should throw an error if the id's protocol is defined but doesn't have a valid name", async () => {
+            var env = new Environment({
+                protocols: {
+                    ppp: new EmptyStore(),
+                    "inv.prot": new EmptyStore(), 
+                }
+            });
+            
+            try {
+                await env.deleteDocument("inv.prot:/path/to/doc");            
+                throw new Error("Id did not throw!");
+            } catch (e) {
+                expect(e.message).to.equal("Unknown protocol: inv.prot");
+            }
+        });
+    });    
+    
+    describe("context = doc.createContext(...namespace)", () => {
+        
+        it("should return a document context", async () => {
+            var env = new Environment();
+            var doc = env.createDocument('/', "...");
+            var docContextPrototype = document.createContext();
+            var docContext = doc.createContext();
+            
+            for (let name in docContextPrototype) {
+                expect(docContext[name]).to.equal(docContextPrototype[name]);
+            }
+        });
+        
+        it("should contain the names contained in the passed namespaces", async () => {
+            var env = new Environment();
+            var doc = env.createDocument('/', "...");
+            var context = doc.createContext({x:10, y:20}, {y:30});
+            expect(context.x).to.equal(10);
+            expect(context.y).to.equal(30);
+        });
+        
+        it("should contain the names contained in the `globals` namespaces passed to the environment constructor", () => {
+            var env = new Environment({
+                globals: {x:10, y:20}
+            });
+            var doc = env.createDocument('/', "...");
+            var context = doc.createContext({y:30});
+            expect(context.x).to.equal(10);
+            expect(context.y).to.equal(30);
+        });
+        
+        it("should contain the names contained in the `presets` namespace", () => {
+            var env = new Environment();
+            var doc = env.createDocument('/', "...", {x:10, y:20});
+            var context = doc.createContext({y:30});
+            expect(context.x).to.equal(10);
+            expect(context.y).to.equal(20);
+        });
+        
+        it("should contain a `argns` object with all the parameters defined in the id query string", () => {
+            var env = new Environment();
+            var doc = env.createDocument('/path/to/doc?x=10&s=abc', "...");
+            var context = doc.createContext();
+            expect(context.argns).to.deep.equal({x:10, s:'abc'});
+        });
+        
+        it("should contain the property `import` mapping to a function", async () => {
+            var env = new Environment({
+                protocols: {
+                    ppp: {get: path => `Doc source @ ppp:${Path.join('/',path)}`}
+                }
+            });
+            var doc = await env.createDocument(`/`, "...");
+            var context = doc.createContext();
+            expect(context.import).to.be.a("function");
+        });
+        
+        describe("docNS = context.import(uri, ...namespaces)", () => {
+            
+            it("should load, evaluate and return the namespace of the olo-document mapped to `uri`", async () => {
+                
+                class TestStore extends EmptyStore {
+                    get (path) {
+                        return `<% i = "${Path.join('/',path)}" %>`;
+                    }
+                }        
+                
+                class PPPStore extends EmptyStore {
+                    get (path) {
+                        return `<% i = "ppp:${Path.join('/',path)}" %>`;
+                    }
+                }            
+                
+                var env = new Environment({
+                    store: new TestStore(),
+                    protocols: {
+                        ppp: new PPPStore()
+                    }
+                });
+                
+                var doc1 = env.createDocument(`/path/to/doc1`, '...');
+                var context1 = doc1.createContext();
+                var doc2_ns = await context1.import("/path/to/doc2");
+                expect(doc2_ns.i).to.equal("/path/to/doc2");
+                
+                var doc1 = env.createDocument(`ppp:/path/to/doc1`, '...');
+                var context1 = doc1.createContext();
+                var doc2_ns = await context1.import("ppp:/path/to/doc2");
+                expect(doc2_ns.i).to.equal("ppp:/path/to/doc2");
+                
+            });                    
+            
+            it("should resolve `uri` relative to the calling document URI", async () => {
+
+                class TestStore extends EmptyStore {
+                    get (path) {
+                        return `<% i = "${Path.join('/',path)}" %>`;
+                    }
+                }                    
+
+                class PPPStore extends EmptyStore {
+                    get (path) {
+                        return `<% i = "ppp:${Path.join('/',path)}" %> <% x = argns.x %> <% y = argns.y %>`;
+                    }
+                }            
+                
+                var env = new Environment({
+                    store: new TestStore(),
+                    protocols: {
+                        ppp: new PPPStore()
+                    }
+                });
+
+                // default store
+                var doc1 = await env.createDocument(`/path/to/doc1`, "...");
+                var context1 = doc1.createContext();
+                
+                var doc2_ns = await context1.import("./doc2");
+                expect(doc2_ns.i).to.equal("/path/to/doc2");
+
+                var doc3_ns = await context1.import("../to_doc3");
+                expect(doc3_ns.i).to.equal("/path/to_doc3");
+
+                var doc4_ns = await context1.import("/path_to/doc4");
+                expect(doc4_ns.i).to.equal("/path_to/doc4");
+                
+                var dir = await env.createDocument(`/path/to/`, "...");
+                var context2 = dir.createContext();
+                
+                var doc5_ns = await context2.import("./doc5");
+                expect(doc5_ns.i).to.equal("/path/to/doc5");
+
+                var doc6_ns = await context2.import("../to_doc6");
+                expect(doc6_ns.i).to.equal("/path/to_doc6");
+
+                var doc7_ns = await context2.import("/path_to/doc7");
+                expect(doc7_ns.i).to.equal("/path_to/doc7");
+                
+                // protocol ppp store
+                var doc1 = await env.createDocument(`ppp:/path/to/doc1?x=10`, "...");
+                var context1 = doc1.createContext();
+                
+                var doc3_ns = await context1.import("../to_doc3");
+                expect(doc3_ns.i).to.equal("ppp:/path/to_doc3");
+                expect(doc3_ns.y).to.equal(null);
+
+                var doc3_ns = await context1.import("../to_doc3?y=20");
+                expect(doc3_ns.i).to.equal("ppp:/path/to_doc3");
+                expect(doc3_ns.y).to.equal(20);
+
+                var doc4_ns = await context1.import("ppp:/path_to/doc4");
+                expect(doc4_ns.i).to.equal("ppp:/path_to/doc4");                
+            });
+            
+            it("should cache the imported documents", async () => {
+                var counter = 0;
+
+                class TestStore extends EmptyStore {
+                    get (path) {
+                        counter += 1;
+                        return `<% i = "${Path.join('/',path)}" %>`;
+                    }
+                }                    
+
+                var env = new Environment({
+                    store: new MemoryStore,
+                    protocols: {
+                        ppp: new TestStore()
+                    }
+                });
+
+                var doc1 = await env.createDocument(`ppp:/path/to/doc1`);
+                var context1 = doc1.createContext();
+                expect(counter).to.equal(0);
+
+                var doc2_NS = await context1.import("/path/to/doc2");
+                expect(counter).to.equal(1);
+                
+                var doc2_NS = await context1.import("/path/to/doc2");
+                expect(counter).to.equal(1);
+                
+                var doc2_NS = await context1.import("/path/to/doc2?x:10");
+                expect(counter).to.equal(1);
+                
+                var doc3_NS = await context1.import("/path/to/doc3");
+                expect(counter).to.equal(2);
+
+            });
+        });        
+    });            
 });
