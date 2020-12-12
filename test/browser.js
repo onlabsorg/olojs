@@ -33,7 +33,6 @@ describe("olojs", () => {
     });
     
     require("./expression");
-    require("./stdlib");    
     require("./document");
     
     describe("stores", () => {

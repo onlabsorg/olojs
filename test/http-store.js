@@ -66,6 +66,10 @@ describe("HTTPStore", () => {
             var httpStore = new HTTPStore("http://localhost:8010");
             var doc = await httpStore.get("/path/to/doc2");
             expect(doc).to.be.equal("doc2 @ /path/to/");            
+
+            var httpStore2 = new HTTPStore("http:/");
+            var doc = await httpStore2.get("/localhost:8010/path/to/doc3");
+            expect(doc).to.be.equal("doc3 @ /path/to/");            
         });
         
         it("should throw a PermissionDenied error if the response status is 403", async () => {

@@ -1,15 +1,13 @@
 # olojs
 
 `olojs` is a content management system based on a distributed network of
-interdependent documents called `olo-documents` or `olo-docs`.
+interdependent documents. Each document holds both narrative content and data
+and can import and use the narrative content and the data held by other
+documents.
 
-An olo-document contains both narrative content and data. The document source is 
-a template with [swan] inline expressions that can be evaluated and rendered;
-
-- once the document is evaluated, it returns the swan namespace, which is an 
-  object containing all the variables defined by the inline expressions;
-- once the document is rendered, it returns the text obtained by replacing the 
-  inline expressions with their result values
+A document contains inline [swan] expression that get evaluated upon document
+rendering and replaced by their result value. All the names defined by the
+swan expressions are contained in the document namespace after rendering.
 
 The following example of olo-document may clarify the concept:
 
@@ -112,8 +110,6 @@ server.listen(8010);
 ### Learn more
 * Learn more about [olojs environments](./docs/environment.md)
 * Learn more about [olojs documents](./docs/document.md)
-* Learn the [standard swan library](./docs/stdlib.md) swan API
-* Learn the [expression](./docs/api/expression.md) module API
 * Learn the [document](./docs/api/document.md) module API
 * Learn the [environment](./docs/api/environment.md) module API
 * Learn the [file store](./docs/api/file-store.md) module API
@@ -131,11 +127,5 @@ server.listen(8010);
 ### License
 [MIT](https://opensource.org/licenses/MIT)
 
-### Related projects
-* [olojs-cli] is a command line interface for managing olojs repositories. It 
-  allows creating a new local repo, mounting external (local or remote) repos 
-  and serving the repo via internet. 
 
-
-[olojs-cli]: https://github.com/onlabsorg/olojs-cli
 [swan]: https://github.com/onlabsorg/swan-js/blob/main/docs/swan.md

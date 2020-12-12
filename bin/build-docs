@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-echo "Building API documentation for olojs.expression"
-bin/gen-doc lib/expression.js > docs/api/expression.md
-
 echo "Building API documentation for olojs.document"
 bin/gen-doc lib/document.js > docs/api/document.md
 

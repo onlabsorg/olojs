@@ -12,6 +12,8 @@ parameters:
 
 - A global context to be shared by all the documents
 - A store object
+- An optional set of protocols used to retrieve documents from remote stores
+  (see [Environment API](./api/environment.md))
 
 >   Stores are objects that expose a simple `get`, `set`, `delete` interface.
 >     
