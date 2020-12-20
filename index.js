@@ -3,18 +3,14 @@ module.exports = {
     
     get expression      () {return require("./lib/expression")},
     get document        () {return require("./lib/document")},
+        
+    get Store           () {return require('./lib/store')},
+    get MemoryStore     () {return require('./lib/memory-store')},
+    get FileStore       () {return require('./lib/file-store')},
+    get HTTPStore       () {return require('./lib/http-store')},
+    get Router          () {return require('./lib/router')},
+
+    get Loader          () {return require("./lib/loader")},
     
-    get Environment     () {return require("./lib/environment")},
-    
-    stores: {
-        get Empty   () {return require('./lib/stores/empty')},
-        get Memory  () {return require('./lib/stores/memory')},
-        get File    () {return require('./lib/stores/file')},
-        get HTTP    () {return require('./lib/stores/http')},
-        get Router  () {return require('./lib/stores/router')},
-    },
-    
-    servers: {
-        get http () {return require("./lib/servers/http")}
-    }
+    get StoreMiddleware () {return require("./lib/store-middleware")}
 };

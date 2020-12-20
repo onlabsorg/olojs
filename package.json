@@ -15,30 +15,23 @@
   },
   "scripts": {
     "develop": "webpack --mode development --watch",
-    "test": "mocha test/index.js",
-    "browser-tests": "node test/browser/run-tests.js",
-    "client-test": "node test/client.js",
-    "build": "webpack --mode production",
-    "build-docs": "bin/build-docs"
+    "test": "mocha test/index.js; node test/browser/run-tests.js",
+    "build": "bin/build"
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "css-loader": "^4.3.0",
-    "mini-css-extract-plugin": "^0.10.1",
     "rimraf": "^3.0.2",
     "webpack": "^4.44.2",
     "webpack-cli": "^3.3.12"
   },
   "dependencies": {
-    "@onlabsorg/swan-js": "file:../../../../shortcuts/swan-js",
+    "@onlabsorg/swan-js": "file:../[ ] swan-js",
     "body-parser": "^1.19.0",
-    "dompurify": "^2.2.2",
     "express": "^4.17.1",
     "isomorphic-fetch": "^3.0.0",
     "marked": "^0.8.2",
     "mkdirp": "^1.0.4",
     "trash": "^6.1.1",
-    "uri-js": "^4.4.0",
-    "vue": "^2.6.12"
+    "uri-js": "^4.4.0"
   }
 }

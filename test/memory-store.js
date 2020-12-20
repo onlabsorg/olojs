@@ -1,5 +1,5 @@
 var expect = require("chai").expect;
-var MemoryStore = require("../lib/stores/memory");
+var MemoryStore = require("../lib/memory-store");
 
 
 

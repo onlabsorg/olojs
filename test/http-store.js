@@ -3,7 +3,6 @@ var expect = require("chai").expect;
 var rimraf = require("rimraf");
 var mkdirp = require("mkdirp");
 var fs = require("fs");
-var errors = require("../lib/stores/store-errors");
 
 var ROOT_PATH = `${__dirname}/fs-store`;
 
@@ -14,9 +13,9 @@ var ROOT_PATH = `${__dirname}/fs-store`;
 
 describe("HTTPStore", () => {
     var server;
-    var FileStore = require("../lib/stores/file");
+    var FileStore = require("../lib/file-store");
     var fileStore = new FileStore(ROOT_PATH);
-    var HTTPStore = require("../lib/stores/http");
+    var HTTPStore = require("../lib/http-store");
     var TestHeader;
     
     before((done) => {
@@ -79,7 +78,7 @@ describe("HTTPStore", () => {
                 await httpStore.get("/private/path/to/doc");
                 throw new NoError("It did not throw");
             } catch (error) {
-                expect(error).to.be.instanceof(errors.PermissionDenied);
+                expect(error).to.be.instanceof(HTTPStore.PermissionDeniedError);
                 expect(error.message).to.equal("Permission denied: GET http://localhost:8010/private/path/to/doc");
             }
         });
@@ -97,7 +96,7 @@ describe("HTTPStore", () => {
                 await httpStore.get("/hidden/path/to/doc");
                 throw new NoError();
             } catch (error) {
-                expect(error).to.be.instanceof(errors.OperationNotAllowed);
+                expect(error).to.be.instanceof(HTTPStore.OperationNotAllowedError);
                 expect(error.message).to.equal("Operation not allowed: GET http://localhost:8010/hidden/path/to/doc");
             }
         });
@@ -131,7 +130,7 @@ describe("HTTPStore", () => {
                 await httpStore.list("/private/path/to/doc");
                 throw new NoError("It did not throw");
             } catch (error) {
-                expect(error).to.be.instanceof(errors.PermissionDenied);
+                expect(error).to.be.instanceof(HTTPStore.PermissionDeniedError);
                 expect(error.message).to.equal("Permission denied: LIST http://localhost:8010/private/path/to/doc");
             }
         });
@@ -149,7 +148,7 @@ describe("HTTPStore", () => {
                 await httpStore.list("/hidden/path/to/doc");
                 throw new NoError();
             } catch (error) {
-                expect(error).to.be.instanceof(errors.OperationNotAllowed);
+                expect(error).to.be.instanceof(HTTPStore.OperationNotAllowedError);
                 expect(error.message).to.equal("Operation not allowed: LIST http://localhost:8010/hidden/path/to/doc");
             }
         });
@@ -183,7 +182,7 @@ describe("HTTPStore", () => {
                 await httpStore.set("/private/path/to/doc");
                 throw new NoError();
             } catch (error) {
-                expect(error).to.be.instanceof(errors.PermissionDenied);
+                expect(error).to.be.instanceof(HTTPStore.PermissionDeniedError);
                 expect(error.message).to.equal("Permission denied: SET http://localhost:8010/private/path/to/doc");
             }
         });
@@ -195,7 +194,7 @@ describe("HTTPStore", () => {
                 await httpStore.set("/hidden/path/to/doc");
                 throw new NoError();
             } catch (error) {
-                expect(error).to.be.instanceof(errors.OperationNotAllowed);
+                expect(error).to.be.instanceof(HTTPStore.OperationNotAllowedError);
                 expect(error.message).to.equal("Operation not allowed: SET http://localhost:8010/hidden/path/to/doc");
             }
         });
@@ -230,7 +229,7 @@ describe("HTTPStore", () => {
                 await httpStore.delete("/private/path/to/doc");
                 throw new NoError();
             } catch (error) {
-                expect(error).to.be.instanceof(errors.PermissionDenied);
+                expect(error).to.be.instanceof(HTTPStore.PermissionDeniedError);
                 expect(error.message).to.equal("Permission denied: DELETE http://localhost:8010/private/path/to/doc");
             }
         });
@@ -242,7 +241,7 @@ describe("HTTPStore", () => {
                 await httpStore.delete("/hidden/path/to/doc");
                 throw new NoError();
             } catch (error) {
-                expect(error).to.be.instanceof(errors.OperationNotAllowed);
+                expect(error).to.be.instanceof(HTTPStore.OperationNotAllowedError);
                 expect(error.message).to.equal("Operation not allowed: DELETE http://localhost:8010/hidden/path/to/doc");
             }
         });

@@ -1,15 +1,8 @@
 
-module.exports = {
-    
-    expression: require("./lib/expression"),
-    document: require("./lib/document"),
-    
-    Environment: require("./lib/environment"),
-    
-    stores: {
-        "Empty":  require('./lib/stores/empty'),
-        "Memory": require('./lib/stores/memory'),
-        "HTTP":   require('./lib/stores/http'),
-        "Router": require('./lib/stores/router'),
-    },
-};
+exports.expression  = require('./lib/expression');
+exports.document    = require('./lib/document');
+exports.Store       = require('./lib/store');
+exports.MemoryStore = require('./lib/memory-store');
+exports.HTTPStore   = require('./lib/http-store');
+exports.Router      = require('./lib/router');
+exports.Loader      = require('./lib/loader');

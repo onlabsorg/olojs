@@ -2,8 +2,7 @@ var expect = require("chai").expect;
 var rimraf = require("rimraf");
 var mkdirp = require("mkdirp");
 var fs = require("fs");
-var errors = require("../lib/stores/store-errors");
-var FileStore = require("../lib/stores/file");
+var FileStore = require("../lib/file-store");
 
 var ROOT_PATH = `${__dirname}/fs-store`;
 

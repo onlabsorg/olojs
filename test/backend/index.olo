@@ -1,4 +1,0 @@
-<% check = (import './test_tools').check %>
-<% __render__ = require 'markdown' %>
-
-# olojs client test document: <% check(1+1 == 2) %>

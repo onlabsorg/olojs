@@ -12,44 +12,37 @@ describe("olojs", () => {
         expect(olojs.document).to.equal(require("../lib/document"));
     });
     
-    it("should export the `stores/empty` module", () => {
-        expect(olojs.stores.Empty).to.equal(require("../lib/stores/empty"));
+    it("should export the `Store` class", () => {
+        expect(olojs.Store).to.equal(require("../lib/store"));
     });
 
-    it("should export the `stores/memory` module", () => {
-        expect(olojs.stores.Memory).to.equal(require("../lib/stores/memory"));
+    it("should export the `MemoryStore` class", () => {
+        expect(olojs.MemoryStore).to.equal(require("../lib/memory-store"));
     });
 
-    it("should export the `stores/file` module", () => {
-        expect(olojs.stores.File).to.equal(require("../lib/stores/file"));
+    it("should export the `FileStore` class", () => {
+        expect(olojs.FileStore).to.equal(require("../lib/file-store"));
     });
     
-    it("should export the `stores/http` module exports", () => {
-        expect(olojs.stores.HTTP).to.equal(require("../lib/stores/http"));
+    it("should export the `HTTPStore` class", () => {
+        expect(olojs.HTTPStore).to.equal(require("../lib/http-store"));
     });
 
-    it("should export the `stores/router` module exports", () => {
-        expect(olojs.stores.Router).to.equal(require("../lib/stores/router"));
+    it("should export the `Router` class", () => {
+        expect(olojs.Router).to.equal(require("../lib/router"));
     });
 
-    it("should export the `environment` module", () => {
-        expect(olojs.Environment).to.equal(require("../lib/environment"));
+    it("should export the `Loader` constructor", () => {
+        expect(olojs.Loader).to.equal(require("../lib/loader"));
     });
 
     require("./expression");
-    require("./document");
-    
-    describe("stores", () => {
-        require("./empty-store");
-        require("./memory-store");
-        require("./file-store");
-        require("./http-store");
-        require("./router-store");
-    });
-    
-    require("./environment");
-    
-    describe("servers", () => {
-        require("./http-server");
-    });
+    require("./document");    
+    require("./store");
+    require("./memory-store");
+    require("./file-store");
+    require("./http-store");
+    require("./router");
+    require("./loader");
+    require("./store-middleware");
 });
