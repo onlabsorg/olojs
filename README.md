@@ -135,4 +135,4 @@ the `npm test` command.
 [FileStore]: ./docs/api/file-store.md
 [HTTPStore]: ./docs/api/http-store.md
 [HTTPServer]: ./docs/api/http-server.md
-[Router]: ./docs/api/router-store.md
+[Router]: ./docs/api/router.md
