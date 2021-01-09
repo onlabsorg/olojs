@@ -7,27 +7,26 @@ httpStore = new HTTPStore(rootURL, options)
 ```
 
 - `rootURL` is the base URL that will be prepended to the paths passed to
-  the `get`, `set` and `delete` methods.
+  the `read`, `list`, `write` and `delete` methods.
 - `options.headers` are custom headers that will be added to every HTTP
   request.
-- `httpStore` is an object that exposes the standard olojs store API: `get`,
-  `set` and `delete`.
+- `httpStore` is a [olojs.Store](./store.md) object
   
-HTTPStore.prototype.get - async method
+httpStore.read - async method
 ------------------------------------------------------------------------
 Retrieves a remote olo-document via HTTP GET (HTTPS GET).
 
 ```js
-const source = await httpStore.get("/path/to/doc")
+source = await httpStore.read("/path/to/doc")
 ```
 
 - On 200 status code, returns the response body as string
-- On 403 status code, throws a PermissionDenied error
+- On 403 status code, throws a `HTTPStore.ReadPermissionDeniedError`
 - On 404 status code, return an empty string
-- On 405 status code, throws an OperationNotAllowed error
+- On 405 status code, throws a `HTTPStore.ReadOperationNotAllowedError`
 - On any other status code, throws a generic error
   
-HTTPStore.prototype.list - async method
+httpStore.list - async method
 ------------------------------------------------------------------------
 Retrieves a remote directory content via an HTTP GET requests that
 accepts only JSON as response.
@@ -37,25 +36,25 @@ entries = await httpStore.list("/path/to/doc")
 ```
 
 - On 200 status code, returns the response body as json array
-- On 403 status code, throws a PermissionDenied error
+- On 403 status code, throws a `HTTPStore.ReadPermissionDeniedError`
 - On 404 status code, return an empty array
-- On 405 status code, throws an OperationNotAllowed error
+- On 405 status code, throws a `HTTPStore.ReadOperationNotAllowedError`
 - On any other status code, throws a generic error
   
-HTTPStore.prototype.set - async method
+httpStore.write - async method
 ------------------------------------------------------------------------
 Modifies a remote olo-document via HTTP PUT (HTTPS PUT).
 
 ```js
-await httpStore.set("/path/to/doc", source)
+await httpStore.write("/path/to/doc", source)
 ```
 
 - On 200 and 201 status code, returns
-- On 403 status code, throws a PermissionDenied error
-- On 405 status code, throws an OperationNotAllowed error
+- On 403 status code, throws a `HTTPStore.WritePermissionDeniedError`
+- On 405 status code, throws a `HTTPStore.WriteOperationNotAllowedError`
 - On any other status code, throws a generic error
   
-HTTPStore.prototype.delete - async method
+httpStore.delete - async method
 ------------------------------------------------------------------------
 Modifies a remote olo-document via HTTP DELETE (HTTPS DELETE).
 
@@ -64,8 +63,8 @@ await httpStore.delete("/path/to/doc")
 ```
 
 - On 200 status code, returns
-- On 403 status code, throws a PermissionDenied error
-- On 405 status code, throws an OperationNotAllowed error
+- On 403 status code, throws a `HTTPStore.WritePermissionDeniedError`
+- On 405 status code, throws a `HTTPStore.WriteOperationNotAllowedError`
 - On any other status code, throws a generic error
   
 

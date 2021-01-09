@@ -1,39 +1,67 @@
 # olojs
 
 `olojs` is a content management system based on a distributed network of
-interdependent documents. Each document holds both narrative content and data
-and can import and use the narrative content and the data held by other
-documents.
+documents having the following properties:
 
-A document contains inline [swan] expression that get evaluated upon document
-rendering and replaced by their result value. All the names defined by the
-swan expressions are contained in the document namespace after rendering.
-
-The following example of olo-document may clarify the concept:
+* Documents are templates containing inline [swan] expressions enclosed between 
+  `<%` and `%>`.
+* Each document holds both data (the variables defined by the inline 
+  expressions) and narrative content (the text obtained by replacing each inline 
+  expression with its value)
+* Documents are contained in stores and identified by a path within their store. 
+  A store can be any repository (local, remote or a combination of both) 
+  implementing the [Store] interface. 
+* Each document can import and use the narrative content and data held by
+  any other document of the same store.
+  
+### Example
+  
+Let's assume that a store contains the following document at `/people/mary`:
 
 ```
-<% name = "Isaac Newton" %>
-
-This is a document about <% name %>. 
-
-<% date_of_birth = "04-01-1643" %>
-<% date_of_death = "31-03-1727" %>
-<% date_manager = import("/path/to/date-manager-document") %>
-
-He was born on <% date_of_birth %> and he died on <% date_of_death %> at the 
-age of <% date_manager.diff_years(date_of_death, date_of_birth) %>.
-
-He formulated the laws of motion, laying the foundations of the classical
-mechanics. About his work he stated: "If I have seen further it is by standing 
-on the shoulders of giants", anticipating one of the principles of the free
-software movement.
-
-<% einstein = import("./albert-einstein") %>
-
-Three centuries later <% einstein.name %> could freely use Newton's work and the
-work of many other scientists like him to formulate his well known theory of
-relativity.
+<% name: "Mary" %> is <% age: 35 %> years old.
 ```
+
+Once evaluated, this document renders to `Mary is 35 years old` and returns
+the namespace `{name: "Mary", age: 35}`.
+
+Let's now assume that the same store contains also the following document,
+mapped to the path `/people/bob`:
+
+```
+<% wife = import "./mary" %>
+<% name: "Bob" %> is <% age: 40 %> years old and he is married to <% wife.name %>,
+who is <% wife.age %> years old. Therefore <% name %> is <% age - wife.age %>
+years older than <% wife.name %>.
+```
+
+Notice that `/people/bob` imports `/people/mary` and uses its content. Once
+evaluated it renders to:
+
+```
+Bob is 40 years old and he is married to Mary, who is 35 years old. 
+Therefore Bob is 5 years older than Mary.
+```
+
+The `/people/bob` document returns the following namespace:
+
+```js
+{
+    name: "Bob",
+    age: 40,
+    wife: {
+        name: "Mary",
+        age: 35
+    }
+}
+```
+
+> The above example gives an idea of how documents work, but to really appreciate
+> this library, you need to consider a) that [swan] is a powerful expression
+> language which, for example, can define functions and therefore parametric
+> chunks of text and b) that stores can be shared over the internet generating a
+> distributed network of documents.
+
 
 ### Getting started
 
@@ -43,89 +71,68 @@ Install olojs via npm
 npm install @onlabsorg/olojs --save
 ```
 
-Parse, evaluate and render an [olo-document](./docs/document.md):
+Import olojs and connect to a store:
 
 ```js
-{document} = require('@onlabsorg/olojs');
-
-source = "<% y=2 %>x*y = <% x*y %>";
-evaluate = document.parse(source);
-
-context = document.createContext({x:10});
-namespace = await evaluate(context);              // {x:10, y:2}
-
-rendering = await document.render(namespace);     // "x*y = 20"
+olojs = require('@onlabsorg/olojs');
+store = new olojs.FileStore('/home/my-olodocs-store');
 ```
 
-Create a shared [environment](./docs/api/environment.md) for your documents:
+> In this example a file-system-based store is used, but a store can be any
+> object implementing the [Store] interface. olojs comes with a number of
+> pre-defined stores, namely [MemoryStore], [FileStore], [HTTPStore] and
+> a multi-store [Router].
+
+Load, evaluate and render a [document]:
 
 ```js
-const {Environment, stores} = require('@onlabsorg/olojs');
-const environment = new Environment({
-    store: new olojs.stores.FileStore('/home/username'),   // where the documents are stored
-    globals: {
-        // global names shared by all the documents in this environment
-    }
-});
+doc = await store.load('/path/to/doc');
+context = doc.createContext();
+doc_namespace = await doc.evaluate(context);
+doc_text = await context.str(doc_namespace);
 ```
 
-Retrieve and render a document from your environment:
+Serve the store via HTTP:
 
 ```js
-const doc1 = await environment.readDocument("/path/to/doc1");    // document at /home/username/path/to/doc1
-const doc1_context = doc1.createContext({x:10});
-const doc1_namespace = await doc1.evaluate(doc1_context);
-const doc1_rendering = await environment.render(doc1);
-```
-
-Let's say that we have the following two documents in `environment`:
-
-* `/path/to/doc1`: `<% y=2 %>`
-* `/path/to/doc2`: `<% doc1 = import './doc1'%>x*y = <% x * doc1.y %>`
-
-Once evaluated, doc2 will return the following namespace
-
-```js
-{
-    x: 10, 
-    doc1: {y:2}
-}
-```
-
-and it will render to the following text:
-
-```
-x*y = 20
-```
-
-Last but not least, you can serve your environment via HTTP and render documents 
-in the browser at URLs like `http://localhost:8010/#/path/to/doc`.
-
-```js
-const {servers} = require("@onlabsorg/olojs");
-const server = servers.http(environment);
+server = olojs.HTTPServer.createServer(store);
 server.listen(8010);
 ```
 
+By serving your store via HTTP, you can:
+- Render your documents in the browser at `localhost:8010/#/path/to/doc`
+- Pblish your documents on the web
+- Allow other users to programmatically access you documents via a
+  [HTTPStore]
+
+
+> olojs works also in the browser, although it has been tested only on Chrome.
+> In order to use the olojs library in the browser, you should require
+> the module `@onlabsorg/olojs/browser`. The only difference between the NodeJS
+> version and the browser version is that the latter doesn't contain the
+> [FileStore] class and the [HTTPServer] object.
+
+
 ### Learn more
-* Learn more about [olojs environments](./docs/environment.md)
 * Learn more about [olojs documents](./docs/document.md)
-* Learn the [document](./docs/api/document.md) module API
-* Learn the [environment](./docs/api/environment.md) module API
-* Learn the [file store](./docs/api/file-store.md) module API
-* Learn the [http store](./docs/api/http-store.md) module API
-* Learn the [memory store](./docs/api/memory-store.md) module API
-* Learn the [router store](./docs/api/router-store.md) module API
-* Learn the [http server](./docs/api/http-server.md) module API
+* Learn more about [olojs stores](./docs/store.md)
+* Learn the [olojs API](./docs/api.md)
 
 
 ### Test 
-* Test olojs in nodejs: `npm test`  
-* Test olojs in the browser: `npm run browser-tests`  
-* Test the browser rendering app: `npm run client-test`
+After cloning `olojs`, you can test it in both NodeJS and in your browser via
+the `npm test` command.
+
 
 ### License
 [MIT](https://opensource.org/licenses/MIT)
 
 
 [swan]: https://github.com/onlabsorg/swan-js/blob/main/docs/swan.md
+[document]: ./docs/document.md
+[Store]: ./docs/api/store.md)
+[MemoryStore]: ./docs/api/memory-store.md)
+[FileStore]: ./docs/api/file-store.md)
+[HTTPStore]: ./docs/api/http-store.md)
+[HTTPServer]: ./docs/api/http-server.md)
+[Router]: ./docs/api/router-store.md

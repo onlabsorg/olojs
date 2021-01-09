@@ -1,0 +1,7 @@
+<% check = import './test-tools' . check %>
+<% __str__ = (__str__ >> require 'markdown') %>
+
+# olojs client test document: <% check(1+1 == 2) %>
+
+### Test error
+<% y = [] / 2 %>

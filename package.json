@@ -20,18 +20,21 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
+    "css-loader": "^5.0.1",
+    "mini-css-extract-plugin": "^1.3.3",
     "rimraf": "^3.0.2",
     "webpack": "^4.44.2",
     "webpack-cli": "^3.3.12"
   },
   "dependencies": {
-    "@onlabsorg/swan-js": "file:../[ ] swan-js",
+    "@onlabsorg/swan-js": "^0.4.0",
     "body-parser": "^1.19.0",
+    "dompurify": "^2.2.6",
     "express": "^4.17.1",
     "isomorphic-fetch": "^3.0.0",
     "marked": "^0.8.2",
     "mkdirp": "^1.0.4",
     "trash": "^6.1.1",
-    "uri-js": "^4.4.0"
+    "vue": "^2.6.12"
   }
 }

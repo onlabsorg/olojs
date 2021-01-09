@@ -33,7 +33,7 @@ describe("Router", () => {
         });
     });
     
-    describe(`source = router.get(path)`, () => {
+    describe(`source = router.read(path)`, () => {
         
         it("should delegate to the matching mounted store", async () => {
             var router = new Router({
@@ -50,11 +50,11 @@ describe("Router", () => {
                     "/path_to/doc"  : "doc @ root:/path_to/doc"                    
                 }),
             });
-            expect(await router.get('/path/to/')).to.equal("doc @ store1:/");
-            expect(await router.get('/path/to/doc')).to.equal("doc @ store1:/path/to/doc");
-            expect(await router.get('/path/to/store2/path/to/doc')).to.equal("doc @ store2:/path/to/doc");
-            expect(await router.get('/path/to/store2/')).to.equal("doc @ store2:/");
-            expect(await router.get('/path_to/doc')).to.equal("doc @ root:/path_to/doc");
+            expect(await router.read('/path/to/')).to.equal("doc @ store1:/");
+            expect(await router.read('/path/to/doc')).to.equal("doc @ store1:/path/to/doc");
+            expect(await router.read('/path/to/store2/path/to/doc')).to.equal("doc @ store2:/path/to/doc");
+            expect(await router.read('/path/to/store2/')).to.equal("doc @ store2:/");
+            expect(await router.read('/path_to/doc')).to.equal("doc @ root:/path_to/doc");
         });
         
         it("should return an empty document if no match is found", async () => {
@@ -68,7 +68,7 @@ describe("Router", () => {
                     "/path/to/doc"  : "doc @ store2:/path/to/doc"
                 }),
             });
-            expect(await router.get('/path_to/doc')).to.equal("");
+            expect(await router.read('/path_to/doc')).to.equal("");
         })
     });
     
@@ -133,7 +133,7 @@ describe("Router", () => {
         });
     });
     
-    describe(`source = router.set(id, source)`, () => {
+    describe(`source = router.write(id, source)`, () => {
         
         it("should delegate to the matching mounted store", async () => {
             var store1 = new MemoryStore();
@@ -142,20 +142,20 @@ describe("Router", () => {
                 s1: store1,
                 s2: store2,
             });                
-            await router.set('/s1/path/to/doc', "doc @ store1");
-            await router.set('s2/path/to/doc', "doc @ store2");
-            expect(await store1.get('/path/to/doc')).to.equal("doc @ store1");
-            expect(await store2.get('/path/to/doc')).to.equal("doc @ store2");
+            await router.write('/s1/path/to/doc', "doc @ store1");
+            await router.write('s2/path/to/doc', "doc @ store2");
+            expect(await store1.read('/path/to/doc')).to.equal("doc @ store1");
+            expect(await store2.read('/path/to/doc')).to.equal("doc @ store2");
         });
         
         it("should throw an error if no match is found", async () => {
             var router = new Router();
             try {
-                await router.set('/s1/path/to/doc', "...");
+                await router.write('/s1/path/to/doc', "...");
                 throw new Error("Id did not throw");
             } catch (error) {
-                expect(error).to.be.instanceof(Router.OperationNotAllowedError);
-                expect(error.message).to.equal('Operation not allowed: SET /s1/path/to/doc')
+                expect(error).to.be.instanceof(Router.WriteOperationNotAllowedError);
+                expect(error.message).to.equal('Operation not allowed: WRITE /s1/path/to/doc')
             }
         });
     });
@@ -170,9 +170,9 @@ describe("Router", () => {
                 s2: store2,
             });                
             
-            await store1.set('/path/to/doc', "doc @ store1");
+            await store1.write('/path/to/doc', "doc @ store1");
             await router.delete('/s1/path/to/doc');
-            expect(store1.get('/path/to/doc')).to.equal("");
+            expect(store1.read('/path/to/doc')).to.equal("");
         });
         
         it("should throw an error if no match is found", async () => {
@@ -181,8 +181,8 @@ describe("Router", () => {
                 await router.delete('/s1/path/to/doc');
                 throw new Error("Id did not throw");
             } catch (error) {
-                expect(error).to.be.instanceof(Router.OperationNotAllowedError);
-                expect(error.message).to.equal('Operation not allowed: DELETE /s1/path/to/doc')
+                expect(error).to.be.instanceof(Router.WriteOperationNotAllowedError);
+                expect(error.message).to.equal('Operation not allowed: WRITE /s1/path/to/doc')
             }                
         })
     });

@@ -40,7 +40,7 @@ async function run_tests () {
     console.log("olojs test server listening on port 8011");
     
     console.log("Running the tests in the browser ...");
-    await exec('xdg-open http://localhost:8011/index.html');
+    exec('xdg-open http://localhost:8011/index.html');
     
     console.log(`Killing the server in 5s ...`);
     setTimeout(() => process.exit(), 5000);

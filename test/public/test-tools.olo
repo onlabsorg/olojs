@@ -1,0 +1,7 @@
+<% success = '<span style="color:green">&#10003;</span>' %>
+<% failure = '<span style="color:red">&#10008;</span>' %>
+
+<% check = condition -> condition ? success ; failure %>
+
+<p>chech(TRUE) returns <% check(TRUE) %></p>
+<p>chech(FALSE) returns <% check(FALSE) %></p>

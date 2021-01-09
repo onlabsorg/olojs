@@ -1,9 +1,9 @@
-RouterStore
+Router
 ============================================================================
-This store is a container for other stores and routes the `get`, `list`, 
-`set` and `delete` requests to the store matching the path.
+This store is a container for other stores and routes the `read`, `list`, 
+`write` and `delete` requests to the store best matching the path.
 ```js
-router = new RouterStore({
+router = new Router({
     "/path/to/store_1/": store_1, 
     "/path/to/store_2/": store_2, 
     ...
@@ -11,21 +11,26 @@ router = new RouterStore({
 ```
 
 - Each `"/path/to/store_i":store_i` parameter is a mount point. All the 
-  `get`, `set` `list` and `delete` calls to paths like 
-  `/path/to/store_i/sub/path/to/doc` will be rerouted to `store_i` after 
+  `read`, `list` `write` and `delete` calls to paths like 
+  `/path/to/store_i/sub/path/to/doc` will be redirected to `store_i` after 
   reducing the path to `/sub/path/to/doc`.
-- `router` is an object that exposes the standard olojs store API: `get`,
-  `list`, `set` and `delete`.
+- `router` is an [olojs.Store](./store.md) object
   
-router.get - async method
+router.read - async method
 ------------------------------------------------------------------------
 Retrieves an olo-document from the matching sub-store.
 ```js
-source = await router.get("/path/to/store_i/sub/path/to/doc");
+router = new Router({
+    "/path/to/store_1/": store_1, 
+    "/path/to/store_2/": store_2, 
+    ...
+})
+
+source = await router.read("/path/to/store_i/sub/path/to/doc");
 ```
 
 - When requesting `/path/to/store_i/sub/path/to/doc`, it returns
-  `await store_i.get('/sub/path/to/doc'). 
+  `await store_i.read('/sub/path/to/doc'). 
 - When no store is mounted on `/path/to/store_i/`, it returns an empty 
   string
   
@@ -33,42 +38,56 @@ router.list - async method
 ------------------------------------------------------------------------
 Returns the list of entry names under the passed path, considering all
 the mount points.
-The following expression ...
-
 ```js
-entries = await router.list("/path/to/dir/");
+router = new Router({
+    "/path/to/": store0,
+    "/path/to/a/s1": store1, 
+    "/path/to/b/s2": store2, 
+    "/path/to/s3": store3
+});
+
+entries = await router.list("/path/to");
 ```
+In the given example, the array `entries` will contain `["a/", "b/",
+"s2"]`, plus all the items returned by `await store0.list("/")`.
 
-... returns an array obtained by merging the following entries:
-
-- `await store1.list('/path/to/dir/')` if `store1` is mounted at `/`
-- `await store2.list('/to/dir/')` if `store2` is mounted at `/path/`
-- `await store3.list('/dir/')` if `store3` is mounted at `/path/to/`
-- `await store4.list('/')` if `store4` is mounted at `/path/to/dir/`
-- a `"dir_i/"` entry for each mount point like `/path/to/dir/dir_i/sub/path/`
+If no mounted stores matches the given path, then an empty array is
+returned.
   
-router.set - async method
+router.write - async method
 ------------------------------------------------------------------------
 Modifies an olo-document contained in the matching sub-store.
 ```js
-await router.set("/path/to/store_i/sub/path/to/doc", source);
+router = new Router({
+    "/path/to/store_1/": store_1, 
+    "/path/to/store_2/": store_2, 
+    ...
+})
+
+await router.write("/path/to/store_i/sub/path/to/doc", source);
 ```
 
 - When `/path/to/store_i/sub/path/to/doc` is passed, it calls
-  `await store_i.set('/sub/path/to/doc', source). 
-- When no store is mounted on `/path/to/store_i`, it throws an 
-  `OperationNotAllowed` error.
+  `await store_i.write('/sub/path/to/doc', source)`. 
+- When no store is mounted on `/path/to/store_i`, it throws a
+  `Router.WriteOperationNotAllowedError`.
   
 router.delete - async method
 ------------------------------------------------------------------------
 Deletes an olo-document contained in the matching sub-store.
 ```js
+router = new Router({
+    "/path/to/store_1/": store_1, 
+    "/path/to/store_2/": store_2, 
+    ...
+})
+
 await router.delete("/path/to/store_i/sub/path/to/doc");
 ```
 
 - When `/path/to/store_i/sub/path/to/doc` is passed, it calls
-  `await store_i.delete('/sub/path/to/doc'). 
-- When no store is mounted on `/path/to/store_i/`, it throws an 
-  `OperationNotAllowed` error.
+  `await store_i.delete('/sub/path/to/doc')`. 
+- When no store is mounted on `/path/to/store_i/`, it throws a 
+  `Router.WriteOperationNotAllowedError`.
   
 

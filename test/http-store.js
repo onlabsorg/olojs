@@ -41,7 +41,7 @@ describe("HTTPStore", () => {
             if (req.accepts('application/json')) {
                 res.status(200).json(await fileStore.list(req.path));
             } else {
-                res.status(200).send(await fileStore.get(req.path))
+                res.status(200).send(await fileStore.read(req.path))
             }
         });
         app.delete("*", async (req, res, next) => {
@@ -52,52 +52,52 @@ describe("HTTPStore", () => {
             type: "text/*"
         }));    
         app.put("*", async (req, res, next) => {
-            await fileStore.set(req.path, req.body);
+            await fileStore.write(req.path, req.body);
             res.status(200).send();
         });
         app.use(express.static(ROOT_PATH) );
         server = app.listen(8010, done);
     });
     
-    describe("source = await httpStore.get(path)", () => {
+    describe("source = await httpStore.read(path)", () => {
         
         it("should return the content of the files fetched via HTTP", async () => {
             var httpStore = new HTTPStore("http://localhost:8010");
-            var doc = await httpStore.get("/path/to/doc2");
+            var doc = await httpStore.read("/path/to/doc2");
             expect(doc).to.be.equal("doc2 @ /path/to/");            
 
             var httpStore2 = new HTTPStore("http:/");
-            var doc = await httpStore2.get("/localhost:8010/path/to/doc3");
+            var doc = await httpStore2.read("/localhost:8010/path/to/doc3");
             expect(doc).to.be.equal("doc3 @ /path/to/");            
         });
         
-        it("should throw a PermissionDenied error if the response status is 403", async () => {
+        it("should throw a ReadPermissionDeniedError if the response status is 403", async () => {
             var httpStore = new HTTPStore("http://localhost:8010");
             class NoError extends Error {};
             try {
-                await httpStore.get("/private/path/to/doc");
+                await httpStore.read("/private/path/to/doc");
                 throw new NoError("It did not throw");
             } catch (error) {
-                expect(error).to.be.instanceof(HTTPStore.PermissionDeniedError);
-                expect(error.message).to.equal("Permission denied: GET http://localhost:8010/private/path/to/doc");
+                expect(error).to.be.instanceof(HTTPStore.ReadPermissionDeniedError);
+                expect(error.message).to.equal("Permission denied: READ http://localhost:8010/private/path/to/doc");
             }
         });
 
         it("should return an empty string if the response status is 404", async () => {
             var httpStore = new HTTPStore("http://localhost:8010");
-            var doc = await httpStore.get("/path/to/non/existing/file");
+            var doc = await httpStore.read("/path/to/non/existing/file");
             expect(doc).to.equal("");
         });
 
-        it("should throw an OperationNotAllowed error if the response status is 405", async () => {
+        it("should throw an ReadOperationNotAllowedError if the response status is 405", async () => {
             var httpStore = new HTTPStore("http://localhost:8010");
             class NoError extends Error {};
             try {
-                await httpStore.get("/hidden/path/to/doc");
+                await httpStore.read("/hidden/path/to/doc");
                 throw new NoError();
             } catch (error) {
-                expect(error).to.be.instanceof(HTTPStore.OperationNotAllowedError);
-                expect(error.message).to.equal("Operation not allowed: GET http://localhost:8010/hidden/path/to/doc");
+                expect(error).to.be.instanceof(HTTPStore.ReadOperationNotAllowedError);
+                expect(error.message).to.equal("Operation not allowed: READ http://localhost:8010/hidden/path/to/doc");
             }
         });
 
@@ -105,7 +105,7 @@ describe("HTTPStore", () => {
             var httpStore = new HTTPStore("http://localhost:8010");
             class NoError extends Error {};
             try {
-                await httpStore.get("/error/path/to/doc");
+                await httpStore.read("/error/path/to/doc");
                 throw new NoError();
             } catch (error) {
                 expect(error).to.not.be.instanceof(NoError);
@@ -123,15 +123,15 @@ describe("HTTPStore", () => {
             expect(entries.sort()).to.deep.equal(["", "dir/", "doc1", "doc2", "doc3"]);            
         });
         
-        it("should throw a PermissionDenied error if the response status is 403", async () => {
+        it("should throw a ReadPermissionDeniedError if the response status is 403", async () => {
             var httpStore = new HTTPStore("http://localhost:8010");
             class NoError extends Error {};
             try {
                 await httpStore.list("/private/path/to/doc");
                 throw new NoError("It did not throw");
             } catch (error) {
-                expect(error).to.be.instanceof(HTTPStore.PermissionDeniedError);
-                expect(error.message).to.equal("Permission denied: LIST http://localhost:8010/private/path/to/doc");
+                expect(error).to.be.instanceof(HTTPStore.ReadPermissionDeniedError);
+                expect(error.message).to.equal("Permission denied: READ http://localhost:8010/private/path/to/doc");
             }
         });
 
@@ -141,15 +141,15 @@ describe("HTTPStore", () => {
             expect(entries).to.deep.equal([]);
         });
 
-        it("should throw an OperationNotAllowed error if the response status is 405", async () => {
+        it("should throw a ReadOperationNotAllowedError if the response status is 405", async () => {
             var httpStore = new HTTPStore("http://localhost:8010");
             class NoError extends Error {};
             try {
                 await httpStore.list("/hidden/path/to/doc");
                 throw new NoError();
             } catch (error) {
-                expect(error).to.be.instanceof(HTTPStore.OperationNotAllowedError);
-                expect(error.message).to.equal("Operation not allowed: LIST http://localhost:8010/hidden/path/to/doc");
+                expect(error).to.be.instanceof(HTTPStore.ReadOperationNotAllowedError);
+                expect(error.message).to.equal("Operation not allowed: READ http://localhost:8010/hidden/path/to/doc");
             }
         });
 
@@ -166,36 +166,36 @@ describe("HTTPStore", () => {
         });
     });        
 
-    describe("await httpStore.set(path, source)", () => {
+    describe("await httpStore.write(path, source)", () => {
         
         it("should change the source of the file at the given http url", async () => {
             var httpStore = new HTTPStore("http://localhost:8010");
-            expect(await fileStore.get(`/path/to/doc1`)).to.equal("doc1 @ /path/to/");
-            await httpStore.set(`/path/to/doc1`, "new doc1 @ /path/to/");
-            expect(await fileStore.get(`/path/to/doc1`)).to.equal("new doc1 @ /path/to/");
+            expect(await fileStore.read(`/path/to/doc1`)).to.equal("doc1 @ /path/to/");
+            await httpStore.write(`/path/to/doc1`, "new doc1 @ /path/to/");
+            expect(await fileStore.read(`/path/to/doc1`)).to.equal("new doc1 @ /path/to/");
         });
         
-        it("should throw a PermissionDenied error if the response status is 403", async () => {
+        it("should throw a WritePermissionDeniedError if the response status is 403", async () => {
             var httpStore = new HTTPStore("http://localhost:8010");
             class NoError extends Error {};
             try {
-                await httpStore.set("/private/path/to/doc");
+                await httpStore.write("/private/path/to/doc");
                 throw new NoError();
             } catch (error) {
-                expect(error).to.be.instanceof(HTTPStore.PermissionDeniedError);
-                expect(error.message).to.equal("Permission denied: SET http://localhost:8010/private/path/to/doc");
+                expect(error).to.be.instanceof(HTTPStore.WritePermissionDeniedError);
+                expect(error.message).to.equal("Permission denied: WRITE http://localhost:8010/private/path/to/doc");
             }
         });
 
-        it("should throw an OperationNotAllowed error if the response status is 405", async () => {
+        it("should throw a WriteOperationNotAllowedError if the response status is 405", async () => {
             var httpStore = new HTTPStore("http://localhost:8010");
             class NoError extends Error {};
             try {
-                await httpStore.set("/hidden/path/to/doc");
+                await httpStore.write("/hidden/path/to/doc");
                 throw new NoError();
             } catch (error) {
-                expect(error).to.be.instanceof(HTTPStore.OperationNotAllowedError);
-                expect(error.message).to.equal("Operation not allowed: SET http://localhost:8010/hidden/path/to/doc");
+                expect(error).to.be.instanceof(HTTPStore.WriteOperationNotAllowedError);
+                expect(error.message).to.equal("Operation not allowed: WRITE http://localhost:8010/hidden/path/to/doc");
             }
         });
 
@@ -203,7 +203,7 @@ describe("HTTPStore", () => {
             var httpStore = new HTTPStore("http://localhost:8010");
             class NoError extends Error {};
             try {
-                await httpStore.set("/error/path/to/doc");
+                await httpStore.write("/error/path/to/doc");
                 throw new NoError();
             } catch (error) {
                 expect(error).to.not.be.instanceof(NoError);
@@ -219,30 +219,30 @@ describe("HTTPStore", () => {
             expect(fs.existsSync(`${ROOT_PATH}/path/to/doc1.olo`)).to.be.true;
             await httpStore.delete(`/path/to/doc1`);
             expect(fs.existsSync(`${ROOT_PATH}/path/to/doc1.olo`)).to.be.false;
-            expect(await fileStore.get(`/path/to/doc1`)).to.equal("");
+            expect(await fileStore.read(`/path/to/doc1`)).to.equal("");
         });
         
-        it("should throw a PermissionDenied error if the response status is 403", async () => {
+        it("should throw a WritePermissionDeniedError if the response status is 403", async () => {
             var httpStore = new HTTPStore("http://localhost:8010");
             class NoError extends Error {};
             try {
                 await httpStore.delete("/private/path/to/doc");
                 throw new NoError();
             } catch (error) {
-                expect(error).to.be.instanceof(HTTPStore.PermissionDeniedError);
-                expect(error.message).to.equal("Permission denied: DELETE http://localhost:8010/private/path/to/doc");
+                expect(error).to.be.instanceof(HTTPStore.WritePermissionDeniedError);
+                expect(error.message).to.equal("Permission denied: WRITE http://localhost:8010/private/path/to/doc");
             }
         });
 
-        it("should throw an OperationNotAllowed error if the response status is 405", async () => {
+        it("should throw an WriteOperationNotAllowedError if the response status is 405", async () => {
             var httpStore = new HTTPStore("http://localhost:8010");
             class NoError extends Error {};
             try {
                 await httpStore.delete("/hidden/path/to/doc");
                 throw new NoError();
             } catch (error) {
-                expect(error).to.be.instanceof(HTTPStore.OperationNotAllowedError);
-                expect(error.message).to.equal("Operation not allowed: DELETE http://localhost:8010/hidden/path/to/doc");
+                expect(error).to.be.instanceof(HTTPStore.WriteOperationNotAllowedError);
+                expect(error.message).to.equal("Operation not allowed: WRITE http://localhost:8010/hidden/path/to/doc");
             }
         });
 
@@ -267,7 +267,7 @@ describe("HTTPStore", () => {
             };
             var httpStore = new HTTPStore("http://localhost:8010", {headers:customHeaders});                
             TestHeader = null;
-            await httpStore.get('/echo-hdr/path/to/doc');
+            await httpStore.read('/echo-hdr/path/to/doc');
             expect(TestHeader).to.equal(customHeaders.Test);
         });
         
@@ -277,7 +277,7 @@ describe("HTTPStore", () => {
             };
             var httpStore = new HTTPStore("http://localhost:8010", {headers:customHeaders});                
             TestHeader = null;
-            await httpStore.set('/echo-hdr/path/to/doc', "...");
+            await httpStore.write('/echo-hdr/path/to/doc', "...");
             expect(TestHeader).to.equal(customHeaders.Test);
         });
         

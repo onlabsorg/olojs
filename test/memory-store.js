@@ -5,7 +5,7 @@ var MemoryStore = require("../lib/memory-store");
 
 describe("MemoryStore", () => {
     
-    describe("source = await memoryStore.get(path)", () => {
+    describe("source = await memoryStore.read(path)", () => {
         
         it("should return the document source mapped to the given path", async () => {
             var memStore = new MemoryStore({
@@ -13,18 +13,18 @@ describe("MemoryStore", () => {
                 "doc2": "doc2 source",
             });
             
-            expect(await memStore.get("/path/to/doc1")).to.equal("doc1 source");
-            expect(await memStore.get("path/to/doc1")).to.equal("doc1 source");
-            expect(await memStore.get("/path/to/../to/./doc1")).to.equal("doc1 source");
+            expect(await memStore.read("/path/to/doc1")).to.equal("doc1 source");
+            expect(await memStore.read("path/to/doc1")).to.equal("doc1 source");
+            expect(await memStore.read("/path/to/../to/./doc1")).to.equal("doc1 source");
 
-            expect(await memStore.get("/doc2")).to.equal("doc2 source");
-            expect(await memStore.get("doc2")).to.equal("doc2 source");
-            expect(await memStore.get("/path/to/../../doc2")).to.equal("doc2 source");
+            expect(await memStore.read("/doc2")).to.equal("doc2 source");
+            expect(await memStore.read("doc2")).to.equal("doc2 source");
+            expect(await memStore.read("/path/to/../../doc2")).to.equal("doc2 source");
         });
 
         it("should return an empty string if the path doesn't exist", async () => {
             var memStore = new MemoryStore();
-            expect(await memStore.get('/path/to/doc')).to.equal("")                
+            expect(await memStore.read('/path/to/doc')).to.equal("")                
         });            
     });    
     
@@ -68,15 +68,15 @@ describe("MemoryStore", () => {
         });
     });
     
-    describe("await memoryStore.set(path, source)", () => {        
+    describe("await memoryStore.write(path, source)", () => {        
         
         it("should map the given source to the given path", async () => {
             var memStore = new MemoryStore();
-            await memStore.set("/path/to/doc1", "doc1 source");
-            await memStore.set("doc2", "doc2 source");
+            await memStore.write("/path/to/doc1", "doc1 source");
+            await memStore.write("doc2", "doc2 source");
             
-            expect(await memStore.get("/path/to/doc1")).to.equal("doc1 source");
-            expect(await memStore.get("/doc2")).to.equal("doc2 source");
+            expect(await memStore.read("/path/to/doc1")).to.equal("doc1 source");
+            expect(await memStore.read("/doc2")).to.equal("doc2 source");
         });
     });
 
@@ -87,13 +87,13 @@ describe("MemoryStore", () => {
                 "doc2": "doc2 source",
             });
             
-            expect(await memStore.get("/path/to/doc1")).to.equal("doc1 source");
+            expect(await memStore.read("/path/to/doc1")).to.equal("doc1 source");
             await memStore.delete("/path/to/doc1");
-            expect(await memStore.get("/path/to/doc1")).to.equal("");
+            expect(await memStore.read("/path/to/doc1")).to.equal("");
 
-            expect(await memStore.get("/doc2")).to.equal("doc2 source");
+            expect(await memStore.read("/doc2")).to.equal("doc2 source");
             await memStore.delete("/path/to/../../doc2");
-            expect(await memStore.get("/doc2")).to.equal("");
+            expect(await memStore.read("/doc2")).to.equal("");
         });
     });
 });    

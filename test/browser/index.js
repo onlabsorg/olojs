@@ -4,10 +4,6 @@ const olojs = require("../../browser");
 
 describe("olojs", () => {
     
-    it("should export the `expression` module", () => {
-        expect(olojs.expression).to.equal(require("../../lib/expression"));
-    });
-
     it("should export the `document` module", () => {
         expect(olojs.document).to.equal(require("../../lib/document"));
     });
@@ -27,16 +23,14 @@ describe("olojs", () => {
     it("should export the `Router` class", () => {
         expect(olojs.Router).to.equal(require("../../lib/router"));
     });
-
-    it("should export the `Loader` constructor", () => {
-        expect(olojs.Loader).to.equal(require("../../lib/loader"));
-    });
     
-    require("../expression");
+    it("should export the `viewer` module", () => {
+        expect(olojs.Viewer).to.equal(require("../../src/viewer"));
+    });
+
     require("../document");
     require("../store");
     require("../memory-store");
     // require("./http-store");
     require("../router");
-    require("../loader");
 });

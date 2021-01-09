@@ -1,6 +1,6 @@
 
 var expect = require("chai").expect;
-var expression = require("../lib/expression");
+var swan = require("@onlabsorg/swan-js");
 
 var document = require("../lib/document");
 
@@ -19,68 +19,54 @@ describe("document", () => {
             
             it("should be an object", async () => {
                 var evaluate = document.parse("document source ...");
-                var context = expression.createContext();
-                var docNS = await evaluate(context);
-                expect(docNS).to.be.an("object");                
+                var context = swan.createContext();
+                var namespace = await evaluate(context);
+                expect(namespace).to.be.an("object");                
             });
             
             it("should contain all the names defined in the swan expressions", async () => {
                 var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
                 var evaluate = document.parse(source);
-                var context = expression.createContext({});
-                var docNS = await evaluate(context);
-                expect(docNS.__str__).to.be.a("function");
-                expect(docNS).to.deep.equal({a:10, b:20, __str__:docNS.__str__});
+                var context = swan.createContext({});
+                var namespace = await evaluate(context);
+                expect(namespace.__str__).to.be.a("function");
+                expect(namespace).to.deep.equal({a:10, b:20, __str__:namespace.__str__});
             });
             
             it("should stringify to a text obtained replacing the swan expressions with their return value", async () => {
                 var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
                 var evaluate = document.parse(source);
-                var context = expression.createContext();
-                var docNS = await evaluate(context);
-                expect(await expression.stringify(docNS)).to.equal("a + b = 30");                
+                var context = swan.createContext();
+                var namespace = await evaluate(context);
+                expect(await context.str(namespace)).to.equal("a + b = 30");                
+            });
+
+            it("should allow overriding the __str__ function", async () => {
+                var source = `Hi<% __str__ = (__str__ >> (text -> text+"!")) %>`;
+                var evaluate = document.parse(source);
+                var context = swan.createContext();
+                var namespace = await evaluate(context);
+                expect(await context.str(namespace)).to.equal("Hi!");
             });
 
             it("should return context.$renderError when an expression throws an error", async () => {
                 var source = `<% 1 + [] %><% a=10 %>`;
                 var evaluate = document.parse(source);
                 expect(evaluate).to.be.a("function");
-                var context = expression.createContext({
+                var context = swan.createContext({
                     $renderError: error => "<ERR!>"
                 }).$extend({});
-                var docNS = await evaluate(context);
-                expect(docNS.a).to.equal(10);
-                expect(await docNS.__str__(docNS)).to.equal("<ERR!>");
+                var namespace = await evaluate(context);
+                expect(namespace.a).to.equal(10);
+                expect(await namespace.__str__(namespace)).to.equal("<ERR!>");
             });            
-        });        
-    });
-    
-    describe("rendered_doc = await document.render(doc_namespace)", () => {
-        
-        it("should stringify the document namespace", async () => {
-            var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
-            var evaluate = document.parse(source);
-            var context = expression.createContext({});
-            var doc_namespace = await evaluate(context);
-            var doc_rendering = await document.render(doc_namespace);
-            expect(doc_rendering).to.equal("a + b = 30");
-        });
-        
-        it("should decorate the stringified docns via context.__render__(str) if it exists", async () => {
-            var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
-            var evaluate = document.parse(source);
-            var context = expression.createContext({});
-            context.__render__ = text => text + "!";
-            var doc_namespace = await evaluate(context);
-            var doc_rendering = await document.render(doc_namespace);
-            expect(doc_rendering).to.equal("a + b = 30!");
         });        
     });
     
     describe("context = document.createContext(namespace)", () => {
         
         it("should be an expression context", () => {
-            var expContext = expression.createContext();
+            var expContext = swan.createContext();
             var docContext = document.createContext();
             for (let name in expContext) {
                 expect(docContext[name]).to.equal(expContext[name]);

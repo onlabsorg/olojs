@@ -1,0 +1,24 @@
+
+olojs v0.16.0:
+    general:
+        ☐ [ ] update README.md
+        ☐ [ ] update document.md
+        ☐ [ ] create publish script
+    document:
+        ✔ documentation @done(2021-01-09) @project(olojs v0.16.0 / document)
+        ✔ improve test  @done(2021-01-09) @project(olojs v0.16.0 / document)
+    stores:
+        ✔ document loader @done(2021-01-09) @project(olojs v0.16.0 / stores)
+    olo-viewer vue component:
+        ☐ documentation
+    http-server:
+        ☐ documentation
+        ☐ add a server with ui based on olo-viewer
+
+ 
+olojs requirements:
+    general:
+    document:
+        ☐ Fragments: pseudo-html-element that results in a function with arguments defined by the attributes)
+    stores:
+    http-server:

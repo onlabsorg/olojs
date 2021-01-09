@@ -14,13 +14,15 @@ generate-documentation () {
     bin/gen-doc "lib/$1.js" > "docs/api/$1.md"    
 }
 
-generate-documentation expression
 generate-documentation document
+generate-documentation store
 generate-documentation http-store
 generate-documentation file-store
 generate-documentation memory-store
 generate-documentation router
-generate-documentation loader
-generate-documentation store-middleware
+generate-documentation http-server
+
+echo "- docs/api/viewer.md"
+bin/gen-doc "src/viewer.js" > "docs/api/viewer.md"
 
 echo
