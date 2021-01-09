@@ -130,9 +130,9 @@ the `npm test` command.
 
 [swan]: https://github.com/onlabsorg/swan-js/blob/main/docs/swan.md
 [document]: ./docs/document.md
-[Store]: ./docs/api/store.md)
-[MemoryStore]: ./docs/api/memory-store.md)
-[FileStore]: ./docs/api/file-store.md)
-[HTTPStore]: ./docs/api/http-store.md)
-[HTTPServer]: ./docs/api/http-server.md)
+[Store]: ./docs/api/store.md
+[MemoryStore]: ./docs/api/memory-store.md
+[FileStore]: ./docs/api/file-store.md
+[HTTPStore]: ./docs/api/http-store.md
+[HTTPServer]: ./docs/api/http-server.md
 [Router]: ./docs/api/router-store.md
