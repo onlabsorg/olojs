@@ -22,7 +22,7 @@ generate-documentation memory-store
 generate-documentation router
 generate-documentation http-server
 
-echo "- docs/api/viewer.md"
-bin/gen-doc "src/viewer.js" > "docs/api/viewer.md"
+echo "- docs/api/create-viewer.md"
+bin/gen-doc "src/create-viewer.js" > "docs/api/create-viewer.md"
 
 echo

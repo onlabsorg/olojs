@@ -3,7 +3,7 @@ const OloViewer = require("./olo-viewer");
 
 
 /**
- *  olojs.Viewer - function
+ *  createViewer - function
  *  ============================================================================
  *  In a browser environment, this function creates a widget that renders the
  *  document mapped to the `src` attribute in a given store.

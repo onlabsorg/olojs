@@ -46,6 +46,6 @@ A `Router` is an object bundles together multiple stores while exposing the
 The `HTTPServer` module contains functions for creating HTTP servers exposing
 a RESTful interface to a `Store` object.
 
-### [olojs.createViewer](./api/viewer.md) [browser only]
+### [olojs.createViewer](./api/create-viewer.md) [browser only]
 In a browser environment, this function creates a widget that renders the
 document mapped to the `src` attribute in a given store.
