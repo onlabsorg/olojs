@@ -18,7 +18,7 @@ const olojs = require('@onlabsorg/olojs/browser');
 ```
 
 ### [olojs.document](./api/document.md)
-The `document` namespace contains a low-level API for documents manipulations:
+The `document` namespace contains a low-level API for documents manipulation:
 it allows to parse a document source, create a document context and evaluate
 the parsed document in that context. The documents handled by this API do not 
 have the concept of store, therefore they cannot import other documents (no 

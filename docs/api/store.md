@@ -102,25 +102,22 @@ following standard:
 When instantiated directly, the base store `delete` method always throws
 `Store.WriteOperationNotAllowedError`.
   
-store.load - async method
+store.createContext - method
 ------------------------------------------------------------------------
-Read a document source and returns a parsed document object.
+Create a document context specific to a given store document.
 ```js
-doc = await store.load(docId);
-context = doc.createContext(...namespaces);
-namespace = await doc.evaluate(context);
+context = store.createContext(docId);
 ```
 - `docId` is a combination of a path and a query string (e.g.
   `/path/to/doc?x=10;y=20;z=30`)
-- `doc.path` contains the path portion of the passed id
-- `doc.source` contained the document source returned by `store.read`
-- `doc.createContext` creates a document context specific to `doc`
-- `context.__path__` contains `doc.path`
+- `context` is a valid document context
+- `context.__path__` contains the path portion of `docId`
 - `context.argns` contains the namespace passed as query string with
-  `docId`
+  `docId`. For example, if `docId = /path/to/doc?x=10;y=20;z=30`, then
+  the argns object will be `{x:10, y:20, z:30}`.
 - `context.import` is a function that returns a store document namespace
-  given its path (which can be relative to `doc.path`)
-- `doc.evaluate` is the function returned by `olojs.document.parse(doc.source)`
+  given its id. If the path portion of the id is a relative path, it
+  will be resolved agains `context.__path__`.
 
 This method is not meant to be overridden. 
   

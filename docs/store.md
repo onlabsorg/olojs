@@ -8,7 +8,8 @@ can be summarized as follows:
 * `store.write(path, source)` modifies the document source mapped to the
   given path
 * `store.delete(path)` removes the document mapped to the given path
-* `store.load(id)` reads a document source and returns a document object
+* `store.createContext(id)` creates a document context specific to a particular
+  stored document
 
 olojs comes with the following pre-defined stores:
 

@@ -109,148 +109,108 @@ describe("Store", () => {
         });
     });
 
-    describe('doc = await store.load(docId)', () => {
-
-        it("should return an object", async () => {
-            const store = new Store();
-            var doc = await store.load("/path/to/doc");
-            expect(doc).to.be.an("object");
+    describe('context = store.createContext(docId)', () => {
+        
+        it("should return a document context", () => {
+            var store = new Store();
+            var context = store.createContext("/path/to/doc");              
+            var docContext = document.createContext();
+            for (let name in docContext) {
+                expect(context[name]).to.equal(docContext[name]);
+            }            
         });
         
-        describe('doc.path', () => {
+        it("should contain include the store.globals object", () => {
+            var store = new Store();
+            Object.assign(store.globals, {x:10, y:20});
+            var context = store.createContext("/path/to/doc");              
+            for (let name in store.globals) {
+                expect(context[name]).to.equal(store.globals[name]);
+            }            
             
-            it("should contain the path part of the document id, wthout query string", async () => {
-                const store = new Store();
-                var doc = await store.load("/path/to/doc");
-                expect(doc.path).to.equal("/path/to/doc");
+        });
+        
+        describe("context.__path__", () => {
+            it("should contain the normalize path portion of the docId", () => {
+                var store = new Store();
+                
+                var context = store.createContext("/path/to/doc?x=10;y=20");                
+                expect(context.__path__).to.equal("/path/to/doc");
+
+                var context = store.createContext("path/to/doc?x=10;y=20");                
+                expect(context.__path__).to.equal("/path/to/doc");
+
+                var context = store.createContext("?x=10;y=20");                
+                expect(context.__path__).to.equal("/");
+
+                var context = store.createContext("..?x=10;y=20");                
+                expect(context.__path__).to.equal("/");
             });
         });
-
-        describe('doc.source', () => {
-            
-            it("should contain the source returned by `store.read(path)`", async () => {
-                const store = new Store();
-                store.read = path => `doc @ ${path}`;                
-                var doc = await store.load("/path/to/doc");
-                expect(doc.source).to.equal("doc @ /path/to/doc");
+        
+        describe("context.argns", () => {
+            it("should contain the key-value pairs passed via the query string", () => {
+                var store = new Store();
+                var context = store.createContext("/path/to/doc?x=1;y=2&s=abc;bool");
+                expect(context.argns).to.deep.equal({x:1, y:2, s:"abc", bool:true});
             });
         });
-
-        describe('docns = await doc.evaluate(context)', () => {
+        
+        describe("docns = context.import(id)", () => {
             
-            it("should evaluate the document source in the passed context", async () => {
+            it("should be a function", () => {
                 const store = new Store();
-                store.read = path => `path = <% p: "${path}" %>`;                
-                var doc = await store.load("/path/to/doc");
-                var context = document.createContext();
-                var docns = await doc.evaluate(context);
-                expect(docns.p).to.equal("/path/to/doc");
-                expect(await context.str(docns)).to.equal("path = /path/to/doc");
+                var context = store.createContext("/path/to/doc");
+                expect(context.import).to.be.a("function");                        
             });
-        });
-
-        describe('context = doc.createContext(...namespaces)', () => {
             
-            it("should return a document context", async () => {
+            it("should return the namespace of the document mapped to the passed id", async () => {
                 const store = new Store();
-                var doc = await store.load("/path/to/doc");
-                var context = doc.createContext();                
-                var docContext = document.createContext();
-                for (let name in docContext) {
-                    expect(context[name]).to.equal(docContext[name]);
+                store.read = path => `<% p = "${path}" %>`
+
+                var context = store.createContext("/path/to/doc?x=10");
+                
+                var doc1_ns = await context.import('/path/to/doc1');
+                expect(doc1_ns.p).to.equal('/path/to/doc1');
+                expect(doc1_ns.argns.x).to.be.undefined;
+
+                var doc1_ns = await context.import('/path/to/doc1?x=20');
+                expect(doc1_ns.p).to.equal('/path/to/doc1');
+                expect(doc1_ns.argns.x).to.equal(20);
+            });
+            
+            it("should resolve ids relative to doc.path", async () => {
+                const store = new Store();
+                store.read = path => `<% p = "${path}" %>`
+                var ctx = store.createContext("/path/to/doc?x=10");
+                
+                expect((await ctx.import('doc1')).p).to.equal('/path/to/doc1');       
+                expect((await ctx.import('../doc2')).p).to.equal('/path/doc2');       
+                expect((await ctx.import('../doc2?x=20')).argns.x).to.equal(20);       
+                expect((await ctx.import('../doc2')).argns.x).to.be.undefined;       
+            });
+            
+            it("should cache the documents and load them only once", async () => {
+                var count = 0;
+                const store = new Store();
+                store.read = path => {
+                    count += 1;
+                    return `doc @ ${path}`;
                 }
-            });
-            
-            it("should include all the names in the passed namespaces", async () => {
-                const store = new Store();
-                var doc = await store.load("/path/to/doc");
-                var context = doc.createContext({x:10, y:20}, {y:30, z:40});                
-                expect(context.x).to.equal(10);                    
-                expect(context.y).to.equal(30);                    
-                expect(context.z).to.equal(40);                    
-            });
-            
-            describe("context.__path__", () => {
-                it("should contain doc.path", async () => {
-                    const store = new Store();
-                    var doc = await store.load("/path/to/doc");
-                    var context = doc.createContext();                
-                    expect(context.__path__).to.equal(doc.path);
-                });
-            });
-            
-            describe("context.argns", () => {
-                it("should contain the key-value pairs passed via the query string", async () => {
-                    const store = new Store();
-                    var doc = await store.load("/path/to/doc?x=1;y=2&s=abc;bool");
-                    var context = doc.createContext();                
-                    expect(context.argns).to.deep.equal({x:1, y:2, s:"abc", bool:true});
-                });
-            });
-            
-            describe("docns = context.import(id)", () => {
+                var ctx = store.createContext("/path/to/doc");
                 
-                it("should be a function", async () => {
-                    const store = new Store();
-                    var doc = await store.load("/path/to/doc");
-                    var context = doc.createContext();
-                    expect(context.import).to.be.a("function");                        
-                });
+                var ns = await ctx.import("/path/to/doc");
+                expect(count).to.equal(1);
                 
-                it("should return the namespace of the document mapped to the passed id", async () => {
-                    const store = new Store();
-                    store.read = path => `<% p = "${path}" %>`
-
-                    var doc0 = await store.load("/path/to/doc?x=10");
-                    var context = doc0.createContext();
-                    
-                    var doc1_ns = await context.import('/path/to/doc1');
-                    expect(doc1_ns.p).to.equal('/path/to/doc1');
-                    expect(doc1_ns.argns.x).to.be.undefined;
-
-                    var doc1_ns = await context.import('/path/to/doc1?x=20');
-                    expect(doc1_ns.p).to.equal('/path/to/doc1');
-                    expect(doc1_ns.argns.x).to.equal(20);
-                });
+                var ns = await ctx.import("/path/to/doc?x=10");
+                expect(count).to.equal(1);
                 
-                it("should resolve ids relative to doc.path", async () => {
-                    const store = new Store();
-                    store.read = path => `<% p = "${path}" %>`
-                    var doc0 = await store.load("/path/to/doc?x=10");
-                    var ctx = doc0.createContext();
-                    
-                    expect((await ctx.import('doc1')).p).to.equal('/path/to/doc1');       
-                    expect((await ctx.import('../doc2')).p).to.equal('/path/doc2');       
-                    expect((await ctx.import('../doc2?x=20')).argns.x).to.equal(20);       
-                    expect((await ctx.import('../doc2')).argns.x).to.be.undefined;       
-                });
-                
-                it("should cache the documents and load them only once", async () => {
-                    var count = 0;
-                    const store = new Store();
-                    store.read = path => {
-                        count += 1;
-                        return `doc @ ${path}`;
-                    }
-                    var doc = await store.load("/path/to/doc");                    
-                    expect(count).to.equal(1);
-                    expect(doc.source).to.equal("doc @ /path/to/doc");
+                var ns = await ctx.import("/path/to/doc2");
+                expect(count).to.equal(2);
 
-                    var ctx = doc.createContext();
-                    
-                    var ns = await ctx.import("/path/to/doc");
-                    expect(count).to.equal(1);
-                    
-                    var ns = await ctx.import("/path/to/doc?x=10");
-                    expect(count).to.equal(1);
-                    
-                    var ns = await ctx.import("/path/to/doc2");
-                    expect(count).to.equal(2);
-
-                    var ns = await ctx.import("/path/to/doc2");
-                    expect(count).to.equal(2);
-                });
+                var ns = await ctx.import("/path/to/doc2");
+                expect(count).to.equal(2);
             });
-        });        
-    });       
+        });
+    });   
 });    
