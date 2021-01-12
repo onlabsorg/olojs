@@ -121,6 +121,23 @@ context = store.createContext(docId);
 
 This method is not meant to be overridden. 
   
+store.load - async method
+------------------------------------------------------------------------
+Reads, evaluates and renders the document identified by the passed id.
+
+```js
+{source, context, namespace, text} = await store.load(docId);
+```
+
+- `docId` is a combination of a path and a query string (e.g.
+  `/path/to/doc?x=10;y=20;z=30`)
+- `source` is the document source returned by `store.read`
+- `context` is the document context returned by `store.createContext`
+- `namespace` is the document namespace evaluated in `context`
+- `text` is the document rendered context
+
+This method is not meant to be overridden. 
+  
 Store.ReadPermissionDeniedError - class
 ----------------------------------------------------------------------------
 Error thrown when attempting a read operation for which the store instance
