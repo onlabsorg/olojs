@@ -165,7 +165,7 @@ describe("Store", () => {
             });
             
             it("should return the namespace of the document mapped to the passed id", async () => {
-                const store = new Store();
+                var store = new Store();
                 store.read = path => `<% p = "${path}" %>`
 
                 var context = store.createContext("/path/to/doc?x=10");
@@ -213,4 +213,18 @@ describe("Store", () => {
             });
         });
     });   
+    
+    describe('doc = await store.load(docId)', () => {
+        it("should return an object containing the document source, context, namespace and rendered text", async () => {
+            var store = new Store();
+            store.read = path => `p = <% p: "${path}" %>, x = <% argns.x %>`;
+            var doc = await store.load('/path/to/doc?x=10');
+            expect(doc.source).to.equal(`p = <% p: "/path/to/doc" %>, x = <% argns.x %>`);
+            expect(doc.context.__path__).to.equal("/path/to/doc");
+            expect(doc.context.argns).to.deep.equal({x:10});
+            expect(doc.namespace.p).to.equal("/path/to/doc");
+            expect(doc.namespace.argns).to.deep.equal({x:10});
+            expect(doc.text).to.equal(`p = /path/to/doc, x = 10`);
+        });
+    });
 });    

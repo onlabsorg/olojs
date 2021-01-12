@@ -86,11 +86,7 @@ store = new olojs.FileStore('/home/my-olodocs-store');
 Load, evaluate and render a [document]:
 
 ```js
-context = store.createContext('/path/to/doc');  // the document evaluation context
-source = await store.read('/path/to/doc');      // the document source
-evaluate = olojs.document.parse(source);        // a function that evaluates the source
-namespace = await evaluate(context);            // the document namespace
-text = await context.str(namespace);            // the document rendered content
+{text, namespace} = await store.load('/path/to/doc');
 ```
 
 Serve the store via HTTP:

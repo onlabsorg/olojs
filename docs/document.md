@@ -157,7 +157,7 @@ I have a <b>persian</b> cat named <i>Izad</i>!
 
 > The import function works also with relative paths. For example the import
 > statement `import './doc2'` evaluated inside `/path/to/doc1` will return
-> the namespace of `/path/to/dc2`.
+> the namespace of `/path/to/doc2`.
 
 If an imported document namespace gets stringified, it returns the rendered
 text of the imported document. For example, lets consider the following

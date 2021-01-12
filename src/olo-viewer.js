@@ -27,12 +27,8 @@ module.exports = store => ({
     methods: {
         
         'refresh': async function () {
-            const context = store.createContext(this.src);
-            const source = await store.read(context.__path__);
-            const evaluate = olojs.document.parse(source);
-            const docns = await evaluate(context);
-            const rawHTML = await context.str(docns);
-            this.html = DOMPurify.sanitize(rawHTML);
+            const {text} = await store.load(this.src);
+            this.html = DOMPurify.sanitize(text);
         }
     },
     
