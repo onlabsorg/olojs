@@ -68,32 +68,26 @@ Documents custom markup
 --------------------------------------------------------------------------------
 Olo-documents are markup-agnostic: the rendered content returned by 
 `await context.str(namespace)` is just the plain text obtained by replacing the 
-inline expressions with their stringified value. In order to customize this
-behavior, you can decorate the namespace `__str__` function.
+inline expressions with their stringified value. 
 
-> The swan `str` function, when applied to a namespaces `ns`, delegates 
-> internally to `ns.__str__(ns)`.
-
-If for example you want to render the document as markdown, you can use the
-swan markdown module `<% md = require 'markdown' %>` which is a callable that
-takes a markdown text as input and retruns the corresponding html markup.
-Once you have the `md` function, you can modify the `__str__` function as
-follows:
+In order to customize this behavior, you can define a swan callable named 
+`__render__` which will decorate the rendered text. For example the following
+document ...
 
 ```
-<% __str__ = __str__ >> md %>
+<% __render__ = text -> text + '!' %>
+Hello world
 ```
 
-> In case you are not familiar with swan yet, you should know that the `>>`
-> operator performs function composition. In this case the new `__str__` 
-> function will execute the old `__str__` function and pass its return value
-> (the plain rendered text) to the `md` function.
+... will render to `Hello world!`. The trailing exclamation mark will be added
+by the `__render__` function to the plain rendered text.
 
-In short, in order to render a document as markdown, you should add the following
-inline expression anywhere inside your document source:
+If you want to render the document as markdown, you can assign the swan markdown 
+module to the `__render__` function:
 
 ```
-<% __str__ = __str__ >> (require 'markdown') %>
+<% __render__ = require 'markdown' %>
+# This is a markdown header
 ```
 
 At the moment of writing, `markdown` is the only markup parser available in

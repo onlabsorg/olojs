@@ -41,6 +41,15 @@ describe("document", () => {
                 expect(await context.str(namespace)).to.equal("a + b = 30");                
             });
 
+            it("should use docns.__render__ as post-stringifier", async () => {
+                var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
+                var evaluate = document.parse(source);
+                var context = swan.createContext();
+                var namespace = await evaluate(context);
+                namespace.__render__ = text => `${text}!`;
+                expect(await context.str(namespace)).to.equal("a + b = 30!");                
+            });
+
             it("should allow overriding the __str__ function", async () => {
                 var source = `Hi<% __str__ = (__str__ >> (text -> text+"!")) %>`;
                 var evaluate = document.parse(source);
