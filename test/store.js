@@ -182,12 +182,15 @@ describe("Store", () => {
             it("should resolve ids relative to doc.path", async () => {
                 const store = new Store();
                 store.read = path => `<% p = "${path}" %>`
-                var ctx = store.createContext("/path/to/doc?x=10");
                 
+                var ctx = store.createContext("/path/to/doc?x=10");
                 expect((await ctx.import('doc1')).p).to.equal('/path/to/doc1');       
                 expect((await ctx.import('../doc2')).p).to.equal('/path/doc2');       
                 expect((await ctx.import('../doc2?x=20')).argns.x).to.equal(20);       
                 expect((await ctx.import('../doc2')).argns.x).to.be.undefined;       
+
+                var ctx = store.createContext("/path/to/");
+                expect((await ctx.import('./doc1')).p).to.equal('/path/to/doc1');       
             });
             
             it("should cache the documents and load them only once", async () => {
