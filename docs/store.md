@@ -8,6 +8,7 @@ can be summarized as follows:
 * `store.write(path, source)` modifies the document source mapped to the
   given path
 * `store.delete(path)` removes the document mapped to the given path
+* `store.deleteAll(path)` removes all the document matching the given path
 * `store.createContext(id)` creates a document context specific to a particular
   stored document
 * `store.load(id)` reads, evaluates and renders a document
