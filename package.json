@@ -1,6 +1,6 @@
 {
   "name": "@onlabsorg/olojs",
-  "version": "0.17.4",
+  "version": "0.17.5",
   "description": "a document-based distributed content management framework",
   "keywords": [
       "store", "document", "template", "sandboxed", "swan", "expression",
