@@ -2,6 +2,11 @@
   "name": "@onlabsorg/olojs",
   "version": "0.17.3",
   "description": "a document-based distributed content management framework",
+  "keywords": [
+      "store", "document", "template", "sandboxed", "swan", "expression",
+      "functional", "CMS", "import", "distributed", "modular",
+      "async", "promise"
+  ],
   "homepage": "https://github.com/onlabsorg/olojs#readme",
   "bugs": {
     "url": "https://github.com/onlabsorg/olojs/issues"
