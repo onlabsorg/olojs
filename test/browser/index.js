@@ -3,11 +3,16 @@ const olojs = require("../../browser");
 
 
 describe("olojs", () => {
-    
+
+    it("should export the `expression` module", () => {
+        expect(olojs.expression).to.equal(require("../../lib/expression"));
+        expect(olojs.expression).to.equal(require("@onlabsorg/swan-js"));
+    });
+
     it("should export the `document` module", () => {
         expect(olojs.document).to.equal(require("../../lib/document"));
     });
-    
+
     it("should export the `Store` class", () => {
         expect(olojs.Store).to.equal(require("../../lib/store"));
     });
@@ -23,11 +28,12 @@ describe("olojs", () => {
     it("should export the `Router` class", () => {
         expect(olojs.Router).to.equal(require("../../lib/router"));
     });
-    
+
     it("should export the `viewer` module", () => {
         expect(olojs.createViewer).to.equal(require("../../src/create-viewer"));
     });
 
+    require("../expression");
     require("../document");
     require("../store");
     require("../memory-store");
