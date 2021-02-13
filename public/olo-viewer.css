@@ -18,7 +18,7 @@
     padding-bottom: 1em;
 }
 
-@media (max-width: 480px) { 
+@media (max-width: 480px) {
     .olo-viewer {
         padding-left: 3%;
         padding-right: 3%;
@@ -30,37 +30,37 @@
     font-family: "Ubuntu";
     font-style: normal;
     font-weight: 300;
-    src: local("Ubuntu Light"), local("Ubuntu-Light"), url("http://themes.googleusercontent.com/static/fonts/ubuntu/v4/WtcvfJHWXKxx4x0kuS1kobO3LdcAZYWl9Si6vvxL-qU.woff") format("woff");
+    src: local("Ubuntu Light"), local("Ubuntu-Light"), url("https://themes.googleusercontent.com/static/fonts/ubuntu/v4/WtcvfJHWXKxx4x0kuS1kobO3LdcAZYWl9Si6vvxL-qU.woff") format("woff");
 }
 @font-face {
     font-family: "Ubuntu";
     font-style: normal;
     font-weight: 400;
-    src: local("Ubuntu"), url("http://themes.googleusercontent.com/static/fonts/ubuntu/v4/CGXpU_uR_FUfdeyCjAWgZ-vvDin1pK8aKteLpeZ5c0A.woff") format("woff");
+    src: local("Ubuntu"), url("https://themes.googleusercontent.com/static/fonts/ubuntu/v4/CGXpU_uR_FUfdeyCjAWgZ-vvDin1pK8aKteLpeZ5c0A.woff") format("woff");
 }
 @font-face {
     font-family: "Ubuntu";
     font-style: normal;
     font-weight: 500;
-    src: local("Ubuntu Medium"), local("Ubuntu-Medium"), url("http://themes.googleusercontent.com/static/fonts/ubuntu/v4/gMhvhm-nVj1086DvGgmzB7O3LdcAZYWl9Si6vvxL-qU.woff") format("woff");
+    src: local("Ubuntu Medium"), local("Ubuntu-Medium"), url("https://themes.googleusercontent.com/static/fonts/ubuntu/v4/gMhvhm-nVj1086DvGgmzB7O3LdcAZYWl9Si6vvxL-qU.woff") format("woff");
 }
 @font-face {
     font-family: "Ubuntu";
     font-style: normal;
     font-weight: 700;
-    src: local("Ubuntu Bold"), local("Ubuntu-Bold"), url("http://themes.googleusercontent.com/static/fonts/ubuntu/v4/nsLtvfQoT-rVwGTHHnkeJrO3LdcAZYWl9Si6vvxL-qU.woff") format("woff");
+    src: local("Ubuntu Bold"), local("Ubuntu-Bold"), url("https://themes.googleusercontent.com/static/fonts/ubuntu/v4/nsLtvfQoT-rVwGTHHnkeJrO3LdcAZYWl9Si6vvxL-qU.woff") format("woff");
 }
 @font-face {
     font-family: "Ubuntu";
     font-style: italic;
     font-weight: 300;
-    src: local("Ubuntu Light Italic"), local("Ubuntu-LightItalic"), url("http://themes.googleusercontent.com/static/fonts/ubuntu/v4/DZ_YjBPqZ88vcZCcIXm6VqfTCPadK0KLfdEfFtGWCYw.woff") format("woff");
+    src: local("Ubuntu Light Italic"), local("Ubuntu-LightItalic"), url("https://themes.googleusercontent.com/static/fonts/ubuntu/v4/DZ_YjBPqZ88vcZCcIXm6VqfTCPadK0KLfdEfFtGWCYw.woff") format("woff");
 }
 
-.olo-viewer, 
-.olo-viewer button, 
-.olo-viewer input, 
-.olo-viewer select, 
+.olo-viewer,
+.olo-viewer button,
+.olo-viewer input,
+.olo-viewer select,
 .olo-viewer textarea {
     color: #57534A;
     font-family: "Ubuntu","Myriad Pro","Myriad",sans-serif;
@@ -68,14 +68,14 @@
 	font-weight: 300;
 }
 
-.olo-viewer, 
+.olo-viewer,
 .olo-viewer textarea {
     line-height: 1.4;
 }
 
-.olo-viewer h1, 
-.olo-viewer h2, 
-.olo-viewer h3, 
+.olo-viewer h1,
+.olo-viewer h2,
+.olo-viewer h3,
 .olo-viewer dt {
     color: #423F37;
     font-weight: 700;
@@ -86,13 +86,13 @@
     margin: 0.67em 0;
 }
 
-.olo-viewer h2, 
+.olo-viewer h2,
 .olo-viewer .article-list .article-title {
     font-size: 1.5em;
     margin: 0.83em 0;
 }
 
-.olo-viewer h3, 
+.olo-viewer h3,
 .olo-viewer dt {
     font-size: 1.17em;
     margin: 1em 0;
@@ -119,11 +119,11 @@
     text-decoration: underline;
 }
 
-.olo-viewer a:link { 
+.olo-viewer a:link {
     color: #0074D9;
 }
 
-.olo-viewer a:visited { 
+.olo-viewer a:visited {
     color: #B10DC9;
 }
 
@@ -133,14 +133,14 @@
 }
 
 
-.olo-viewer p, 
+.olo-viewer p,
 .olo-viewer pre {
     margin: 1em 0;
 }
 
-.olo-viewer code, 
-.olo-viewer kbd, 
-.olo-viewer pre, 
+.olo-viewer code,
+.olo-viewer kbd,
+.olo-viewer pre,
 .olo-viewer samp {
     font-family: monospace,serif;
     background-color: #F8F5F0;
@@ -170,7 +170,7 @@
     width: 390px;
 }
 
-.olo-viewer b, 
+.olo-viewer b,
 .olo-viewer strong {
     font-weight: bold;
     color: #423F37;
@@ -232,8 +232,8 @@
     width: 6px;
 }
 
-.olo-viewer ol, 
-.olo-viewer ul, 
+.olo-viewer ol,
+.olo-viewer ul,
 .olo-viewer dl {
     margin-left: 2rem;
     padding: 0;
@@ -269,8 +269,8 @@
     margin-top: 0.5em;
 }
 
-.olo-viewer small, 
-.olo-viewer dd, 
+.olo-viewer small,
+.olo-viewer dd,
 .olo-viewer figcaption {
     color: #A19C91;
     display: block;
