@@ -28,6 +28,7 @@ to the router declaration above:
 - `router.read('ppp2:/path/to/doc')` will result in a call to
   `protocol_store_2.read('/path/to/doc')`
 If no match is found, it will behave as empty store.
+
 The constructor will ignore the following routes/protocols:
 - The properties of the `routes` object which are not instance of Store
 - The properties of the `protocols` object which are not instance of Store
