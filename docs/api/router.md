@@ -2,23 +2,28 @@ Router
 ============================================================================
 This store is a container for other stores and routes the `read`, `list`,
 `write` and `delete` requests to the store best matching the path.
+
 ```js
 routes = {
     "/path/to/store_1/": store_1,
     "/path/to/store_2/": store_2,
     ...
 };
+
 protocols = {
     "ppp1": protocol_store_1,
     "ppp2": protocol_store_2,
     ...
 };
+
 router = new Router(routes, protocols);
 ```
+
 Every time a `read`, `list`, `write`, `delete` or `deleteAll` method is
 called on a `path`, the router delegates to the corresponding method of
 the store matching the path or its uri scheme. For example, with reference
 to the router declaration above:
+
 - `router.read('/path/to/store_1/path/to/doc')` will result in a call to
   `store_1.read('/path/to/doc')`
 - `router.read('/path/to/store_2/path/to/doc')` will result in a call to
@@ -27,6 +32,7 @@ to the router declaration above:
   `protocol_store_1.read('/path/to/doc')`
 - `router.read('ppp2:/path/to/doc')` will result in a call to
   `protocol_store_2.read('/path/to/doc')`
+
 If no match is found, it will behave as empty store, which is: `read` will
 return an empty string, `list` will return an empty array, `write`,
 `delete` and `deleteAll` will throw a `WriteOperationNotAllowed` error.
