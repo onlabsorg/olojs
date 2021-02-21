@@ -9,18 +9,18 @@ describe("Router", () => {
 
     describe("[store, subPath] = router.match(path)", () => {
 
-        it("should return store mounted at the route matching the path and the subPath relative to that route", async () => {
+        it("should return store mounted at the route matching the path and the subPath relative to that route", () => {
             var routes = {
                 "path/to": new MemoryStore(),
                 "/path/to/store2": new MemoryStore(),
                 "/": new MemoryStore()
             }
             var router = new Router(routes);
-            expect(await router.matchRoute('/path/to/')).to.deep.equal([routes['path/to'], "/"]);
-            expect(await router.matchRoute('/path/to/doc')).to.deep.equal([routes['path/to'], "/doc"]);
-            expect(await router.matchRoute('/path/to/store2/path/to/doc')).to.deep.equal([routes['/path/to/store2'], "/path/to/doc"]);
-            expect(await router.matchRoute('/path/to/store2/')).to.deep.equal([routes['/path/to/store2'], "/"]);
-            expect(await router.matchRoute('/path_to/doc')).to.deep.equal([routes['/'], "/path_to/doc"]);
+            expect(router.match('/path/to/')).to.deep.equal([routes['path/to'], "/"]);
+            expect(router.match('/path/to/doc')).to.deep.equal([routes['path/to'], "/doc"]);
+            expect(router.match('/path/to/store2/path/to/doc')).to.deep.equal([routes['/path/to/store2'], "/path/to/doc"]);
+            expect(router.match('/path/to/store2/')).to.deep.equal([routes['/path/to/store2'], "/"]);
+            expect(router.match('/path_to/doc')).to.deep.equal([routes['/'], "/path_to/doc"]);
         });
 
         it("should return [null, path] if no match is found", () => {
@@ -29,7 +29,40 @@ describe("Router", () => {
                 "/path/to/s2": new MemoryStore(),
             }
             var router = new Router(routes);
-            expect(router.matchRoute('/path/to/s3/doc')).to.deep.equal([null, "/path/to/s3/doc"]);
+            expect(router.match('/path/to/s3/doc')).to.deep.equal([null, "/path/to/s3/doc"]);
+        });
+    });
+
+    describe("[store, subPath] = router.match(URI)", () => {
+
+        it("should return the protocol store mapped to the uri scheme", () => {
+            var routes = {
+                "/": new MemoryStore()
+            };
+            var protocols = {
+                ppp1: new MemoryStore(),
+                ppp2: new MemoryStore()
+            }
+            var router = new Router(routes, protocols);
+            expect(router.match('ppp1:/path/to/doc1')).to.deep.equal([protocols.ppp1, "/path/to/doc1"]);
+            expect(router.match('ppp1://path/to/doc2')).to.deep.equal([protocols.ppp1, "/path/to/doc2"]);
+            expect(router.match('ppp2:/path/to/doc3')).to.deep.equal([protocols.ppp2, "/path/to/doc3"]);
+        });
+
+        it("should return [null, uri] if no protocol match is found", () => {
+            var routes = {
+                "/path/to/s1": new MemoryStore(),
+                "/path/to/s2": new MemoryStore(),
+            }
+            var protocols = {
+                ppp1: new MemoryStore(),
+                ppp_3: new MemoryStore()
+            }
+            var router = new Router(routes, protocols);
+            console.log(router._protocols);
+            expect(router.match('ppp1:/path/to/doc1')).to.deep.equal([protocols.ppp1, "/path/to/doc1"]);
+            expect(router.match('ppp2:/path/to/doc2')).to.deep.equal([null, "ppp2:/path/to/doc2"]);
+            expect(router.match('ppp_3:/path/to/doc3')).to.deep.equal([null, "ppp_3:/path/to/doc3"]);
         });
     });
 
