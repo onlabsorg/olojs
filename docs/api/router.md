@@ -16,19 +16,19 @@ protocols = {
 router = new Router(routes, protocols);
 ```
 Every time a `read`, `list`, `write`, `delete` or `deleteAll` method is
-called on a `path`, the store delegates to the corresponding method of
+called on a `path`, the router delegates to the corresponding method of
 the store matching the path or its uri scheme. For example, with reference
 to the router declaration above:
 - `router.read('/path/to/store_1/path/to/doc')` will result in a call to
   `store_1.read('/path/to/doc')`
-- `router.read('/path/to/store_2/path/to/dir')` will result in a call to
+- `router.read('/path/to/store_2/path/to/doc')` will result in a call to
   `store_2.read('/path/to/doc')`
 - `router.read('ppp1:/path/to/doc')` will result in a call to
   `protocol_store_1.read('/path/to/doc')`
 - `router.read('ppp2:/path/to/doc')` will result in a call to
   `protocol_store_2.read('/path/to/doc')`
-If no match is found, it will behave as empty store.
 
+If no match is found, it will behave as empty store.
 The constructor will ignore the following routes/protocols:
 - The properties of the `routes` object which are not instance of Store
 - The properties of the `protocols` object which are not instance of Store
