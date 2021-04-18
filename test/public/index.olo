@@ -1,7 +1,16 @@
 <% check = import './test-tools' . check %>
-<% __render__ = require 'markdown' %>
 
-# olojs client test document: <% check(1+1 == 2) %>
+# olojs viewer test
 
-### Test error
-<% y = [] / 2 %>
+### Boolean operations
+- Equality                  <% check((TRUE, 10, 'abc', [1,2,3], {a:1}) == (TRUE, 10, 'abc', [1,2,3], {a:1})) %>
+- Non-equality              <% check((TRUE, 10, 'abc', [1,2,3], {a:1}, x->2*x) != (TRUE, 10, 'abc', [1,2,3], {a:2}, x->2*x)) %>
+- Greater than              <% check(10>9 & 'bbb'>'aaa' & [1,2,4]>[1,2,3]) %>
+- Greater than or equal to  <% check(10>=9 & 'aaa'>='aaa') %>
+- Less than                 <% check(9<10 & 'aaa'<'bbb' & [1,2,3]<[1,3,4]) %>
+- Less than or equal to     <% check(9<=10 & 'aaa'<='aaa') %>
+
+
+
+
+<% __str__ = require 'markdown' __str__ %>

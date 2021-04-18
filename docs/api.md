@@ -8,10 +8,10 @@ const olojs = require('@onlabsorg/olojs');
 In the browser, the `olojs` namespace can be imported as global object
 
 ```html
-<script src="/path-to-olojs/public/olo.js"></script>
+<script src="/path-to-olojs/browser/olo.js"></script>
 ```
 
-or it can be loaded in a webpack project as follows:
+or it can be loaded in a [webpack](https://webpack.js.org/) project as follows:
 
 ```js
 const olojs = require('@onlabsorg/olojs/browser');
@@ -45,13 +45,14 @@ the files with `.olo` extension as olojs documents.
 The `HTTPStore` is a store backed by a remote store served over HTTP.
 
 ### [olojs.Router](./api/router.md)
-A `Router` is an object bundles together multiple stores while exposing the
-`Store` interface itself.
+A `Router` is an Store that bundles together multiple stores making them appear
+as a single store.
 
 ### [olojs.HTTPServer](./api/http-server.md) [NodeJS only]
 The `HTTPServer` module contains functions for creating HTTP servers exposing
-a RESTful interface to a `Store` object.
+a RESTful interface to a `Store` object. It also allows to serve the documents
+as HTML pages.
 
-### [olojs.createViewer](./api/create-viewer.md) [browser only]
+### [olojs.Viewer](./api/viewer.md) [browser only]
 In a browser environment, this function creates a widget that renders the
 document mapped to the `src` attribute in a given store.

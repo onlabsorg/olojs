@@ -1,24 +1,12 @@
 const path = require('path');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
         
-    entry: "./src/olo.js",
+    entry: "./browser.js",
     
     output: {
         filename: 'olo.js',
         chunkFilename: '[name].bundle.js',
-        path: path.resolve(__dirname, './public')
+        path: path.resolve(__dirname, './browser')
     },  
-    
-    plugins: [ new MiniCssExtractPlugin({filename: 'olo-viewer.css'}) ],
-    
-    module: {
-        rules: [
-            {
-                test: /\.css$/i,
-                use: [MiniCssExtractPlugin.loader, 'css-loader'],
-            },
-        ],
-    },
 }

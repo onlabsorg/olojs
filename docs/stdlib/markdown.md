@@ -8,5 +8,6 @@ Takes a markdown text as input and returns the corresponding HTML text.
 ```
 html_text = markdown(md_text)
 ```
+For example, the function `markdown('*bold*')` returns `<p><em>bold</em></p>`.
   
 

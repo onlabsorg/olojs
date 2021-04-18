@@ -1,6 +1,6 @@
 {
   "name": "@onlabsorg/olojs",
-  "version": "0.17.9",
+  "version": "0.18.0",
   "description": "a document-based distributed content management framework",
   "keywords": [
     "store",
@@ -30,26 +30,26 @@
   },
   "scripts": {
     "develop": "webpack --mode development --watch",
-    "test": "mocha test/index.js; node test/browser/run-tests.js",
+    "test": "node test/help.js",
+    "node-test": "mocha test/index.js",
+    "browser-test": "node test/browser/run-tests.js",
+    "viewer-test": "node test/viewer.js /index",
     "build": "bin/build"
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "css-loader": "^5.0.1",
     "rimraf": "^3.0.2",
-    "mini-css-extract-plugin": "^1.3.3",
     "webpack": "^4.44.2",
     "webpack-cli": "^3.3.12"
   },
   "dependencies": {
-    "@onlabsorg/swan-js": "0.5.x",
+    "@onlabsorg/swan-js": "file:../swan-js",
     "body-parser": "^1.19.0",
     "dompurify": "^2.2.6",
     "express": "^4.17.1",
     "isomorphic-fetch": "^3.0.0",
     "marked": "^0.8.2",
     "mkdirp": "^1.0.4",
-    "trash": "^6.1.1",
-    "vue": "^2.6.12"
+    "trash": "^6.1.1"
   }
 }

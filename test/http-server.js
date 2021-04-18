@@ -5,18 +5,17 @@ var document = require("../lib/document");
 var Store = require("../lib/store");
 var MemoryStore = require("../lib/memory-store");
 var Router = require("../lib/router");
+var HTTPServer = require("../lib/http-server");
 
 var http = require('http');
 var express = require('express');
-var HTTPServer = require('../lib/http-server');
 
 require("isomorphic-fetch");
 
-
 describe("HTTPServer", () => {
 
-    describe("Default HTTPServer", () => {
-        var homeStore, router, server;
+    describe("HTTPServer.StoreMiddleware", () => {
+        var homeStore, server;
 
         before((done) => {
 
@@ -42,14 +41,16 @@ describe("HTTPServer", () => {
 
             homeStore = new MemoryStore();
 
-            router = new Router({
+            const router = new Router({
                 '/': homeStore,
                 '/private/': new PrivateStore(),
                 '/hidden/': new NotAllowedStore(),
                 '/error/': new ErrorStore(),
             });
-
-            server = HTTPServer.createServer(router);
+            
+            const app = express();
+            app.use('/docs', HTTPServer.StoreMiddleware(router));
+            server = http.createServer(app);
             server.listen(8888, done);
         });
 
@@ -259,94 +260,58 @@ describe("HTTPServer", () => {
             });
         });
 
-        describe("HTTP GET /docs/*", async () => {
-
-            it("should return the default index.html page if the path is '/'", async () => {
-                var indexHTMLPage = fs.readFileSync(pathlib.resolve(__dirname, "../public/index.html"), "utf8");
-                var response = await fetch(`http://localhost:8888/`);
-                expect(response.status).to.equal(200);
-                expect(await response.text()).to.equal(indexHTMLPage);
-            });
-
-            it("should return files from the public path for non `/env/*` GET requests", async () => {
-                var indexHTMLPage = fs.readFileSync(pathlib.resolve(__dirname, "../public/index.html"), "utf8");
-                var response = await fetch(`http://localhost:8888/index.html`);
-                expect(response.status).to.equal(200);
-                expect(await response.text()).to.equal(indexHTMLPage);
-            });
-        });
-
         after((done) => {
             server.close(done);
         });
     });
-
-    describe("Custom HTTPServer", () => {
-        var store, server, customPublicPath;
-
-        before((done) => {
-            customPublicPath = pathlib.resolve(__dirname, "./public");
-            store = new MemoryStore();
-
-            const beforeMiddleware = express.Router();
-            beforeMiddleware.all(`/store/before/*`, (req, res, next) => {
-                res.status(200).send(`@before: ${req.method} ${req.path}`);
-            });
-
-            const afterMiddleware = express.Router();
-            afterMiddleware.all(`/after/*`, (req, res, next) => {
-                res.status(200).send(`@after: ${req.method} ${req.path}`);
-            });
-
-            server = HTTPServer.createServer(store, {
-                before: beforeMiddleware,
-                storeRoute: '/store',
-                after: afterMiddleware,
-                publicPath: customPublicPath
-            });
-
+    
+    describe("HTTPServer.ViewerMiddleware", () => {
+        var server;
+        
+        before((done) => {            
+            const app = express();
+            app.use('/docs', HTTPServer.StoreMiddleware(new MemoryStore()));
+            app.use('/viewer', HTTPServer.ViewerMiddleware('/docs'))
+            server = http.createServer(app);
             server.listen(8888, done);
         });
-
-        it("should call the `options.before` middleware at every request", async () => {
-            var response = await fetch(`http://localhost:8888/store/before/test`);
-            expect(response.status).to.equal(200);
-            expect(await response.text()).to.equal("@before: GET /store/before/test");
+        
+        it("should respond with the viewer html page on `GET /` requests", async () => {
+            const response = await fetch('http://localhost:8888/viewer/');
+            const page = await response.text();
+            expect(page).to.equal(fs.readFileSync(`${__dirname}/../browser/index.html`, 'utf8'));
         });
-
-        it("should delegate to the store middleware if the path starts with `options.storeRoute`", async () => {
-            await store.write('/path/to/doc', "Doc @ /path/to/doc");
-            var response = await fetch(`http://localhost:8888/store/path/to/doc`);
-            expect(response.status).to.equal(200);
-            expect(await response.text()).to.equal("Doc @ /path/to/doc");
-        });
-
-        it("should call the `options.after` middleware at every request not handled by the store middleware", async () => {
-            var response = await fetch(`http://localhost:8888/after/test`);
-            expect(response.status).to.equal(200);
-            expect(await response.text()).to.equal("@after: GET /after/test");
-        });
-
-        it("should return the custom index.html page if the path is '/'", async () => {
-            var customIndexPage = "<p>custom html document page</p>";
-            fs.writeFileSync(customPublicPath+"/index.html", customIndexPage, "utf8");
-
-            var response = await fetch(`http://localhost:8888/`);
-            expect(response.status).to.equal(200);
-            expect(await response.text()).to.equal(customIndexPage);
-        });
-
-        it("should return files from the public path for non-text/olo GET requests", async () => {
-            var file1_content = "content of file 1";
-            fs.writeFileSync(customPublicPath+"/file1.txt", file1_content, "utf8");
-
-            var response = await fetch(`http://localhost:8888/file1.txt`);
-            expect(response.status).to.equal(200);
-            expect(await response.text()).to.equal(file1_content);
-        });
-
+        
         after((done) => {
             server.close(done);
+        });        
+    });
+
+    describe("HTTPServer.createServer", () => {
+        var store, server;
+        
+        before((done) => {            
+            store = new MemoryStore({
+                "/path/to/doc": "Test document."
+            });
+            server = HTTPServer.createServer(store);
+            server.listen(8888, done);
         });
+        
+        it("should respond with the viewer html page on `GET /` requests", async () => {
+            const response = await fetch('http://localhost:8888/');
+            const page = await response.text();
+            expect(page).to.equal(fs.readFileSync(`${__dirname}/../browser/index.html`, 'utf8'));
+        });
+        
+        it("should serve the backend store documents on path `/docs`", async () => {
+            const response = await fetch('http://localhost:8888/docs/path/to/doc');
+            const doc = await response.text();
+            expect(doc).to.equal("Test document.");
+        });
+        
+        after((done) => {
+            server.close(done);
+        });        
     });
 });

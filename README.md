@@ -107,7 +107,8 @@ By serving your store via HTTP, you can:
 > In order to use the olojs library in the browser, you should require
 > the module `@onlabsorg/olojs/browser`. The only difference between the NodeJS
 > version and the browser version is that the latter doesn't contain the
-> [FileStore] class and the [HTTPServer] object.
+> [FileStore] class and the [HTTPServer] object, but contains instead the 
+> [Viewer] widget.
 
 
 ### Learn more
@@ -140,5 +141,6 @@ the `npm test` command.
 [HTTPStore]: ./docs/api/http-store.md
 [HTTPServer]: ./docs/api/http-server.md
 [Router]: ./docs/api/router.md
+[Viewer]: ./docs/api/viewer.md
 [olojs-cli]: https://github.com/onlabsorg/olojs-cli
 [olowiki]: https://github.com/onlabsorg/olowiki

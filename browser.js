@@ -1,10 +1,12 @@
 
-exports.expression  = require('./lib/expression');
-exports.document    = require('./lib/document');
+const olojs = window.olojs = module.exports = {};
 
-exports.Store       = require('./lib/store');
-exports.MemoryStore = require('./lib/memory-store');
-exports.HTTPStore   = require('./lib/http-store');
-exports.Router      = require('./lib/router');
+olojs.expression  = require('./lib/expression');
+olojs.document    = require('./lib/document');
 
-exports.createViewer = require('./src/create-viewer');
+olojs.Store       = require('./lib/store');
+olojs.MemoryStore = require('./lib/memory-store');
+olojs.HTTPStore   = require('./lib/http-store');
+olojs.Router      = require('./lib/router');
+
+olojs.Viewer      = require('./lib/viewer');

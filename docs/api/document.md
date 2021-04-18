@@ -1,11 +1,11 @@
 olojs.document
 ============================================================================
-This module contains functions to parse, evaluate and render any string of
-text formatted as olo-document.
+This module contains functions to parse, evaluate and render olojs
+documents.
 ```js
 source = "Twice x is <% 2*x %>!";
-context = olojs.document.createContext({x:10});
 evaluate = olojs.document.parse(source);
+context = olojs.document.createContext({x:10});
 namespace = await evaluate(context);    // {x:10}
 text = await context.str(namespace);    // "Twice x is 20"
 ```
@@ -18,7 +18,7 @@ a document context object and returns the document namespace object.
 evaluate = olojs.document.parse(source);
 namespace = await evaluate(context);
 ```
-- `source` is a string containing olo-document markup
+- `source` is a string containing the source of an olojs document
 - `evaluate` is an asynchronous function that evaluates the document and
   returns its namespace
 - `namespace` is an object containing all the names defined by the inline
@@ -36,7 +36,7 @@ context = olojs.document.createContext(...namespaces)
 ```
 - `namespaces`: list of objects; each of them, from left to right, will be
   mixed-in to the basic document context
-- `context`: an object containing all the named values and function that
+- `context`: an object containing all the named values and functions that
   will be visible to the document inline expressions.
   
 

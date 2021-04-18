@@ -9,13 +9,12 @@ describe("olojs expression stdlib", () => {
 
         it("should expose a function that converts markdown to HTML", async () => {
             var markdown = require('../lib/stdlib/markdown');
-            var html = await expression.O.apply(markdown, "*bold*");
+            var evaluate = expression.parse(`{
+                markdown = require 'markdown',
+                html = markdown '*bold*'
+            }.html`);
+            var html = await evaluate(expression.createContext())
             expect(html).to.equal("<p><em>bold</em></p>\n");
-        });
-
-        it("should load the markdown module via require", async () => {
-            var markdown = await expression.createContext().require('markdown');
-            expect(markdown).to.equal(require('../lib/stdlib/markdown'));
         });
     });
 });

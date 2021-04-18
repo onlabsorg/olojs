@@ -59,7 +59,6 @@ describe("Router", () => {
                 ppp_3: new MemoryStore()
             }
             var router = new Router(routes, protocols);
-            console.log(router._protocols);
             expect(router.match('ppp1:/path/to/doc1')).to.deep.equal([protocols.ppp1, "/path/to/doc1"]);
             expect(router.match('ppp2:/path/to/doc2')).to.deep.equal([null, "ppp2:/path/to/doc2"]);
             expect(router.match('ppp_3:/path/to/doc3')).to.deep.equal([null, "ppp_3:/path/to/doc3"]);

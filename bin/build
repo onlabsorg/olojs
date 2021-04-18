@@ -21,6 +21,7 @@ generate-documentation file-store
 generate-documentation memory-store
 generate-documentation router
 generate-documentation http-server
+generate-documentation viewer
 
 
 generate-stdlib-documentation () {
@@ -29,9 +30,5 @@ generate-stdlib-documentation () {
 }
 
 generate-stdlib-documentation markdown
-
-
-echo "- docs/api/create-viewer.md"
-bin/gen-doc "src/create-viewer.js" > "docs/api/create-viewer.md"
 
 echo

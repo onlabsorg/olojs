@@ -1,1 +1,0 @@
-window.olojs = require('../browser');

@@ -29,10 +29,6 @@ describe("olojs", () => {
         expect(olojs.Router).to.equal(require("../../lib/router"));
     });
 
-    it("should export the `viewer` module", () => {
-        expect(olojs.createViewer).to.equal(require("../../src/create-viewer"));
-    });
-
     require("../expression");
     require("../document");
     require("../store");

@@ -1,9 +1,20 @@
-HTTPServer.createMiddleware - function
+HTTPServer - module
 ============================================================================
+The `HTTPServer` module contains functions for creating HTTP servers exposing
+a RESTful interface to a `Store` object. It also allows to serve the documents
+as HTML pages.
+
+```js
+olojs = require('@onlabsorg/olojs');
+HTTServer = olojs.HTTPServer;
+```
+  
+HTTPServer.StoreMiddleware - function
+----------------------------------------------------------------------------
 Creates an express middleware that exposes a RESTFul API to interact with an
 olojs store via HTTP.
 ```js
-middleware = HTTPServer.createMiddleware(store)
+middleware = HTTPServer.StoreMiddleware(store)
 expressApp.use(mountPath, middleware);
 ```
 - On `GET /paht/to/doc` requests accepting `text/*`, it will respond with
@@ -17,6 +28,8 @@ expressApp.use(mountPath, middleware);
   `store.write("/path/to/doc", body)` method.
 - On `DELETE /paht/to/doc` requests it will execute the
   `store.delete("/path/to/doc")` method.
+- On `DELETE /paht/to/doc` requests accepting a `text/directory` MimeType, 
+  it will execute the `store.deleteAll("/path/to/doc")` method.
 - The `GET` handler, on store's `ReadPermissionDeniedError` will
   respond with the status code 403
 - The `GET` handler, on store's `ReadOperationNotAllowedError` will
@@ -26,34 +39,38 @@ expressApp.use(mountPath, middleware);
 - The `PUT` and `DELETE` handlers, on store's `WriteOperationNotAllowedError`
   will respond with the status code 405
   
-HTTPStore.createServer - function
-============================================================================
-Functions that creates an http server exposing an olojs environment via HTTP.
+HTTPServer.ViewerMiddleware - function
+----------------------------------------------------------------------------
+Creates an express middleware that serves an olojs document viewer app.
+
+```js
+middleware = HTTPServer.ViewerMiddleware(storeURL)
+expressApp.use(mountPath, middleware);
+```
+
+- `storeURL` is the URL of an HTTP store from which the client will load the
+  documents to be rendered. If `storeURL` is a relative URL, the store
+  HTTP request will be sent to the same server that mounts the `ViewerMiddleware`
+- `middleware` is the express middleware that servers the viewer app on
+  `GET /` requests.
+
+The viewer app, in the browsers, will load from `HTTPStore(storeURL)` the
+document with id defined by the URL fragment (e.g. `/#/path/to/doc`),
+evaluate it, render it, sanitize it and inject it in the DOM.
+  
+HTTPServer.createServer - function
+----------------------------------------------------------------------------
+This function takes an olojs Store as input and returns a HTTP server that 
+mounts a `StoreMiddleware` on `/docs` and a `ViewerMiddleware` at `/`.
+
 ```js
 server = HTTPServer.createServer(store, options)
-server.listen(8010, callback);
 ```
-- `store` is any valid [olojs.Store](./store.md) instance
-- `options.before` is an express middleware to be mounted on `/` before
-  the store middleware
-- `options.storeRoute` define the route on which the store middleware
-  returned by `HTTPStore.createMiddleware(store)` will be mounted.
-  It defaults to `/docs`.
-- `options.after` is an express middleware to be mounted on `/` after
-  the store middleware
-- `options.publicPath` indicates the location of the public path, which is
-  useful if you want to create your own web UI for rendering the documents
-- `server` is a nodejs http.Server instance
-The request handling sequence is as follows:
-1. On any `/*` request, it will delegate to the `options.before` middleware,
-   if it exists.
-2. On any `/docs/*` request, it will delegate to the middleware created via
-   `HTTPStore.createMiddleware(store)`. The mounting route `/docs` can be
-   customized via the `options.storeRoute` parameter.
-3. On any `/*` request, it will delegate to the `options.after` middleware,
-   if it exists.
-4. On `GET /` requests it will serve the resources from `options.publicPath`,
-   defaulting to `@onalbsorg/olojs/public` which contains a single page
-   application that loads and renders the document mapped to the url hash.
+
+- `store` is the olojs `Store` instance that will be served via the 
+  `StoreMiddleware`
+- `options.storePath` is the store mounting path (defaults to `/docs`)
+- `server` is the HTTP server that serves the store on `/<options.storePath>/path/to/doc`
+  requests and the viewer on `/#/path/to/doc` requests
   
 
