@@ -118,8 +118,9 @@ By serving your store via HTTP, you can:
 
 
 ### Test
-After cloning `olojs`, you can test it in both NodeJS and in your browser via
-the `npm test` command.
+- `npm run note-test` tests olojs in the NodeJS environment
+- `npm run browser-test` tests olojs in the default browser
+- `npm run viewer-test` tests the olojs viewer in the default browser
 
 
 ### License
