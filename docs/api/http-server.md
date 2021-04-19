@@ -44,19 +44,17 @@ HTTPServer.ViewerMiddleware - function
 Creates an express middleware that serves an olojs document viewer app.
 
 ```js
-middleware = HTTPServer.ViewerMiddleware(storeURL)
+middleware = HTTPServer.ViewerMiddleware(store)
 expressApp.use(mountPath, middleware);
 ```
 
-- `storeURL` is the URL of an HTTP store from which the client will load the
-  documents to be rendered. If `storeURL` is a relative URL, the store
-  HTTP request will be sent to the same server that mounts the `ViewerMiddleware`
+- `store` is the store containing the documents to be served
 - `middleware` is the express middleware that servers the viewer app on
   `GET /` requests.
 
-The viewer app, in the browsers, will load from `HTTPStore(storeURL)` the
-document with id defined by the URL fragment (e.g. `/#/path/to/doc`),
-evaluate it, render it, sanitize it and inject it in the DOM.
+The viewer app, in the browsers, will load the document with id defined by 
+the URL fragment (e.g. `/#/path/to/doc`), evaluate it, render it, sanitize 
+it and inject it in the DOM.
   
 HTTPServer.createServer - function
 ----------------------------------------------------------------------------
@@ -64,13 +62,12 @@ This function takes an olojs Store as input and returns a HTTP server that
 mounts a `StoreMiddleware` on `/docs` and a `ViewerMiddleware` at `/`.
 
 ```js
-server = HTTPServer.createServer(store, options)
+server = HTTPServer.createServer(store)
 ```
 
 - `store` is the olojs `Store` instance that will be served via the 
   `StoreMiddleware`
-- `options.storePath` is the store mounting path (defaults to `/docs`)
-- `server` is the HTTP server that serves the store on `/<options.storePath>/path/to/doc`
+- `server` is the HTTP server that serves the store on `/docs/path/to/doc`
   requests and the viewer on `/#/path/to/doc` requests
   
 

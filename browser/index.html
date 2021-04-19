@@ -24,9 +24,7 @@
             document.addEventListener("DOMContentLoaded", async () => {
                 
                 // create the olojs store
-                const infoRes = await fetch('info');
-                const info = await infoRes.json();
-                const storeURL = new URL(info.storeURL, location.origin);
+                const storeURL = new URL('docs', location.href);
                 const store = new olojs.Router({
                     '/': new olojs.HTTPStore(String(storeURL))
                 },{

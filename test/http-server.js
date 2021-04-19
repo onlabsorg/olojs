@@ -266,12 +266,14 @@ describe("HTTPServer", () => {
     });
     
     describe("HTTPServer.ViewerMiddleware", () => {
-        var server;
+        var store, server;
         
-        before((done) => {            
+        before((done) => {
+            store = new MemoryStore({
+                "/path/to/doc": "Test document."
+            });
             const app = express();
-            app.use('/docs', HTTPServer.StoreMiddleware(new MemoryStore()));
-            app.use('/viewer', HTTPServer.ViewerMiddleware('/docs'))
+            app.use('/viewer', HTTPServer.ViewerMiddleware(store))
             server = http.createServer(app);
             server.listen(8888, done);
         });
@@ -280,6 +282,12 @@ describe("HTTPServer", () => {
             const response = await fetch('http://localhost:8888/viewer/');
             const page = await response.text();
             expect(page).to.equal(fs.readFileSync(`${__dirname}/../browser/index.html`, 'utf8'));
+        });
+        
+        it("should serve the backend store documents on path `/docs`", async () => {
+            const response = await fetch('http://localhost:8888/viewer/docs/path/to/doc');
+            const doc = await response.text();
+            expect(doc).to.equal("Test document.");
         });
         
         after((done) => {
