@@ -1,4 +1,4 @@
-(window["webpackJsonp"] = window["webpackJsonp"] || []).push([["/stdlib/text"],{
+(window["webpackJsonp"] = window["webpackJsonp"] || []).push([["stdlib/text"],{
 
 /***/ "../../node_modules/@onlabsorg/swan-js/lib/stdlib/text.js":
 /*!****************************************************************************************!*\
