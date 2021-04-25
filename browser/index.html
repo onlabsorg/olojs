@@ -38,7 +38,7 @@
                 
                 // bind the viewer src attribute to the url hash of this page
                 const render = () => element.setAttribute('src', location.hash.slice(1));
-                document.addEventListener('hashchange', render);
+                window.addEventListener('hashchange', render);
                 render();
             });
         </script>
