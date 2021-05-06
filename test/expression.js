@@ -8,7 +8,6 @@ describe("olojs expression stdlib", () => {
     describe("markdown module", () => {
 
         it("should expose a function that converts markdown to HTML", async () => {
-            var markdown = require('../lib/stdlib/markdown');
             var evaluate = expression.parse(`{
                 markdown = require 'markdown',
                 html = markdown '*bold*'

@@ -12,7 +12,8 @@
 var olojs = require('..');
 
 const store = new olojs.FileStore(`${__dirname}/public`);
-const server = olojs.HTTPServer.createServer(store);
+
+const server = olojs.HTTPServer.ViewerServer(store);
 
 server.listen(8010, async () => {
     console.log("olojs http server listening on port 8010");

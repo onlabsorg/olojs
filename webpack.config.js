@@ -6,7 +6,7 @@ module.exports = {
     
     output: {
         filename: 'olo.js',
-        chunkFilename: '[name].bundle.js',
+        chunkFilename: '[name].js',
         path: path.resolve(__dirname, './browser')
     },  
 }

@@ -92,13 +92,13 @@ Load, evaluate and render a [document]:
 Serve the store via HTTP:
 
 ```js
-server = olojs.HTTPServer.createServer(store);
+server = olojs.HTTPServer.ViewerServer(store);
 server.listen(8010);
 ```
 
 By serving your store via HTTP, you can:
 - Render your documents in the browser at `localhost:8010/#/path/to/doc`
-- Pblish your documents on the web
+- Publish your documents on the web
 - Allow other users to programmatically access you documents via a
   [HTTPStore]
 

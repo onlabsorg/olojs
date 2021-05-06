@@ -265,6 +265,255 @@ describe("HTTPServer", () => {
         });
     });
     
+    describe("HTTPServer.StoreServer", () => {
+        var homeStore, server;
+
+        before((done) => {
+
+            class PrivateStore extends Store {
+                read (path) {throw new Store.ReadPermissionDeniedError(path)}
+                list (path) {throw new Store.ReadPermissionDeniedError(path)}
+                write (path,src) {throw new Store.WritePermissionDeniedError(path)}
+                delete (path) {throw new Store.WritePermissionDeniedError(path)}
+            }
+
+            class NotAllowedStore extends Store {
+                read (path) {throw new Store.ReadOperationNotAllowedError(path)}
+                list (path) {throw new Store.ReadOperationNotAllowedError(path)}
+                write (path, src) {throw new Store.WriteOperationNotAllowedError(path)}
+                delete (path) {throw new Store.WriteOperationNotAllowedError(path)}
+            }
+
+            class ErrorStore extends Store {
+                read (path) {throw new Error()}
+                write (path, src) {throw new Error()}
+                delete (path) {throw new Error()}
+            }
+
+            homeStore = new MemoryStore();
+
+            const router = new Router({
+                '/': homeStore,
+                '/private/': new PrivateStore(),
+                '/hidden/': new NotAllowedStore(),
+                '/error/': new ErrorStore(),
+            });
+            
+            server = HTTPServer.StoreServer(router);
+            server.listen(8888, done);
+        });
+
+        describe("HTTP GET /*", () => {
+
+            it("should return the document source mapped to path by the passed loader", async () => {
+                var docPath = "/path/to/doc1";
+                var docSource = "document source ...";
+                await homeStore.write(docPath, docSource);
+
+                var response = await fetch(`http://localhost:8888/${docPath}`, {
+                    method: 'get',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                });
+                expect(response.status).to.equal(200);
+                expect(await response.text()).to.equal(docSource);
+            });
+
+            it("should return the status code 403 if the backend environment throws ReadPermissionDenied", async () => {
+                var response = await fetch(`http://localhost:8888/private/path/to/doc`, {
+                    method: 'get',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                });
+                expect(response.status).to.equal(403);
+            });
+
+            it("should return the status code 405 if the backend environment throws Store.ReadOperationNotDefined", async () => {
+                var response = await fetch(`http://localhost:8888/hidden/path/to/doc`, {
+                    method: 'get',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                });
+                expect(response.status).to.equal(405);
+            });
+
+            it("should return the status code 500 if the backend environment throws a generic error", async () => {
+                var response = await fetch(`http://localhost:8888/error/path/to/doc`, {
+                    method: 'get',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                });
+                expect(response.status).to.equal(500);
+            });
+
+            it("should respond with the JSON-stringified entries list if the accepted MimeType is `apprication/json`", async () => {
+                var docPath = "/path/to/doc1";
+                var docSource = "document source ...";
+                await homeStore.write(docPath, docSource);
+
+                var response = await fetch(`http://localhost:8888/`, {
+                    method: 'get',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                });
+                expect(response.status).to.equal(200);
+                expect((await response.json()).sort()).to.deep.equal(['error/', 'hidden/', 'path/', 'private/']);
+            });
+
+            it("should return the status code 413 if the accepted MimeType is neither `text/*` nor `application/json`", async () => {
+                var response = await fetch(`http://localhost:8888/env/path/to/img`, {
+                    method: 'get',
+                    headers: {
+                        'Accept': 'image/bmp'
+                    },
+                });
+                expect(response.status).to.equal(415);
+            });
+        });
+
+        describe("HTTP PUT /*", () => {
+
+            it("should modify the resource and return 200", async () => {
+                var docPath = "/path/to/doc1";
+                var docSource = "document source ...";
+                homeStore.write(docPath, docSource);
+
+                var response = await fetch(`http://localhost:8888${docPath}`, {
+                    method: 'put',
+                    headers: {
+                        'Accept': 'text/*',
+                        'Content-Type': 'text/plain',
+                    },
+                    body: "new document source ..."
+                });
+
+                expect(response.status).to.equal(200);
+                expect(homeStore.read(docPath)).to.equal("new document source ...")
+            });
+
+            it("should return the status code 403 if the backend environment throws WritePermissionDenied", async () => {
+                var response = await fetch(`http://localhost:8888/private/path/to/doc`, {
+                    method: 'put',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                        'Accept': 'text/*'
+                    },
+                    body: ""
+                });
+                expect(response.status).to.equal(403);
+            });
+
+            it("should return the status code 405 if the backend environment throws WriteOperationNotDefined", async () => {
+                var response = await fetch(`http://localhost:8888/hidden/path/to/doc`, {
+                    method: 'put',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                        'Accept': 'text/*'
+                    },
+                    body: ""
+                });
+                expect(response.status).to.equal(405);
+            });
+
+            it("should return the status code 500 if the backend environment throws a generic error", async () => {
+                var response = await fetch(`http://localhost:8888/error/path/to/doc`, {
+                    method: 'put',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                        'Accept': 'text/*'
+                    },
+                    body: ""
+                });
+                expect(response.status).to.equal(500);
+            });
+        });
+
+        describe("HTTP DELETE /*", () => {
+
+            it("should remove the resource and return 200", async () => {
+                var docPath = "/path/to/doc1";
+                var docSource = "document source ...";
+                homeStore.write(docPath, docSource);
+
+                var response = await fetch(`http://localhost:8888${docPath}`, {
+                    method: 'delete',
+                    headers: {
+                        'Accept': 'text/*',
+                        'Content-Type': 'text/plain',
+                    },
+                });
+
+                expect(response.status).to.equal(200);
+                expect(homeStore.read(docPath)).to.equal("");
+            });
+
+            it("should remove all the resources matching the path if Content-Type is `text/directory`", async () => {
+                await homeStore.write("/path/to/doc1", "doc @ /path/to/doc1");
+                await homeStore.write("/path/to/dir/", "doc @ /path/to/dir/");
+                await homeStore.write("/path/to/dir/doc2", "doc @ /path/to/dir/doc2");
+
+                expect(await homeStore.read("/path/to/doc1")).to.equal("doc @ /path/to/doc1");
+                expect(await homeStore.read("/path/to/dir/")).to.equal("doc @ /path/to/dir/");
+                expect(await homeStore.read("/path/to/dir/doc2")).to.equal("doc @ /path/to/dir/doc2");
+
+                var response = await fetch(`http://localhost:8888/path/to/dir`, {
+                    method: 'delete',
+                    headers: {
+                        'Accept': 'text/*',
+                        'Content-Type': 'text/directory',
+                    },
+                });
+
+                expect(response.status).to.equal(200);
+                expect(await homeStore.read("/path/to/doc1")).to.equal("doc @ /path/to/doc1");
+                expect(await homeStore.read("/path/to/dir/")).to.equal("");
+                expect(await homeStore.read("/path/to/dir/doc2")).to.equal("");
+            });
+
+            it("should return the status code 403 if the backend environment throws WritePermissionDenied", async () => {
+                var response = await fetch(`http://localhost:8888/private/path/to/doc`, {
+                    method: 'delete',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                        'Accept': 'text/*'
+                    },
+                });
+                expect(response.status).to.equal(403);
+            });
+
+            it("should return the status code 405 if the backend environment throws WriteOperationNotDefined", async () => {
+                var response = await fetch(`http://localhost:8888/hidden/path/to/doc`, {
+                    method: 'delete',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                        'Accept': 'text/*'
+                    },
+                });
+                expect(response.status).to.equal(405);
+            });
+
+            it("should return the status code 500 if the backend environment throws a generic error", async () => {
+                var response = await fetch(`http://localhost:8888/error/path/to/doc`, {
+                    method: 'delete',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                        'Accept': 'text/*'
+                    },
+                });
+                expect(response.status).to.equal(500);
+            });
+        });
+
+        after((done) => {
+            server.close(done);
+        });
+    });
+    
     describe("HTTPServer.ViewerMiddleware", () => {
         var store, server;
         
@@ -290,19 +539,25 @@ describe("HTTPServer", () => {
             expect(doc).to.equal("Test document.");
         });
         
+        it("should return `dist/olo.js` on `GET /bin/olo.js` requests", async () => {
+            const response = await fetch('http://localhost:8888/viewer/olo.js');
+            const script = await response.text();
+            expect(script).to.equal(fs.readFileSync(`${__dirname}/../browser/olo.js`, 'utf8'));
+        });
+        
         after((done) => {
             server.close(done);
         });        
     });
 
-    describe("HTTPServer.createServer", () => {
+    describe("HTTPServer.ViewerServer", () => {
         var store, server;
         
-        before((done) => {            
+        before((done) => {
             store = new MemoryStore({
                 "/path/to/doc": "Test document."
             });
-            server = HTTPServer.createServer(store);
+            server = HTTPServer.ViewerServer(store);
             server.listen(8888, done);
         });
         
@@ -316,6 +571,12 @@ describe("HTTPServer", () => {
             const response = await fetch('http://localhost:8888/docs/path/to/doc');
             const doc = await response.text();
             expect(doc).to.equal("Test document.");
+        });
+        
+        it("should return `dist/olo.js` on `GET /bin/olo.js` requests", async () => {
+            const response = await fetch('http://localhost:8888/olo.js');
+            const script = await response.text();
+            expect(script).to.equal(fs.readFileSync(`${__dirname}/../browser/olo.js`, 'utf8'));
         });
         
         after((done) => {

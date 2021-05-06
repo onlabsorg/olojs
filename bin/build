@@ -25,8 +25,8 @@ generate-documentation viewer
 
 
 generate-stdlib-documentation () {
-    echo "- docs/stdlib/$1.md"
-    bin/gen-doc "lib/stdlib/$1.js" > "docs/stdlib/$1.md"
+    echo "- docs/swan_modules/$1.md"
+    bin/gen-doc "lib/swan_modules/$1.js" > "docs/swan_modules/$1.md"
 }
 
 generate-stdlib-documentation markdown
