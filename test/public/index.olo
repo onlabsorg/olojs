@@ -48,7 +48,7 @@
 
 ### Undefined
 - undefined type    <% check( type(undefined()) == "Undefined" ) %>
-- undefined string  <% check( str(undefined()) == "[[Undefined]]" ) %>
+- undefined string  <% check( str(undefined('value', 'xxx')) == "[[Undefined: value, xxx]]" ) %>
 - undefined inspection  <% check( ((10,undefined('a','b','c'),20) ?> str) == (10,"abc",20) & (10 ?> str) == 10 ) %>
 
 

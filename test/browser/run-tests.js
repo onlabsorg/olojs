@@ -42,8 +42,8 @@ async function run_tests () {
     console.log("Running the tests in the browser ...");
     exec('xdg-open http://localhost:8011/index.html');
     
-    console.log(`Killing the server in 5s ...`);
-    setTimeout(() => process.exit(), 5000);
+    console.log(`Killing the server in 10s ...`);
+    setTimeout(() => process.exit(), 10000);
 }
 
 run_tests();
