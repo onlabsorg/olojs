@@ -190,6 +190,10 @@ describe("Store", () => {
                 var doc1_ns = await context.import('/path/to/doc1?x=20');
                 expect(doc1_ns.p).to.equal('/path/to/doc1');
                 expect(doc1_ns.argns.x).to.equal(20);
+                
+                var dir_ns = await context.import('/path/to/dir/');
+                expect(dir_ns.p).to.equal('/path/to/dir/');
+                expect(dir_ns.argns.x).to.be.undefined;                
             });
 
             it("should resolve ids relative to doc.path", async () => {
