@@ -47,11 +47,11 @@ HTTPServer.ViewerMiddleware - function
 Creates an express middleware that serves an olojs document viewer app.
 
 ```js
-middleware = HTTPServer.ViewerMiddleware(store);
+middleware = HTTPServer.ViewerMiddleware(storeURL);
 expressApp.use(mountPath, middleware);
 ```
 
-- `store` is the store containing the documents to be served
+- `storeURL` is the url of a store served over HTTP (e.g. via a StoreServer)
 - `middleware` is the express middleware that servers the viewer app on
   `GET /` requests.
 
@@ -61,7 +61,8 @@ it and inject it in the DOM.
   
 HTTPServer.ViewerServer - function
 ----------------------------------------------------------------------------
-Creates a HTTP Server that mounts a `ViewerMiddleware` at `/`.
+Creates a HTTP Server that mounts a `ViewerMiddleware` at `/` and the given
+store at `/docs`.
 
 ```js
 server = HTTPServer.ViewerServer(store);

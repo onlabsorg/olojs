@@ -15,6 +15,7 @@
             }
         </style>
         <link rel="stylesheet" href="viewer.css"></link>
+        <meta name="store-url" content="{{store-url}}"></meta>
     </head>
     <body>
         
@@ -24,7 +25,8 @@
             document.addEventListener("DOMContentLoaded", async () => {
                 
                 // create the olojs store
-                const storeURL = new URL('docs', location.href);
+                const storeUrlMetaElt = document.querySelector('meta[name="store-url"]');
+                const storeURL = new URL(storeUrlMetaElt.getAttribute('content'), location.href);
                 const store = new olojs.HTTPStore(String(storeURL));
 
                 // create the olojs viewer

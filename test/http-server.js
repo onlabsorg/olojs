@@ -515,31 +515,31 @@ describe("HTTPServer", () => {
     });
     
     describe("HTTPServer.ViewerMiddleware", () => {
-        var store, server;
+        var store, storePath, server;
         
         before((done) => {
             store = new MemoryStore({
                 "/path/to/doc": "Test document."
             });
+            storePath = '/store';
             const app = express();
-            app.use('/viewer', HTTPServer.ViewerMiddleware(store))
+            app.use(storePath, HTTPServer.StoreMiddleware(store));
+            app.use('/viewer', HTTPServer.ViewerMiddleware(storePath));
             server = http.createServer(app);
             server.listen(8888, done);
         });
         
         it("should respond with the viewer html page on `GET /` requests", async () => {
-            const response = await fetch('http://localhost:8888/viewer/');
+            const response = await fetch('http://localhost:8888/viewer/');            
             const page = await response.text();
-            expect(page).to.equal(fs.readFileSync(`${__dirname}/../browser/index.html`, 'utf8'));
+
+            const viewerPage = fs.readFileSync(`${__dirname}/../browser/viewer.html`, 'utf8')
+                .replace("{{store-url}}", storePath);
+
+            expect(page).to.equal(viewerPage);
         });
         
-        it("should serve the backend store documents on path `/docs`", async () => {
-            const response = await fetch('http://localhost:8888/viewer/docs/path/to/doc');
-            const doc = await response.text();
-            expect(doc).to.equal("Test document.");
-        });
-        
-        it("should return `dist/olo.js` on `GET /bin/olo.js` requests", async () => {
+        it("should return `browser/olo.js` on `GET /<mount-point>/olo.js` requests", async () => {
             const response = await fetch('http://localhost:8888/viewer/olo.js');
             const script = await response.text();
             expect(script).to.equal(fs.readFileSync(`${__dirname}/../browser/olo.js`, 'utf8'));
@@ -564,7 +564,11 @@ describe("HTTPServer", () => {
         it("should respond with the viewer html page on `GET /` requests", async () => {
             const response = await fetch('http://localhost:8888/');
             const page = await response.text();
-            expect(page).to.equal(fs.readFileSync(`${__dirname}/../browser/index.html`, 'utf8'));
+
+            const viewerPage = fs.readFileSync(`${__dirname}/../browser/viewer.html`, 'utf8')
+                .replace("{{store-url}}", '/docs');
+
+            expect(page).to.equal(viewerPage);
         });
         
         it("should serve the backend store documents on path `/docs`", async () => {
