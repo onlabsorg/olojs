@@ -25,12 +25,7 @@
                 
                 // create the olojs store
                 const storeURL = new URL('docs', location.href);
-                const store = new olojs.Router({
-                    '/': new olojs.HTTPStore(String(storeURL))
-                },{
-                    'http' : new olojs.HTTPStore('http:/'),
-                    'https': new olojs.HTTPStore('https:/'),
-                });
+                const store = new olojs.HTTPStore(String(storeURL));
 
                 // create the olojs viewer
                 const element = document.querySelector('.olo-viewer');
