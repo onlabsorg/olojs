@@ -28,7 +28,9 @@ return an empty string, `list` will return an empty array, `write`,
 `delete` and `deleteAll` will throw a `WriteOperationNotAllowed` error.
 
 The constructor will ignore the properties of the `routes` object which are 
-not an instance of Store.
+not valid stores, that is objects that do not have any of the methods 
+`read`, `list`, `write`, `delete`, `deleteAll`, `createContext`, `load`.
+The easiest way to create a valid store is by extending the `Store` class.
   
 router.read - async method
 ------------------------------------------------------------------------
