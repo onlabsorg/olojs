@@ -128,9 +128,9 @@ By serving your store via HTTP, you can:
 
 
 ### Related projects
-* [olojs-cli] is a command-line interface written in NodeJS that allows you to
+* [stilo] is a command-line interface written in NodeJS that allows you to
   create and mange local olojs document repositories.
-* [olowiki] is a plug-in for [olojs-cli] that allows to render and edit your
+* [olowiki] is a plug-in for [stilo] that allows to render and edit your
   olojs documents in the browser
 
 
@@ -143,5 +143,5 @@ By serving your store via HTTP, you can:
 [HTTPServer]: ./docs/api/http-server.md
 [Router]: ./docs/api/router.md
 [Viewer]: ./docs/api/viewer.md
-[olojs-cli]: https://github.com/onlabsorg/olojs-cli
+[stilo]: https://github.com/onlabsorg/stilo
 [olowiki]: https://github.com/onlabsorg/olowiki
