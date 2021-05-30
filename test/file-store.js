@@ -50,6 +50,9 @@ const describeFileStore = (title, ROOT_PATH, options) => describe(title, () => {
             var fileStore = new FileStore(ROOT_PATH, options);
             var items = await fileStore.list(`/`);
             expect(items.sort()).to.deep.equal(["doc1", "doc2", "doc3", "path/"]);
+
+            var items = await fileStore.list(`/path/to/`);
+            expect(items.sort()).to.deep.equal(["", "dir/", "doc1", "doc2", "doc3"]);
         });
 
         it("should discard files that are not .olo documents", async () => {

@@ -53,6 +53,8 @@ describe("MemoryStore", () => {
             expect(await memStore.list("/")).to.deep.equal(['path/']);
             expect(await memStore.list("")).to.deep.equal(['path/']);
             expect(await memStore.list("/path/..")).to.deep.equal(['path/']);
+            
+            expect((await memStore.list("/path/to/dir1/")).sort()).to.deep.equal(['', 'doc1', 'doc2']);
         });
 
         it("should return an empty array if the given path doesn't exist", async () => {
