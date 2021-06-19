@@ -533,16 +533,16 @@ describe("HTTPServer", () => {
             const response = await fetch('http://localhost:8888/viewer/');            
             const page = await response.text();
 
-            const viewerPage = fs.readFileSync(`${__dirname}/../browser/viewer.html`, 'utf8')
+            const viewerPage = fs.readFileSync(`${__dirname}/../dist/viewer.html`, 'utf8')
                 .replace("{{store-url}}", storePath);
 
             expect(page).to.equal(viewerPage);
         });
         
-        it("should return `browser/olo.js` on `GET /<mount-point>/olo.js` requests", async () => {
+        it("should return `dist/olo.js` on `GET /<mount-point>/olo.js` requests", async () => {
             const response = await fetch('http://localhost:8888/viewer/olo.js');
             const script = await response.text();
-            expect(script).to.equal(fs.readFileSync(`${__dirname}/../browser/olo.js`, 'utf8'));
+            expect(script).to.equal(fs.readFileSync(`${__dirname}/../dist/olo.js`, 'utf8'));
         });
         
         after((done) => {
@@ -565,7 +565,7 @@ describe("HTTPServer", () => {
             const response = await fetch('http://localhost:8888/');
             const page = await response.text();
 
-            const viewerPage = fs.readFileSync(`${__dirname}/../browser/viewer.html`, 'utf8')
+            const viewerPage = fs.readFileSync(`${__dirname}/../dist/viewer.html`, 'utf8')
                 .replace("{{store-url}}", '/docs');
 
             expect(page).to.equal(viewerPage);
@@ -580,7 +580,7 @@ describe("HTTPServer", () => {
         it("should return `dist/olo.js` on `GET /bin/olo.js` requests", async () => {
             const response = await fetch('http://localhost:8888/olo.js');
             const script = await response.text();
-            expect(script).to.equal(fs.readFileSync(`${__dirname}/../browser/olo.js`, 'utf8'));
+            expect(script).to.equal(fs.readFileSync(`${__dirname}/../dist/olo.js`, 'utf8'));
         });
         
         after((done) => {

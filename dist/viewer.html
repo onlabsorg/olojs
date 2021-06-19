@@ -1,0 +1,43 @@
+<html>
+    <head>
+        <script src="olo.js"></script>
+        <style>
+            html, body {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                display: block;
+                margin: 0 auto;
+                background-color: #FFFFFF;
+                line-height: 1.4;
+            }
+        </style>
+        <link rel="stylesheet" href="viewer.css"></link>
+        <meta name="store-url" content="{{store-url}}"></meta>
+    </head>
+    <body>
+        
+        <div class="olo-viewer"></div>
+    
+        <script>
+            document.addEventListener("DOMContentLoaded", async () => {
+                
+                // create the olojs store
+                const storeUrlMetaElt = document.querySelector('meta[name="store-url"]');
+                const storeURL = new URL(storeUrlMetaElt.getAttribute('content'), location.href);
+                const store = new olojs.HTTPStore(String(storeURL));
+
+                // create the olojs viewer
+                const element = document.querySelector('.olo-viewer');
+                const viewer = new olojs.Viewer(element, store);
+                
+                // bind the viewer src attribute to the url hash of this page
+                const render = () => element.setAttribute('src', location.hash.slice(1));
+                window.addEventListener('hashchange', render);
+                render();
+            });
+        </script>
+    </body>
+</html>

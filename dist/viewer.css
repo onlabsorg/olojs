@@ -1,0 +1,392 @@
+.olo-viewer {
+    display: block;
+    padding: 2em 20%;
+}
+
+.olo-viewer .runtime-error {
+    font-family: "monospace";
+    border: 1px solid #D32F2F;
+    color: #D32F2F;
+}
+
+.olo-viewer .runtime-error .message {
+    font-size: 1em;
+}
+
+.olo-viewer .runtime-error .source {
+    font-size: 0.8em;
+    padding-bottom: 1em;
+}
+
+@media (max-width: 480px) {
+    .olo-viewer {
+        padding-left: 3%;
+        padding-right: 3%;
+    }
+}
+
+
+@font-face {
+    font-family: "Ubuntu";
+    font-style: normal;
+    font-weight: 300;
+    src: local("Ubuntu Light"), local("Ubuntu-Light"), url("https://themes.googleusercontent.com/static/fonts/ubuntu/v4/WtcvfJHWXKxx4x0kuS1kobO3LdcAZYWl9Si6vvxL-qU.woff") format("woff");
+}
+@font-face {
+    font-family: "Ubuntu";
+    font-style: normal;
+    font-weight: 400;
+    src: local("Ubuntu"), url("https://themes.googleusercontent.com/static/fonts/ubuntu/v4/CGXpU_uR_FUfdeyCjAWgZ-vvDin1pK8aKteLpeZ5c0A.woff") format("woff");
+}
+@font-face {
+    font-family: "Ubuntu";
+    font-style: normal;
+    font-weight: 500;
+    src: local("Ubuntu Medium"), local("Ubuntu-Medium"), url("https://themes.googleusercontent.com/static/fonts/ubuntu/v4/gMhvhm-nVj1086DvGgmzB7O3LdcAZYWl9Si6vvxL-qU.woff") format("woff");
+}
+@font-face {
+    font-family: "Ubuntu";
+    font-style: normal;
+    font-weight: 700;
+    src: local("Ubuntu Bold"), local("Ubuntu-Bold"), url("https://themes.googleusercontent.com/static/fonts/ubuntu/v4/nsLtvfQoT-rVwGTHHnkeJrO3LdcAZYWl9Si6vvxL-qU.woff") format("woff");
+}
+@font-face {
+    font-family: "Ubuntu";
+    font-style: italic;
+    font-weight: 300;
+    src: local("Ubuntu Light Italic"), local("Ubuntu-LightItalic"), url("https://themes.googleusercontent.com/static/fonts/ubuntu/v4/DZ_YjBPqZ88vcZCcIXm6VqfTCPadK0KLfdEfFtGWCYw.woff") format("woff");
+}
+
+.olo-viewer,
+.olo-viewer button,
+.olo-viewer input,
+.olo-viewer select,
+.olo-viewer textarea {
+    color: #57534A;
+    font-family: "Ubuntu","Myriad Pro","Myriad",sans-serif;
+    font-size: 18px;
+	font-weight: 300;
+}
+
+.olo-viewer,
+.olo-viewer textarea {
+    line-height: 1.4;
+}
+
+.olo-viewer h1,
+.olo-viewer h2,
+.olo-viewer h3,
+.olo-viewer dt {
+    color: #423F37;
+    font-weight: 700;
+}
+
+.olo-viewer h1 {
+    font-size: 2em;
+    margin: 0.67em 0;
+}
+
+.olo-viewer h2,
+.olo-viewer .article-list .article-title {
+    font-size: 1.5em;
+    margin: 0.83em 0;
+}
+
+.olo-viewer h3,
+.olo-viewer dt {
+    font-size: 1.17em;
+    margin: 1em 0;
+}
+
+.olo-viewer h4 {
+    font-size: 1em;
+    margin: 1.33em 0;
+}
+
+.olo-viewer h5 {
+    font-size: 0.83em;
+    margin: 1.67em 0;
+}
+
+.olo-viewer h6 {
+    font-size: 0.75em;
+    margin: 2.33em 0;
+}
+
+.olo-viewer a {
+    cursor: pointer;
+    outline: 0 none;
+    text-decoration: underline;
+}
+
+.olo-viewer a:link {
+    color: #0074D9;
+}
+
+.olo-viewer a:visited {
+    color: #B10DC9;
+}
+
+.olo-viewer a:hover {
+    outline: 0 none;
+    color: blue;
+}
+
+
+.olo-viewer p,
+.olo-viewer pre {
+    margin: 1em 0;
+}
+
+.olo-viewer code,
+.olo-viewer kbd,
+.olo-viewer pre,
+.olo-viewer samp {
+    font-family: monospace,serif;
+    background-color: #F8F5F0;
+    font-size: 1rem;
+    margin: 0;
+    padding: 0 0.5rem;
+}
+
+.olo-viewer pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 0.9rem;
+    overflow-x: auto;
+    padding: 1.3rem;
+    position: relative;
+    white-space: pre;
+    word-wrap: normal;
+}
+
+.olo-viewer code {
+    color: #423F37;
+}
+
+.olo-viewer aside {
+    display: block;
+    float: right;
+    width: 390px;
+}
+
+.olo-viewer b,
+.olo-viewer strong {
+    font-weight: bold;
+    color: #423F37;
+    font-weight: 700;
+}
+
+
+.olo-viewer blockquote {
+  background: #f9f9f9;
+  border-left: 10px solid #ccc;
+  margin: 1.5em 10px;
+  padding: 0.5em 10px;
+  quotes: "\201C""\201D""\2018""\2019";
+}
+
+.olo-viewer blockquote p {
+  display: inline;
+}
+
+.olo-viewer figure {
+	margin-left: -4.5rem;
+    margin-right: -4.5rem;
+    margin-bottom: 2em;
+    margin-top: 2em;
+}
+
+.olo-viewer hr {
+    border: 0;
+    height: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.olo-viewer img {
+    max-width: 100%;
+    display: block;
+    border: 0 none;
+}
+
+.olo-viewer ol > li:before {
+    color: #423F37;
+    content: counter(ol, decimal) ".";
+    counter-increment: ol;
+    font-weight: 700;
+    margin-right: 0.333em;
+    position: absolute;
+    right: 100%;
+}
+
+.olo-viewer ul > li:before {
+    background-color: #423F37;
+    border-radius: 14px 14px 14px 14px;
+    content: "";
+    height: 6px;
+    margin-right: 0.333em;
+    margin-top: 0.55em;
+    position: absolute;
+    right: 100%;
+    width: 6px;
+}
+
+.olo-viewer ol,
+.olo-viewer ul,
+.olo-viewer dl {
+    margin-left: 2rem;
+    padding: 0;
+}
+
+.olo-viewer ol {
+    counter-reset: ol;
+}
+
+.olo-viewer li {
+    margin-top: 0.5em;
+}
+
+
+.olo-viewer dd + dt {
+    margin-top: 0.5em;
+}
+
+
+.olo-viewer ul > li {
+    position: relative;
+}
+
+.olo-viewer ol > li {
+    position: relative;
+}
+
+.olo-viewer li {
+    list-style: none outside none;
+}
+
+.olo-viewer figure > figcaption {
+    margin-top: 0.5em;
+}
+
+.olo-viewer small,
+.olo-viewer dd,
+.olo-viewer figcaption {
+    color: #A19C91;
+    display: block;
+    font-size: 0.8rem;
+    font-style: italic;
+    line-height: 1.2;
+}
+
+.olo-viewer tbody {
+    display: table-row-group;
+}
+
+.olo-viewer tfoot {
+    display: table-footer-group;
+}
+
+.olo-viewer table {
+    margin-bottom: 2em;
+    font-size: 0.8em;
+    padding: 0;
+    border-collapse: collapse;
+    -webkit-box-shadow: 1px 1px 2px rgba(0,0,0,.35);
+    width: 80%;
+    margin:0 auto 2em auto;
+}
+
+.olo-viewer table th,
+.olo-viewer table td {
+    padding: 10px 10px 9px;
+    line-height: 18px;
+    text-align: left;
+}
+
+.olo-viewer table th {
+    padding-top: 9px;
+    vertical-align: middle;
+}
+
+.olo-viewer table td {
+    vertical-align: top;
+    border-top: 1px solid #ddd;
+}
+
+.olo-viewer table tbody th {
+    border-top: 1px solid #ddd;
+    vertical-align: top;
+}
+
+.olo-viewer table {
+    border: 1px solid #ddd;
+    border-collapse: separate;
+    *border-collapse:collapse;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;border-radius:4px;
+}
+
+.olo-viewer table th+th,
+.olo-viewer table td+td,
+.olo-viewer table th+td {
+    border-left: 1px solid #ddd;
+}
+
+.olo-viewer table thead tr:first-child th:first-child,
+.olo-viewer table tbody tr:first-child td:first-child {
+    -webkit-border-radius: 4px 0 0 0;
+    -moz-border-radius: 4px 0 0 0;
+    border-radius: 4px 0 0 0;
+}
+
+.olo-viewer table thead tr:first-child th:last-child,
+.olo-viewer table tbody tr:first-child td:last-child {
+    -webkit-border-radius: 0 4px 0 0;
+    -moz-border-radius: 0 4px 0 0;
+    border-radius: 0 4px 0 0;
+}
+
+.olo-viewer table tbody tr:last-child td:first-child {
+    -webkit-border-radius: 0 0 0 4px;
+    -moz-border-radius: 0 0 0 4px;
+    border-radius: 0 0 0 4px;
+}
+
+.olo-viewer table tbody tr:last-child td:last-child {
+    -webkit-border-radius: 0 0 4px 0;
+    -moz-border-radius: 0 0 4px 0;
+    border-radius: 0 0 4px 0
+}
+
+.olo-viewer tbody tr:nth-child(odd) {
+    background-color: rgba(0,0,0,0.03);
+}
+
+.olo-viewer caption {
+    display: table-caption;
+    font-weight: 300;
+    font-size: 1.3em;
+    letter-spacing: 2px;
+    word-spacing: .2em;
+    background: rgba(0,0,0,.75);
+    color: #EEE;
+    padding: 4px;
+    -webkit-border-radius: 4px;
+    margin: 4px 0;
+    -webkit-box-shadow: 2px 2px 2px rgba(0,0,0,.35);
+}
+
+/* grey out placeholders */
+.olo-viewer :-moz-placeholder {
+  color: #bfbfbf;
+}
+.olo-viewer ::-webkit-input-placeholder {
+  color: #bfbfbf;
+}
+
+.olo-viewer .article-date {
+    color: #C7C2B8;
+    display: block;
+    font-size: 0.8rem;
+}

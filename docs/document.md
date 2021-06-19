@@ -87,6 +87,16 @@ text with the `markdown` function.
 At the moment of writing, `markdown` is the only markup parser available, but 
 other parsers may be available in the future.
 
+A more concise, but less flexible way to achieve markup rendering is given by
+the `__render__` decorator function: defining a `__render__ = fn` function anywhere
+in your document is equivalent to executing `__str__ = fn __str__` at the end
+of the document. This means that you can render your document as markdown just 
+by adding the following expression in your document:
+
+```
+<% __render__ = require 'markdown' %>
+```
+
 
 
 ## Reusing documents content

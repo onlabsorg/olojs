@@ -58,6 +58,20 @@ describe("document", () => {
                 var namespace = await evaluate(context);
                 expect(await context.str(namespace)).to.equal("a + b = 30");
             });
+
+            it("should decorate the rendered text with the `__render__` function if it exists", async () => {
+                var source = `<% __render__ = text -> text + "!" %>Hello World`;
+                var evaluate = document.parse(source);
+                var context = document.createContext();
+                var namespace = await evaluate(context);
+                expect(await context.str(namespace)).to.equal("Hello World!");
+
+                var source = `<% __render__ = text -> {__str__:text + "!!"} %>Hello World`;
+                var evaluate = document.parse(source);
+                var context = document.createContext();
+                var namespace = await evaluate(context);
+                expect(await context.str(namespace)).to.equal("Hello World!!");
+            });
         });        
     });
 });
