@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
         
-    entry: "./browser.js",
+    entry: "./src/index.js",
     
     output: {
         filename: 'olo.js',

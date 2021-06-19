@@ -1,12 +1,13 @@
 
-const olojs = window.olojs = module.exports = {};
+module.exports = {
+    expression  : require('./lib/expression'),
+    document    : require('./lib/document'),
 
-olojs.expression  = require('./lib/expression');
-olojs.document    = require('./lib/document');
+    Store       : require('./lib/store'),
+    MemoryStore : require('./lib/memory-store'),
+    HTTPStore   : require('./lib/http-store'),
+    Router      : require('./lib/router'),
 
-olojs.Store       = require('./lib/store');
-olojs.MemoryStore = require('./lib/memory-store');
-olojs.HTTPStore   = require('./lib/http-store');
-olojs.Router      = require('./lib/router');
+    Viewer      : require('./lib/viewer'),    
+};
 
-olojs.Viewer      = require('./lib/viewer');

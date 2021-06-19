@@ -52,5 +52,8 @@
     "marked": "^0.8.2",
     "mkdirp": "^1.0.4",
     "trash": "^6.1.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

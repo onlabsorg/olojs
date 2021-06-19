@@ -208,7 +208,7 @@
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("\nconst olojs = window.olojs = module.exports = {};\n\nolojs.expression  = __webpack_require__(/*! ./lib/expression */ \"../../lib/expression.js\");\nolojs.document    = __webpack_require__(/*! ./lib/document */ \"../../lib/document.js\");\n\nolojs.Store       = __webpack_require__(/*! ./lib/store */ \"../../lib/store.js\");\nolojs.MemoryStore = __webpack_require__(/*! ./lib/memory-store */ \"../../lib/memory-store.js\");\nolojs.HTTPStore   = __webpack_require__(/*! ./lib/http-store */ \"../../lib/http-store.js\");\nolojs.Router      = __webpack_require__(/*! ./lib/router */ \"../../lib/router.js\");\n\nolojs.Viewer      = __webpack_require__(/*! ./lib/viewer */ \"../../lib/viewer.js\");\n\n\n//# sourceURL=webpack:////home/marcello/mdb/Code/olojs/browser.js?");
+eval("\nmodule.exports = {\n    expression  : __webpack_require__(/*! ./lib/expression */ \"../../lib/expression.js\"),\n    document    : __webpack_require__(/*! ./lib/document */ \"../../lib/document.js\"),\n\n    Store       : __webpack_require__(/*! ./lib/store */ \"../../lib/store.js\"),\n    MemoryStore : __webpack_require__(/*! ./lib/memory-store */ \"../../lib/memory-store.js\"),\n    HTTPStore   : __webpack_require__(/*! ./lib/http-store */ \"../../lib/http-store.js\"),\n    Router      : __webpack_require__(/*! ./lib/router */ \"../../lib/router.js\"),\n\n    Viewer      : __webpack_require__(/*! ./lib/viewer */ \"../../lib/viewer.js\"),    \n};\n\n\n\n//# sourceURL=webpack:////home/marcello/mdb/Code/olojs/browser.js?");
 
 /***/ }),
 
