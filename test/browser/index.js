@@ -28,6 +28,10 @@ describe("olojs", () => {
     it("should export the `Router` class", () => {
         expect(olojs.Router).to.equal(require("../../lib/router"));
     });
+    
+    it("should export the `Protocols` class", () => {
+        expect(olojs.Protocols).to.equal(require("../../lib/protocols"));
+    });    
 
     require("../expression");
     require("../document");
