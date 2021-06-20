@@ -35,4 +35,5 @@ describe("olojs", () => {
     require("../memory-store");
     // require("./http-store");
     require("../router");
+    require("../protocols");
 });

@@ -81,7 +81,7 @@ store = new olojs.FileStore('/home/my-olodocs-store');
 > In this example a file-system-based store is used, but a store can be any
 > object implementing the [Store] interface. olojs comes with a number of
 > pre-defined stores, namely [MemoryStore], [FileStore], [HTTPStore] and
-> a multi-store [Router].
+> a multi-store [Router] or [Protocols].
 
 Load, evaluate and render a [document]:
 
@@ -142,6 +142,7 @@ By serving your store via HTTP, you can:
 [HTTPStore]: ./docs/api/http-store.md
 [HTTPServer]: ./docs/api/http-server.md
 [Router]: ./docs/api/router.md
+[Protocols]: ./docs/api/protocols.md
 [Viewer]: ./docs/api/viewer.md
 [stilo]: https://github.com/onlabsorg/stilo
 [olowiki]: https://github.com/onlabsorg/olowiki

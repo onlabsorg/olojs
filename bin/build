@@ -20,6 +20,7 @@ generate-documentation http-store
 generate-documentation file-store
 generate-documentation memory-store
 generate-documentation router
+generate-documentation protocols
 generate-documentation http-server
 generate-documentation viewer
 

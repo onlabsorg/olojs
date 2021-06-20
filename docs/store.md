@@ -21,7 +21,9 @@ olojs comes with the following pre-defined stores:
   via HTTP (see also [HTTPServer])
 * [Router](./api/router.md) which bounds together multiple stores while
   behaving like a single store
-
+* [Protocols](./api/protocols.md) is a particular router that maps URI schemes
+  to stores.
+  
 More stores can be created by extending the [Store] class.
 
 

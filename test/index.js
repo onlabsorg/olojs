@@ -44,5 +44,6 @@ describe("olojs", () => {
     require("./file-store");
     require("./http-store");
     require("./router");
+    require("./protocols");
     require("./http-server");
 });
