@@ -170,4 +170,46 @@ describe("Protocols instance", () => {
             }
         })
     });
+    
+    describe(`context = protocols.createContext(docId)`, () => {
+        
+        it("should generate a context with a __path__ recognizing protocols", () => {
+            var store1 = new MemoryStore();
+            var store2 = new MemoryStore();
+            var protocols = new Protocols({
+                s1: store1,
+                s2: store2,
+            });
+
+            var context = protocols.createContext('path/to/doc?x=10');
+            expect(context.__path__).to.equal("/path/to/doc");
+            expect(context.argns).to.deep.equal({x:10});
+
+            var context = protocols.createContext('s1:/path/to/doc?x=10');
+            expect(context.__path__).to.equal("s1:/path/to/doc");
+            expect(context.argns).to.deep.equal({x:10});
+        });
+    });
+
+    describe(`{text} = await protocols.load(docId)`, () => {
+        
+        it("should load a document from a path or from a protocol recognizing protocols", async () => {
+            var store1 = new MemoryStore({
+                "/path/to/doc": "store<% argns.s %> document at <% __path__ %>"
+            });
+            var store2 = new MemoryStore({
+                "/path/to/doc": "store<% argns.s %> document at <% __path__ %>"
+            });
+            var protocols = new Protocols({
+                default: store1,
+                ppp: store2,
+            });
+
+            var {text} = await protocols.load('path/to/doc?s=1');
+            expect(text).to.equal("store1 document at /path/to/doc")
+
+            var {text} = await protocols.load('ppp:/path/to/doc?s=2');
+            expect(text).to.equal("store2 document at ppp:/path/to/doc")
+        });
+    });
 });
