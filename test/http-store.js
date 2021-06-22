@@ -124,6 +124,18 @@ describe("HTTPStore", () => {
             }
         });
 
+        it("should throw an ReadOperationNotAllowedError if the path is an URI", async () => {
+            var httpStore = new HTTPStore("http://localhost:8020");
+            class NoError extends Error {};
+            try {
+                await httpStore.read("ppp:/path/to/doc");
+                throw new NoError();
+            } catch (error) {
+                expect(error).to.be.instanceof(HTTPStore.ReadOperationNotAllowedError);
+                expect(error.message).to.equal("Operation not allowed: READ ppp:/path/to/doc");
+            }
+        });
+
         it("should throw an error if the response code is not 2xx", async () => {
             var httpStore = new HTTPStore("http://localhost:8020");
             class NoError extends Error {};
@@ -188,6 +200,18 @@ describe("HTTPStore", () => {
             }
         });
 
+        it("should throw an ReadOperationNotAllowedError if the path is an URI", async () => {
+            var httpStore = new HTTPStore("http://localhost:8020");
+            class NoError extends Error {};
+            try {
+                await httpStore.list("ppp:/path/to/doc");
+                throw new NoError();
+            } catch (error) {
+                expect(error).to.be.instanceof(HTTPStore.ReadOperationNotAllowedError);
+                expect(error.message).to.equal("Operation not allowed: READ ppp:/path/to/doc");
+            }
+        });
+
         it("should throw an error if the response code is not 2xx", async () => {
             var httpStore = new HTTPStore("http://localhost:8020");
             class NoError extends Error {};
@@ -243,6 +267,18 @@ describe("HTTPStore", () => {
             } catch (error) {
                 expect(error).to.be.instanceof(HTTPStore.WriteOperationNotAllowedError);
                 expect(error.message).to.equal("Operation not allowed: WRITE http://localhost:8020/e501/path/to/doc");
+            }
+        });
+
+        it("should throw an ReadOperationNotAllowedError if the path is an URI", async () => {
+            var httpStore = new HTTPStore("http://localhost:8020");
+            class NoError extends Error {};
+            try {
+                await httpStore.write("ppp:/path/to/doc", "...");
+                throw new NoError();
+            } catch (error) {
+                expect(error).to.be.instanceof(HTTPStore.WriteOperationNotAllowedError);
+                expect(error.message).to.equal("Operation not allowed: WRITE ppp:/path/to/doc");
             }
         });
 
@@ -305,6 +341,18 @@ describe("HTTPStore", () => {
             }
         });
 
+        it("should throw an ReadOperationNotAllowedError if the path is an URI", async () => {
+            var httpStore = new HTTPStore("http://localhost:8020");
+            class NoError extends Error {};
+            try {
+                await httpStore.delete("ppp:/path/to/doc");
+                throw new NoError();
+            } catch (error) {
+                expect(error).to.be.instanceof(HTTPStore.WriteOperationNotAllowedError);
+                expect(error.message).to.equal("Operation not allowed: WRITE ppp:/path/to/doc");
+            }
+        });
+
         it("should throw an error if the response code is not 2xx", async () => {
             var httpStore = new HTTPStore("http://localhost:8020");
             class NoError extends Error {};
@@ -363,6 +411,18 @@ describe("HTTPStore", () => {
             } catch (error) {
                 expect(error).to.be.instanceof(HTTPStore.WriteOperationNotAllowedError);
                 expect(error.message).to.equal("Operation not allowed: WRITE http://localhost:8020/e501/path/to/doc");
+            }
+        });
+
+        it("should throw an ReadOperationNotAllowedError if the path is an URI", async () => {
+            var httpStore = new HTTPStore("http://localhost:8020");
+            class NoError extends Error {};
+            try {
+                await httpStore.deleteAll("ppp:/path/to/doc");
+                throw new NoError();
+            } catch (error) {
+                expect(error).to.be.instanceof(HTTPStore.WriteOperationNotAllowedError);
+                expect(error.message).to.equal("Operation not allowed: WRITE ppp:/path/to/doc");
             }
         });
 
