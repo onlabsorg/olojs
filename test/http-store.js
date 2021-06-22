@@ -33,6 +33,9 @@ describe("HTTPStore", () => {
         app.all("/error/*", (req, res, next) => {
             res.status(500).send(`An error occurred while retrieving the document at ${req.path}`);
         });
+        app.all("/e501/*", (req, res, next) => {
+            res.status(501).send(`Operation not define for document at ${req.path}`);
+        });
         app.all("/echo-hdr/*", (req, res, next) => {
             TestHeader = req.get('Test');
             res.status(200).send();
@@ -109,6 +112,18 @@ describe("HTTPStore", () => {
             }
         });
 
+        it("should throw an ReadOperationNotAllowedError if the response status is 501", async () => {
+            var httpStore = new HTTPStore("http://localhost:8020");
+            class NoError extends Error {};
+            try {
+                await httpStore.read("/e501/path/to/doc");
+                throw new NoError();
+            } catch (error) {
+                expect(error).to.be.instanceof(HTTPStore.ReadOperationNotAllowedError);
+                expect(error.message).to.equal("Operation not allowed: READ http://localhost:8020/e501/path/to/doc");
+            }
+        });
+
         it("should throw an error if the response code is not 2xx", async () => {
             var httpStore = new HTTPStore("http://localhost:8020");
             class NoError extends Error {};
@@ -161,6 +176,18 @@ describe("HTTPStore", () => {
             }
         });
 
+        it("should throw a ReadOperationNotAllowedError if the response status is 501", async () => {
+            var httpStore = new HTTPStore("http://localhost:8020");
+            class NoError extends Error {};
+            try {
+                await httpStore.list("/e501/path/to/doc");
+                throw new NoError();
+            } catch (error) {
+                expect(error).to.be.instanceof(HTTPStore.ReadOperationNotAllowedError);
+                expect(error.message).to.equal("Operation not allowed: READ http://localhost:8020/e501/path/to/doc");
+            }
+        });
+
         it("should throw an error if the response code is not 2xx", async () => {
             var httpStore = new HTTPStore("http://localhost:8020");
             class NoError extends Error {};
@@ -204,6 +231,18 @@ describe("HTTPStore", () => {
             } catch (error) {
                 expect(error).to.be.instanceof(HTTPStore.WriteOperationNotAllowedError);
                 expect(error.message).to.equal("Operation not allowed: WRITE http://localhost:8020/hidden/path/to/doc");
+            }
+        });
+
+        it("should throw a WriteOperationNotAllowedError if the response status is 501", async () => {
+            var httpStore = new HTTPStore("http://localhost:8020");
+            class NoError extends Error {};
+            try {
+                await httpStore.write("/e501/path/to/doc");
+                throw new NoError();
+            } catch (error) {
+                expect(error).to.be.instanceof(HTTPStore.WriteOperationNotAllowedError);
+                expect(error.message).to.equal("Operation not allowed: WRITE http://localhost:8020/e501/path/to/doc");
             }
         });
 
@@ -254,6 +293,18 @@ describe("HTTPStore", () => {
             }
         });
 
+        it("should throw an WriteOperationNotAllowedError if the response status is 501", async () => {
+            var httpStore = new HTTPStore("http://localhost:8020");
+            class NoError extends Error {};
+            try {
+                await httpStore.delete("/e501/path/to/doc");
+                throw new NoError();
+            } catch (error) {
+                expect(error).to.be.instanceof(HTTPStore.WriteOperationNotAllowedError);
+                expect(error.message).to.equal("Operation not allowed: WRITE http://localhost:8020/e501/path/to/doc");
+            }
+        });
+
         it("should throw an error if the response code is not 2xx", async () => {
             var httpStore = new HTTPStore("http://localhost:8020");
             class NoError extends Error {};
@@ -300,6 +351,18 @@ describe("HTTPStore", () => {
             } catch (error) {
                 expect(error).to.be.instanceof(HTTPStore.WriteOperationNotAllowedError);
                 expect(error.message).to.equal("Operation not allowed: WRITE http://localhost:8020/hidden/path/to/doc");
+            }
+        });
+
+        it("should throw an WriteOperationNotAllowedError if the response status is 501", async () => {
+            var httpStore = new HTTPStore("http://localhost:8020");
+            class NoError extends Error {};
+            try {
+                await httpStore.deleteAll("/e501/path/to/doc");
+                throw new NoError();
+            } catch (error) {
+                expect(error).to.be.instanceof(HTTPStore.WriteOperationNotAllowedError);
+                expect(error.message).to.equal("Operation not allowed: WRITE http://localhost:8020/e501/path/to/doc");
             }
         });
 

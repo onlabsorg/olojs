@@ -24,7 +24,7 @@ source = await httpStore.read("/path/to/doc")
 - On 200 status code, returns the response body as string
 - On 403 status code, throws a `HTTPStore.ReadPermissionDeniedError`
 - On 404 status code, return an empty string
-- On 405 status code, throws a `HTTPStore.ReadOperationNotAllowedError`
+- On 405 or 501 status code, throws a `HTTPStore.ReadOperationNotAllowedError`
 - On any other status code, throws a generic error
   
 httpStore.list - async method
@@ -39,7 +39,7 @@ entries = await httpStore.list("/path/to/doc")
 - On 200 status code, returns the response body as json array
 - On 403 status code, throws a `HTTPStore.ReadPermissionDeniedError`
 - On 404 status code, return an empty array
-- On 405 status code, throws a `HTTPStore.ReadOperationNotAllowedError`
+- On 405 or 501 status code, throws a `HTTPStore.ReadOperationNotAllowedError`
 - On any other status code, throws a generic error
   
 httpStore.write - async method
@@ -52,7 +52,7 @@ await httpStore.write("/path/to/doc", source)
 
 - On 200 and 201 status code, returns
 - On 403 status code, throws a `HTTPStore.WritePermissionDeniedError`
-- On 405 status code, throws a `HTTPStore.WriteOperationNotAllowedError`
+- On 405 or 501 status code, throws a `HTTPStore.WriteOperationNotAllowedError`
 - On any other status code, throws a generic error
   
 httpStore.delete - async method
@@ -65,7 +65,7 @@ await httpStore.delete("/path/to/doc")
 
 - On 200 status code, returns
 - On 403 status code, throws a `HTTPStore.WritePermissionDeniedError`
-- On 405 status code, throws a `HTTPStore.WriteOperationNotAllowedError`
+- On 405 or 501 status code, throws a `HTTPStore.WriteOperationNotAllowedError`
 - On any other status code, throws a generic error
   
 httpStore.deleteAll - async method
@@ -79,7 +79,7 @@ await httpStore.deleteAll("/path/to/dir")
 
 - On 200 status code, returns
 - On 403 status code, throws a `HTTPStore.WritePermissionDeniedError`
-- On 405 status code, throws a `HTTPStore.WriteOperationNotAllowedError`
+- On 405 or 501 status code, throws a `HTTPStore.WriteOperationNotAllowedError`
 - On any other status code, throws a generic error
   
 
