@@ -142,8 +142,51 @@ describe("Store", () => {
             }
 
         });
+        
+        describe("context.__read__", () => {
+            
+            it("should call store.read", async () => {
+                var store = new Store();
+                store.read = path => `document @ ${path}`;
+                var context = store.createContext('/doc');
+                expect(context.__read__("/path/to/doc")).to.equal("document @ /path/to/doc");
+            });
+        });
+
+        describe("context.__list__", () => {
+            
+            it("should call store.list", async () => {
+                var store = new Store();
+                store.list = path => `items @ ${path}`;
+                var context = store.createContext('/doc');
+                expect(context.__list__("/path/to/dir")).to.equal("items @ /path/to/dir");
+            });
+        });
+
+        describe("context.__context__", () => {
+            
+            it("should call store.createContext", async () => {
+                var store = new Store();
+                var context = store.createContext('/doc');
+                store.createContext = docId => `context for document @ ${docId}`;
+                expect(context.__context__("/path/to/doc")).to.equal("context for document @ /path/to/doc");
+            });
+        });
+
+        describe("context.__parse__", () => {
+            
+            it("should call document.parse", async () => {
+                var store = new Store();
+                var context = store.createContext('/doc');
+                var document_parse = document.parse;
+                document.parse = source => `parsed "${source}"`
+                expect(context.__parse__("abc")).to.equal('parsed "abc"');
+                document.parse = document_parse;
+            });
+        });
 
         describe("context.__path__", () => {
+            
             it("should contain the normalize path portion of the docId", () => {
                 var store = new Store();
 
