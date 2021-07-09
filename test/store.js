@@ -133,16 +133,6 @@ describe("Store", () => {
             }
         });
 
-        it("should contain include the store.globals object", () => {
-            var store = new Store();
-            Object.assign(store.globals, {x:10, y:20});
-            var context = store.createContext("/path/to/doc");
-            for (let name in store.globals) {
-                expect(context[name]).to.equal(store.globals[name]);
-            }
-
-        });
-        
         describe("context.__read__", () => {
             
             it("should call store.read", async () => {
@@ -166,22 +156,27 @@ describe("Store", () => {
         describe("context.__context__", () => {
             
             it("should call store.createContext", async () => {
-                var store = new Store();
+                class TestStore extends Store {
+                    createContext (docId) {
+                        var context = super.createContext(docId);
+                        context.$$$ = "aaa bbb ccc";
+                        return context;                        
+                    }
+                }
+                var store = new TestStore();
                 var context = store.createContext('/doc');
-                store.createContext = docId => `context for document @ ${docId}`;
-                expect(context.__context__("/path/to/doc")).to.equal("context for document @ /path/to/doc");
+                expect(context.__context__("/path/to/doc").$$$).to.equal("aaa bbb ccc");
             });
         });
 
         describe("context.__parse__", () => {
             
-            it("should call document.parse", async () => {
+            it("should parse the passed source and return its evaluator", async () => {
                 var store = new Store();
                 var context = store.createContext('/doc');
-                var document_parse = document.parse;
-                document.parse = source => `parsed "${source}"`
-                expect(context.__parse__("abc")).to.equal('parsed "abc"');
-                document.parse = document_parse;
+                var evaluate = context.__parse__("<% 2*x %>");
+                var docns = await evaluate( document.createContext({x:10}) );
+                expect(docns.__str__).to.equal("20");
             });
         });
 
