@@ -153,29 +153,14 @@ describe("Store", () => {
             });
         });
 
-        describe("context.__context__", () => {
-            
-            it("should call store.createContext", async () => {
-                class TestStore extends Store {
-                    createContext (docId) {
-                        var context = super.createContext(docId);
-                        context.$$$ = "aaa bbb ccc";
-                        return context;                        
-                    }
-                }
-                var store = new TestStore();
-                var context = store.createContext('/doc');
-                expect(context.__context__("/path/to/doc").$$$).to.equal("aaa bbb ccc");
-            });
-        });
-
         describe("context.__parse__", () => {
             
             it("should parse the passed source and return its evaluator", async () => {
                 var store = new Store();
                 var context = store.createContext('/doc');
-                var evaluate = context.__parse__("<% 2*x %>");
-                var docns = await evaluate( document.createContext({x:10}) );
+                context.a = 2;
+                var evaluate = context.__parse__("<% a*x %>");
+                var docns = await evaluate( {x:10} );
                 expect(docns.__str__).to.equal("20");
             });
         });

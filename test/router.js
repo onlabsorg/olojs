@@ -7,6 +7,94 @@ var Router = require('../lib/router');
 
 describe("Router", () => {
 
+    describe("iterator = router.iterRoutes()", () => {
+
+        it("should return an iterator yielding all the [routeId, store] pairs in analphabetic order", () => {
+            var routes = {
+                "path/to": new MemoryStore(),
+                "/path/to/store2": new MemoryStore(),
+                "/": new MemoryStore()
+            }
+            var router = new Router(routes);
+            expect(router.iterRoutes()[Symbol.iterator]).to.be.a("function");
+            expect(Array.from(router.iterRoutes())).to.deep.equal([
+                ['/path/to/store2/', routes["/path/to/store2"]],
+                ['/path/to/', routes["path/to"]],
+                ['/', routes["/"]],
+            ]);
+        });
+    });
+
+    describe("router.mount(path, store)", () => {
+        
+        it("should add a new store to the router", () => {
+            var routes = {
+                "path/to": new MemoryStore(),
+                "/path/to/store2": new MemoryStore(),
+                "/": new MemoryStore()
+            }
+            var router = new Router(routes);
+            expect(Array.from(router.iterRoutes())).to.deep.equal([
+                ['/path/to/store2/', routes["/path/to/store2"]],
+                ['/path/to/', routes["path/to"]],
+                ['/', routes["/"]],
+            ]);
+
+            var store3 = new MemoryStore();
+            router.mount('/path/to/new/store', store3);
+            expect(Array.from(router.iterRoutes())).to.deep.equal([
+                ['/path/to/store2/', routes["/path/to/store2"]],
+                ['/path/to/new/store/', store3],
+                ['/path/to/', routes["path/to"]],
+                ['/', routes["/"]],
+            ]);
+        });
+
+        it("should fail silently is store is not a valid store", () => {
+            var routes = {
+                "path/to": new MemoryStore(),
+                "/path/to/store2": new MemoryStore(),
+                "/": new MemoryStore()
+            }
+            var router = new Router(routes);
+            expect(Array.from(router.iterRoutes())).to.deep.equal([
+                ['/path/to/store2/', routes["/path/to/store2"]],
+                ['/path/to/', routes["path/to"]],
+                ['/', routes["/"]],
+            ]);
+
+            router.mount('/path/to/new/store', {});
+            expect(Array.from(router.iterRoutes())).to.deep.equal([
+                ['/path/to/store2/', routes["/path/to/store2"]],
+                ['/path/to/', routes["path/to"]],
+                ['/', routes["/"]],
+            ]);
+        });
+    });
+
+    describe("router.unmount(routeId)", () => {
+        
+        it("should remove the store mapped to the given Id from the router", () => {
+            var routes = {
+                "path/to": new MemoryStore(),
+                "/path/to/store2": new MemoryStore(),
+                "/": new MemoryStore()
+            }
+            var router = new Router(routes);
+            expect(Array.from(router.iterRoutes())).to.deep.equal([
+                ['/path/to/store2/', routes["/path/to/store2"]],
+                ['/path/to/', routes["path/to"]],
+                ['/', routes["/"]],
+            ]);
+
+            router.unmount('path/to/store2');
+            expect(Array.from(router.iterRoutes())).to.deep.equal([
+                ['/path/to/', routes["path/to"]],
+                ['/', routes["/"]],
+            ]);
+        });
+    });
+
     describe("[store, subPath] = router.match(path)", () => {
 
         it("should return store mounted at the route matching the path and the subPath relative to that route", () => {
