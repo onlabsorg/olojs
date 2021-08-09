@@ -36,8 +36,8 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "rimraf": "^3.0.2",
-    "webpack": "^4.44.2",
-    "webpack-cli": "^3.3.12"
+    "webpack": "^5.49.0",
+    "webpack-cli": "^4.7.2"
   },
   "dependencies": {
     "@onlabsorg/swan-js": "0.7.x",

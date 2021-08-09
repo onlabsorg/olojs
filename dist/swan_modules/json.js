@@ -1,1 +1,1 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[4],{21:function(n,i){i.parse=n=>JSON.parse(n),i.stringify=n=>i=>JSON.stringify(i,null,n)}}]);
+(self.webpackChunk_onlabsorg_olojs=self.webpackChunk_onlabsorg_olojs||[]).push([[660],{718:(s,l)=>{l.parse=s=>JSON.parse(s),l.stringify=s=>l=>JSON.stringify(l,null,s)}}]);
