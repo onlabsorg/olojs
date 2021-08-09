@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-echo "@olojs: BUILDING BROWSER MODULES"
+echo "@olojs/bin/build: BUILDING BROWSER MODULES"
 echo "------------------------------------------------------------------------------------"
 npx webpack --mode production
 echo
 
 
-echo "@olojs: BUILDING DOCUMENTATION"
+echo "@olojs/bin/build: BUILDING DOCUMENTATION"
 echo "------------------------------------------------------------------------------------"
 
 generate-documentation () {
@@ -20,9 +20,8 @@ generate-documentation http-store
 generate-documentation file-store
 generate-documentation memory-store
 generate-documentation router
-generate-documentation protocols
 generate-documentation http-server
-generate-documentation viewer
+generate-documentation library
 
 
 generate-stdlib-documentation () {

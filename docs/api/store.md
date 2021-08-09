@@ -118,40 +118,6 @@ following standard:
 When instantiated directly, the base store `deleteAll` method always throws
 `Store.WriteOperationNotAllowedError`.
   
-store.createContext - method
-------------------------------------------------------------------------
-Creates a document context specific to a given store document.
-```js
-context = store.createContext(docId);
-```
-- `docId` is a combination of a path and a query string (e.g.
-  `/path/to/doc?x=10;y=20;z=30`)
-- `context` is a valid document context
-- `context.__path__` contains the path portion of `docId`
-- `context.argns` contains the namespace passed as query string with
-  `docId`. For example, if `docId = /path/to/doc?x=10;y=20;z=30`, then
-  the `argns` namespace will be `{x:10, y:20, z:30}`.
-- `context.import` is a function that returns a store document namespace
-  given its id. If the path portion of the id is a relative path, it
-  will be resolved agains `context.__path__`.
-
-The `createContext` method is not meant to be overridden.
-  
-store.load - async method
-------------------------------------------------------------------------
-Reads, evaluates and renders the document identified by the passed id.
-```js
-{source, context, namespace, text} = await store.load(docId);
-```
-- `docId` is a combination of a path and a query string (e.g.
-  `/path/to/doc?x=10;y=20;z=30`)
-- `source` is the document source returned by `store.read`
-- `context` is the document context returned by `store.createContext`
-- `namespace` is the document namespace evaluated in `context`
-- `text` is the document rendered content
-
-The `load` method is not meant to be overridden.
-  
 Store.ReadPermissionDeniedError - class
 ----------------------------------------------------------------------------
 Error thrown when attempting a read operation for which the store instance

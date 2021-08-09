@@ -29,8 +29,8 @@ describe("olojs", () => {
         expect(olojs.Router).to.equal(require("../../lib/router"));
     });
     
-    it("should export the `Protocols` class", () => {
-        expect(olojs.Protocols).to.equal(require("../../lib/protocols"));
+    it("should export the `Library` class", () => {
+        expect(olojs.Library).to.equal(require("../../lib/library"));
     });    
 
     require("../expression");
@@ -39,5 +39,5 @@ describe("olojs", () => {
     require("../memory-store");
     // require("./http-store");
     require("../router");
-    require("../protocols");
+    require("../library");
 });

@@ -7,8 +7,7 @@ module.exports = {
     MemoryStore : require('./lib/memory-store'),
     HTTPStore   : require('./lib/http-store'),
     Router      : require('./lib/router'),
-    Protocols   : require('./lib/protocols'),
-
-    Viewer      : require('./lib/viewer'),    
+    
+    Library     : require('./lib/library'),
 };
 

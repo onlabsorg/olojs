@@ -33,8 +33,8 @@ describe("olojs", () => {
         expect(olojs.Router).to.equal(require("../lib/router"));
     });
 
-    it("should export the `Protocols` class", () => {
-        expect(olojs.Protocols).to.equal(require("../lib/protocols"));
+    it("should export the `Library` class", () => {
+        expect(olojs.Library).to.equal(require("../lib/library"));
     });
 
     it("should export the `HTTPServer` module", () => {
@@ -48,6 +48,11 @@ describe("olojs", () => {
     require("./file-store");
     require("./http-store");
     require("./router");
-    require("./protocols");
+    require("./library");
     require("./http-server");
+    
+    after(async () => {
+        const runBrowserTest = require('./browser/test');
+        await runBrowserTest();
+    });
 });

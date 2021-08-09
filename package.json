@@ -30,10 +30,7 @@
   },
   "scripts": {
     "develop": "webpack --mode development --watch",
-    "test": "node test/help.js",
-    "node-test": "mocha test/index.js",
-    "browser-test": "node test/browser/run-tests.js",
-    "viewer-test": "node test/viewer.js /index",
+    "test": "mocha test/index.js",
     "build": "bin/build"
   },
   "devDependencies": {

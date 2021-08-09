@@ -3,6 +3,22 @@ var http = require('http');
 var child_process = require('child_process');
 
 
+async function runTests () {
+    console.log("Compiling tests for the browser with webpack ...")
+    await exec('npx webpack --mode development')
+    
+    console.log("Starting the server ...")
+    var server = await startServer(8011);
+    console.log("olojs test server listening on port 8011");
+    
+    console.log("Running the tests in the browser ...");
+    exec('xdg-open http://localhost:8011/index.html');
+    
+    console.log(`Killing the server after 10s ...`);
+    setTimeout(() => process.exit(), 10000);
+}
+
+
 function exec (command) {
     let options = {
         cwd: __dirname
@@ -31,19 +47,8 @@ function startServer (port) {
 }
 
 
-async function run_tests () {
-    console.log("Compiling tests for the browser with webpack ...")
-    await exec('npx webpack --mode development')
-    
-    console.log("Starting the server ...")
-    var server = await startServer(8011);
-    console.log("olojs test server listening on port 8011");
-    
-    console.log("Running the tests in the browser ...");
-    exec('xdg-open http://localhost:8011/index.html');
-    
-    console.log(`Killing the server in 10s ...`);
-    setTimeout(() => process.exit(), 10000);
+if (require.main === module) {
+    runTests();
+} else {
+    module.exports = runTests;
 }
-
-run_tests();

@@ -750,6 +750,21 @@ describe("Library", () => {
             });
         });
     });   
+    
+    describe("Library bultin http protocols", () => {
+        
+        it("should map to the entire http and https namespace", async () => {
+            
+            // fetch the README.md file of this project
+            const response = await fetch("https://raw.githubusercontent.com/onlabsorg/olojs/master/README.md");
+            const README = await response.text();
+            
+            // read the README.md file via a Library instance
+            const library = new Library();
+            expect(await library.read("https://raw.githubusercontent.com/onlabsorg/olojs/master/README.md")).to.equal(README);            
+            expect(await library.read("http://raw.githubusercontent.com/onlabsorg/olojs/master/README.md")).to.equal(README);            
+        })
+    });
 });
 
 

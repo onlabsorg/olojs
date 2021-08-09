@@ -9,7 +9,8 @@ module.exports = {
     get FileStore   () {return require('./lib/file-store')},
     get HTTPStore   () {return require('./lib/http-store')},
     get Router      () {return require('./lib/router')},
-    get Protocols   () {return require('./lib/protocols')},
-    
-    get HTTPServer  () {return require("./lib/http-server")},
+
+    get Library     () {return require('./lib/library')},    
+
+    get HTTPServer  () {return require("./lib/http-server")},    
 };
