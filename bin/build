@@ -14,6 +14,16 @@ generate-documentation () {
     bin/gen-doc "lib/$1.js" > "docs/api/$1.md"
 }
 
+generate-src-documentation () {
+    echo "- docs/api/$1.md"
+    bin/gen-doc "src/$1.js" > "docs/api/$1.md"
+}
+
+generate-stdlib-documentation () {
+    echo "- docs/swan_modules/$1.md"
+    bin/gen-doc "lib/swan_modules/$1.js" > "docs/swan_modules/$1.md"
+}
+
 generate-documentation document
 generate-documentation store
 generate-documentation http-store
@@ -22,13 +32,7 @@ generate-documentation memory-store
 generate-documentation router
 generate-documentation http-server
 generate-documentation library
-
-
-generate-stdlib-documentation () {
-    echo "- docs/swan_modules/$1.md"
-    bin/gen-doc "lib/swan_modules/$1.js" > "docs/swan_modules/$1.md"
-}
-
+generate-src-documentation browser-store
 generate-stdlib-documentation markdown
 
 echo

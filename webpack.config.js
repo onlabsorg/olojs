@@ -12,10 +12,7 @@ module.exports = {
     
     resolve: {
         fallback: {
-            "fs": false,
-            "path": false,
-            "http": false,
-            "https": false,
+            "path": require.resolve('path-browserify'),
         }
     }
 }

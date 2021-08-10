@@ -1,6 +1,8 @@
 const expect = require("chai").expect;
 const olojs = require("../../browser");
 
+const pathlib = require('path');
+console.log(pathlib);
 
 describe("olojs", () => {
 
@@ -21,6 +23,10 @@ describe("olojs", () => {
         expect(olojs.MemoryStore).to.equal(require("../../lib/memory-store"));
     });
 
+    it("should export the `BrowserStore` class", () => {
+        expect(olojs.BrowserStore).to.equal(require("../../src/browser-store"));
+    });
+
     it("should export the `HTTPStore` class", () => {
         expect(olojs.HTTPStore).to.equal(require("../../lib/http-store"));
     });
@@ -37,6 +43,7 @@ describe("olojs", () => {
     require("../document");
     require("../store");
     require("../memory-store");
+    require("../browser-store");
     // require("./http-store");
     require("../router");
     require("../library");
