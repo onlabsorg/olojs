@@ -213,7 +213,7 @@ describe("Library", () => {
             
             it("should resolve the source of the document mapped to docId", async () => {
                 
-                var library = new Library( new MemoryStore({
+                var library = new Library(new MemoryStore({
                     '/path/to/doc1': "doc @ /path/to/doc1",
                     '/path/to/doc2': "doc @ /path/to/doc2"
                 }) );
