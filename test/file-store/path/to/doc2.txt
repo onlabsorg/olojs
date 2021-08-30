@@ -1,1 +1,1 @@
-doc @ /path/to/doc2
+<% docnum = 2 %>

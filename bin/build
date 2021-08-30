@@ -31,7 +31,6 @@ generate-documentation file-store
 generate-documentation memory-store
 generate-documentation router
 generate-documentation http-server
-generate-documentation library
 generate-src-documentation browser-store
 generate-stdlib-documentation markdown
 

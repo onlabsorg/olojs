@@ -1,4 +1,5 @@
 const expect = require("chai").expect;
+const document = require('../lib/document');
 const Store = require('../lib/store');
 
 
@@ -124,7 +125,6 @@ module.exports = (description, options={}) => describe(description, () => {
             });
         }
     });
-    
     
     describe("await store.write(path, source)", () => {
         
@@ -275,6 +275,81 @@ module.exports = (description, options={}) => describe(description, () => {
                 expect(await store.read(`/path/to/dir/doc3`)).to.equal("");
                 expect(await store.list(`/path/to/dir`)).to.deep.equal([]);
             });
+        }
+    });
+    
+    describe("store.createContext(path, presets)", () => {
+        
+        it("should be a document context", async () => {
+            const context = await store.createContext('/path/to/doc1');
+            
+            const documentContextPrototype = Object.getPrototypeOf(document.createContext());
+            expect(documentContextPrototype.isPrototypeOf(context)).to.be.true;
+        })
+        
+        it("should contain the document path as '__path__'", async () => {
+            const context = await store.createContext('path/to/./doc1');            
+            expect(context.__path__).to.equal('/path/to/doc1');
+        });
+        
+        it("should contain an 'import' function", async () => {
+            const context = await store.createContext('/path/to/doc1');                
+            expect(context.import).to.be.a("function");
+        });
+
+        if (!(options.readAccessDenied || options.writeAccessDenied || options.voidStore || options.readOnly)) {
+            describe("doc.context.import", () => {
+                
+                it("should return the namespace of the passed object", async () => {
+                    await store.write('/path/to/doc1', "<% docnum = 1 %>");
+                    await store.write('/path/to/doc2', "<% docnum = 2 %>");
+                    
+                    const ctx1 = await store.createContext('/path/to/doc1');
+                    const doc2_ns = await ctx1.import('/path/to/doc2');
+                    expect(doc2_ns.docnum).to.equal(2);
+                });
+
+                it("should resolve relative ids", async () => {
+                    await store.write('/path/to/doc1', "<% docnum = 1 %>");
+                    await store.write('/path/to/doc2', "<% docnum = 2 %>");
+                    await store.write('/path/to/doc3', "<% docnum = 3 %>");
+                    
+                    const ctx1 = await store.createContext('/path/to/doc1');
+                    
+                    const doc2_ns = await ctx1.import('doc2');
+                    expect(doc2_ns.docnum).to.equal(2);
+
+                    const doc3_ns = await ctx1.import('./doc3');
+                    expect(doc3_ns.docnum).to.equal(3);
+                });
+
+                it("should cache the documents", async () => {
+                    var count;
+                    store.read = path => {
+                        count += 1;
+                        return `doc @ ${path}<% p = __path__ %>`;
+                    }
+
+                    const ctx = await store.createContext('/path/to/doc');
+                    count = 0;
+
+                    var ns = await ctx.import("/path/to/doc1");
+                    expect(count).to.equal(1);
+
+                    var ns = await ctx.import("/path/to/doc1");
+                    expect(count).to.equal(1);
+
+                    var ns = await ctx.import("/path/to/doc2");
+                    expect(count).to.equal(2);
+                    expect(ns.p).to.equal("/path/to/doc2");
+
+                    var ns = await ctx.import("/path/to/doc2");
+                    expect(count).to.equal(2);
+                    expect(ns.p).to.equal("/path/to/doc2");
+                    
+                    delete store.read;
+                });
+            });            
         }
     });
     
