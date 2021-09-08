@@ -74,41 +74,45 @@ npm install @onlabsorg/olojs --save
 Import olojs and connect to a store:
 
 ```js
-olojs = require('@onlabsorg/olojs');
-store = new olojs.FileStore('/home/my-olodocs-store');
+olo = require('@onlabsorg/olojs');
+store = new olo.FileStore('/home/my-olodocs-store');
 ```
 
 > In this example a file-system-based store is used, but a store can be any
 > object implementing the [Store] interface. olojs comes with a number of
-> pre-defined stores, namely [MemoryStore], [FileStore], [HTTPStore] and
-> a multi-store [Router] or [Protocols].
+> predefined stores, namely [MemoryStore], [FileStore], [HTTPStore], 
+> [BrowserStore] and a multi-store [Router].
 
 Load, evaluate and render a [document]:
 
 ```js
-{text, namespace} = await store.load('/path/to/doc');
+docPath = '/path/to/doc';
+source = await store.read(docPath);             // fetch the document source
+evaluate = olo.document.parse(source);          // compile the source
+context = await store.createContext(docPath);   // create an evaluation context
+{data, text} = await evaluate(context);         // evaluate the document
 ```
 
 Serve the store via HTTP:
 
 ```js
-server = olojs.HTTPServer.ViewerServer(store);
+server = olo.HTTPServer.create(store);
 server.listen(8010);
 ```
 
-By serving your store via HTTP, you can:
-- Render your documents in the browser at `localhost:8010/#/path/to/doc`
-- Publish your documents on the web
-- Allow other users to programmatically access you documents via a
-  [HTTPStore]
+Interface to your store via HTTP:
 
+```js
+remoteStore = new olo.HTTPStore('http://localhost:8010');
+doc = await remoteStore.read('/path/to/doc');
+```
 
 > olojs works also in the browser, although it has been tested only on Chrome.
 > In order to use the olojs library in the browser, you should require
 > the module `@onlabsorg/olojs/browser`. The only difference between the NodeJS
 > version and the browser version is that the latter doesn't contain the
-> [FileStore] class and the [HTTPServer] object, but contains instead the 
-> [Viewer] widget.
+> [FileStore] class and the [HTTPServer] object, but it contains the 
+> [BrowserStore] instead.
 
 
 ### Learn more
@@ -118,9 +122,8 @@ By serving your store via HTTP, you can:
 
 
 ### Test
-- `npm run note-test` tests olojs in the NodeJS environment
-- `npm run browser-test` tests olojs in the default browser
-- `npm run viewer-test` tests the olojs viewer in the default browser
+- `npm run node-test` tests the library in NodeJS
+- `npm run browser-test` tests the library in the browser
 
 
 ### License
@@ -130,7 +133,7 @@ By serving your store via HTTP, you can:
 ### Related projects
 * [stilo] is a command-line interface written in NodeJS that allows you to
   create and mange local olojs document repositories.
-* [olowiki] is a plug-in for [stilo] that allows to render and edit your
+* [olowiki] is a HTTP client and [stilo] plugin for editing and rendering 
   olojs documents in the browser
 
 
@@ -142,7 +145,7 @@ By serving your store via HTTP, you can:
 [HTTPStore]: ./docs/api/http-store.md
 [HTTPServer]: ./docs/api/http-server.md
 [Router]: ./docs/api/router.md
-[Protocols]: ./docs/api/protocols.md
+[BrowserStore]: ./docs/api/browser-store.md
 [Viewer]: ./docs/api/viewer.md
-[stilo]: https://github.com/onlabsorg/stilo
-[olowiki]: https://github.com/onlabsorg/olowiki
+[stilo]: https://github.com/onlabsorg/stilo/blob/main/README.md
+[olowiki]: https://github.com/onlabsorg/olowiki/blob/master/README.md

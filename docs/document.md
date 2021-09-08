@@ -37,22 +37,22 @@ straight forward and yet powerful, due to the flexibility of the [swan] language
 ## Evaluating and rendering documents
 
 An olojs document source template can be evaluated and rendered using the 
-`olojs.document` module as shown in the following example:
+`olo.document` module as shown in the following example:
 
 ```js
-document = require("@onlabsorg/olojs").document;
+{document} = require("@onlabsorg/olojs");
 
 source = "<% name %> is <% age %> years old. <% id = name + str(age) %>";
 evaluate = document.parse(source);
 
 context = document.createContext({name:"Bob", age:27});
-namespace = await evaluate(context);        // {name:"Bob", age:27, id:"Bob27"}
-
-rendering = await context.str(namespace);   // "Bob is 27 years old."
+{data, text} = await evaluate(context);        
+        // data: {name:"Bob", age:27, id:"Bob27"}
+        // text: "Bob is 27 years old."
 ```
 
 For a more in depth documentation of the `document` module, read the 
-[olojs.document API](./api/document.md).
+[olo.document API](./api/document.md).
 
 
 
@@ -62,40 +62,34 @@ Olojs documents are markup-agnostic in that the rendered content is just the
 plain text obtained by replacing the inline expressions with their stringified 
 value. Nonetheless any markup language can theoretically be used; let's see how.
 
-At every point of the document, the `__str__` name is mapped to the text
-which has been rendered so far. The same `__str__` string will be the return
-value of the `context.str(namespace)` function call. This means that by
-modifying the `__str__` value, you can alter the rendered text. For expample:
+The `evaluate` function returns a `text` string and a `data` namespace.
 
-```
-Hi there, this is a document content that will never be rendered, because the
-following expression will alter the value mapped to the __str__ name.
-<% __str__ = "Less is more!" %>
-```
-
-... will render to `Less is more!`. 
-
-If you want to render the document as markdown, you can post-process the `__str__`
-text with the `markdown` function.
-
-```
-# This is a markdown header
-<% markdown = require 'markdown' # load the markdown module %>
-<% __str__ = markdown(__str__) %>
-```
-
-At the moment of writing, `markdown` is the only markup parser available, but 
-other parsers may be available in the future.
-
-A more concise, but less flexible way to achieve markup rendering is given by
-the `__render__` decorator function: defining a `__render__ = fn` function anywhere
-in your document is equivalent to executing `__str__ = fn __str__` at the end
-of the document. This means that you can render your document as markdown just 
-by adding the following expression in your document:
+- the `data` object contains all the names defined in the [swan] expressions
+- the `text` string obtained by replacing each [swan] expression with its 
+  stringified value (plain text) and decorating it via 
+  `returnedText = await data.__render__(plainText)`.
+  
+Therefore, if you want to render the document as markdown, you can decorate its 
+plain text by defining a `__render__` function that takes a markdown text as 
+input and returns HTML markup as output. Such a function is buit-in in the 
+olojs expression library. For example, the following text will render as markdown:
 
 ```
 <% __render__ = require 'markdown' %>
+
+# This is a header
+
+This is a paragraph.
+
+- This
+- is
+- a
+- list
 ```
+
+> A the moment, the only built-in decorator is the `markdown` function shown in 
+> the example above, but more may follow in the future.
+
 
 
 
@@ -116,8 +110,8 @@ This document defines some helper functions that create html tags.
 <% italic = text -> '<i>' + text + '</i>' %>
 ```
 
-Once evaluated, this document returns a namespace containing two functions:
-`bold` and `img` and renders to `"This document defines some helper functions 
+Once evaluated, this document returns a `data` namespace containing two functions:
+`bold` and `img` and the `text` string `"This document defines some helper functions 
 that create html tags."`
 
 Let's now assume that the same store contains also the following document mapped
@@ -134,23 +128,21 @@ The `/path/to/mycat` document imports the namespace of `/tools/tags` under the
 name `tags` and uses the functions contained in it (namely `tags.bold` and 
 `tags.italic`) to generate part of its own content.
 
-Once evaluated, the `/path/to/mycat` document returns the following namespace:
+Once evaluated, the `/path/to/mycat` document returns the following object:
 
 ```js
 {
-    name: "Izad",
-    kind: "persian",
-    tags: {
-        bold:   text => '<b>' + text + '</b>',
-        italic: text => '<i>' + text + '</i>'
-    }
+    data: {
+        name: "Izad",
+        kind: "persian",
+        tags: {
+            bold:   text => '<b>' + text + '</b>',
+            italic: text => '<i>' + text + '</i>'
+        }
+    },
+    
+    text: "I have a <b>persian</b> cat named <i>Izad</i>!"
 }
-```
-
-and renders to:
-
-```
-I have a <b>persian</b> cat named <i>Izad</i>!
 ```
 
 > The import function works also with relative paths. For example the import
@@ -179,7 +171,7 @@ host document.
 Learn more
 --------------------------------------------------------------------------------
 * Learn the [swan] language
-* Learn the [olojs.document API](./api/document.md)
+* Learn the [olo.document API](./api/document.md)
 * Learn more about [stores](./store.md)
 
 

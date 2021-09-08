@@ -1,8 +1,8 @@
 
 module.exports = {
 
-    get expression  () {return require("./lib/expression")},
-    get document    () {return require("./lib/document")},
+    get expression () {return require("./lib/expression")},
+    get document   () {return require("./lib/document")},
 
     get Store       () {return require('./lib/store')},
     get MemoryStore () {return require('./lib/memory-store')},
@@ -10,7 +10,6 @@ module.exports = {
     get HTTPStore   () {return require('./lib/http-store')},
     get Router      () {return require('./lib/router')},
 
-    get Library     () {return require('./lib/library')},    
-
-    get HTTPServer  () {return require("./lib/http-server")},    
+    get HTTPServer () {return require('./lib/http-server')}
 };
+

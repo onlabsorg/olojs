@@ -2,13 +2,14 @@ MemoryStore
 ============================================================================
 This store handles read/write operations on an in-memory map object.
 ```js
-memStore = new MemoryStore(documents)
+memStore = new MemoryStore({
+    "/path/to/doc1": "source of doc1",
+    "/path/to/doc2": "source of doc2",
+    ...
+})
 ```
-Where `documents` is an optional object containing path-document pairs that
-will be added to the store upon creation.
-
-The MemoryStore inherits the `load` method and the Error static properties
-from the parent `Store` class.
+The MemoryStore inherits from the `Store` class and overrides the `read`,
+`list`, `write`, `delete` and `deleteAll` methods.
   
 memStore.read - method
 ------------------------------------------------------------------------
@@ -65,7 +66,7 @@ await memStore.delete("/path/to/doc");
   
 memStore.deleteAll - method
 ------------------------------------------------------------------------
-Erases all the docs whos path starts with the given path.
+Erases all the docs whose path starts with the given path.
 
 ```js
 await memStore.deleteAll("/path/to/");

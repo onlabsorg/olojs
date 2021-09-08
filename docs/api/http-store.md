@@ -8,7 +8,7 @@ httpStore = new HTTPStore(rootURL, options)
 ```
 
 - `rootURL` is the base URL that will be prepended to the paths passed to
-  the `read`, `list`, `write` and `delete` methods.
+  the `read`, `list`, `write`, `delete` and `deleteAll` methods.
 - `options.headers` are custom headers that will be added to every HTTP
   request.
 - `httpStore` is a [olojs.Store](./store.md) object
@@ -41,6 +41,10 @@ entries = await httpStore.list("/path/to/doc")
 - On 404 status code, return an empty array
 - On 405 or 501 status code, throws a `HTTPStore.ReadOperationNotAllowedError`
 - On any other status code, throws a generic error
+
+This method works with servers that return a JSON list on
+`GET application/json` requests. This behaviour is implemented in
+the olojs [HTTPServer](./http-server.md).     
   
 httpStore.write - async method
 ------------------------------------------------------------------------
@@ -70,8 +74,7 @@ await httpStore.delete("/path/to/doc")
   
 httpStore.deleteAll - async method
 ------------------------------------------------------------------------
-Modifies a remote `text/direcotry` resource via HTTP DELETE (HTTPS DELETE)
-that accepts `text/directory` as MimeType.
+Modifies a remote `text/direcotry` resource via HTTP DELETE (HTTPS DELETE).
 
 ```js
 await httpStore.deleteAll("/path/to/dir")
@@ -81,5 +84,9 @@ await httpStore.deleteAll("/path/to/dir")
 - On 403 status code, throws a `HTTPStore.WritePermissionDeniedError`
 - On 405 or 501 status code, throws a `HTTPStore.WriteOperationNotAllowedError`
 - On any other status code, throws a generic error
+
+This method works with servers that perform a `deleteAll` operation on
+`DELETE text/directory` requests. This behaviour is implemented in
+the olojs [HTTPServer](./http-server.md).
   
 

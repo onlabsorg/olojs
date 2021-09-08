@@ -71,28 +71,6 @@ describe("Router", () => {
                 ['/', routes["/"]],
             ]);
         });
-        
-        it("should mount uri-like routes under /.prot/<scheme>", () => {
-            const store1 = new MemoryStore();
-            const store2 = new MemoryStore();
-            const store3 = new MemoryStore();
-            
-            var router = new Router({
-                '/path/to/store1': store1,
-                '/path/to/store2': store2,
-            });
-            expect(Array.from(router._iterRoutes())).to.deep.equal([
-                ['/path/to/store2/', store2],
-                ['/path/to/store1/', store1],
-            ]);
-
-            router.mount('http:/path/to/store3', store3);
-            expect(Array.from(router._iterRoutes())).to.deep.equal([
-                ['/path/to/store2/', store2],
-                ['/path/to/store1/', store1],
-                ['/.prot/http/path/to/store3/', store3],
-            ]);            
-        });
     });
 
     describe("router.unmount(routeId)", () => {
@@ -116,29 +94,6 @@ describe("Router", () => {
                 ['/', routes["/"]],
             ]);
         });
-        
-        it("should remove uri-like routes under /.prot/<scheme>", () => {
-            const store1 = new MemoryStore();
-            const store2 = new MemoryStore();
-            const store3 = new MemoryStore();
-            
-            var router = new Router({
-                '/path/to/store1': store1,
-                '/path/to/store2': store2,
-                'http:/path/to/store3': store3
-            });
-            expect(Array.from(router._iterRoutes())).to.deep.equal([
-                ['/path/to/store2/', store2],
-                ['/path/to/store1/', store1],
-                ['/.prot/http/path/to/store3/', store3],
-            ]);
-
-            router.unmount('http:/path/to/store3', store3);
-            expect(Array.from(router._iterRoutes())).to.deep.equal([
-                ['/path/to/store2/', store2],
-                ['/path/to/store1/', store1],
-            ]);            
-        });        
     });
 
     describe("[store, subPath] = router._match(path)", () => {
@@ -204,17 +159,6 @@ describe("Router", () => {
             });
             expect(await router.read('/path_to/doc')).to.equal("");
         })
-        
-        it("should resolve uri-like paths", async () => {
-            const router = new Router({
-                "http:/path/to/store1": new MemoryStore({
-                    "/doc1"  : "doc1 @ http:/path/to/store1",
-                    "/doc2"  : "doc2 @ http:/path/to/store1"
-                }),
-            });
-            expect(await router.read('http:/path/to/store1/doc1')).to.equal("doc1 @ http:/path/to/store1");
-            expect(await router.read('/.prot/http/path/to/store1/doc2')).to.equal("doc2 @ http:/path/to/store1");
-        });
     });
 
     describe(`entries = router.list(id)`, () => {
@@ -276,22 +220,6 @@ describe("Router", () => {
             expect((await router.list("/store/path/to/")).sort()).to.deep.equal(['dir1/', 'dir2/', 'doc1', 'doc2', 'doc3', 'doc4']);
             expect((await router.list("/")).sort()).to.deep.equal(['doc5', 'path/', 'store/']);
         });
-        
-        it("should resolve uri-like paths", async () => {
-            const router = new Router({
-                "http:/path1/to/doc": new MemoryStore(),
-                "http:/path2/to/doc": new MemoryStore(),
-                "ftp:/path/to/dir1/": new MemoryStore(),
-                "ftp:/path/to/dir1/doc1": new MemoryStore(),
-                "/path/to/dir1/doc2": new MemoryStore(),
-                "/path/to/dir2/": new MemoryStore(),
-            });
-
-            expect(await router.list("/")).to.deep.equal(['path/', '.prot/']);
-            expect(await router.list("http:/")).to.deep.equal(['path2/', 'path1/']);
-            expect(await router.list("http:/path1")).to.deep.equal(['to/']);
-            expect(await router.list("/.prot/")).to.deep.equal(['http/', 'ftp/']);
-        });        
     });
 
     describe(`source = router.write(id, source)`, () => {
@@ -318,21 +246,6 @@ describe("Router", () => {
                 expect(error).to.be.instanceof(Router.WriteOperationNotAllowedError);
                 expect(error.message).to.equal('Operation not allowed: WRITE /s1/path/to/doc')
             }
-        });
-        
-        it("should resolve uri-like paths", async () => {
-            var store1 = new MemoryStore();
-            var store2 = new MemoryStore();
-            var router = new Router({
-                'http:/store1': store1,
-                'http:/store2': store2,
-            });
-            
-            await router.write('http:/store1/path/to/doc', "doc @ store1");
-            expect(await store1.read('/path/to/doc')).to.equal("doc @ store1");
-            
-            await router.write('/.prot/http/store2/path/to/doc', "doc @ store2");
-            expect(await store2.read('/path/to/doc')).to.equal("doc @ store2");
         });
     });
 
@@ -361,27 +274,6 @@ describe("Router", () => {
                 expect(error.message).to.equal('Operation not allowed: WRITE /s1/path/to/doc')
             }
         })
-        
-        it("should resolve uri-like paths", async () => {
-            var store1 = new MemoryStore({
-                '/path/to/doc': "doc @ store1"
-            });
-            var store2 = new MemoryStore({
-                '/path/to/doc': "doc @ store2"                
-            });
-            var router = new Router({
-                'http:/store1': store1,
-                'http:/store2': store2,
-            });
-            
-            expect(await store1.read('/path/to/doc')).to.equal("doc @ store1");
-            await router.delete('http:/store1/path/to/doc');
-            expect(await store1.read('/path/to/doc')).to.equal("");
-            
-            expect(await store2.read('/path/to/doc')).to.equal("doc @ store2");
-            await router.delete('/.prot/http/store2/path/to/doc');
-            expect(await store2.read('/path/to/doc')).to.equal("");
-        });        
     });
 
     describe(`source = router.deleteAll(id)`, () => {
@@ -414,24 +306,6 @@ describe("Router", () => {
                 expect(error.message).to.equal('Operation not allowed: WRITE /s1/path/to/doc')
             }
         })
-
-        it("should resolve uri-like paths", async () => {
-            var store1 = new MemoryStore();
-            var store2 = new MemoryStore();
-            var router = new Router({
-                'http:/store1': store1,
-                'http:/store2': store2,
-            });
-
-            var called = "";
-            store1.deleteAll = path => {
-                called = `store1.deleteAll ${path}`;
-            }
-
-            await router.deleteAll('http:/store1/path/to/dir');
-
-            expect(called).to.equal("store1.deleteAll /path/to/dir");
-        });
     });
     
     describe(`context = router.createContext(path, presets)`, () => {
@@ -469,25 +343,6 @@ describe("Router", () => {
             expect(ctx.__path__).to.equal('/store3/path/to/doc');
 
             delete Store.contextPrototype.storeName;
-        });
-        
-        it("should resolve uri-like paths", () => {
-            const store1 = new MemoryStore();
-            const store2 = Object.create(store1);
-            store2.createContext = (path, presets) => {
-                const context = store1.createContext(path, presets);
-                context.storeName = "store2";
-                return context;
-            }
-            var router = new Router({
-                'http:/store1': store1,
-                'http:/store2': store2
-            });
-            
-            const ctx = router.createContext('http:/store2/path/to/doc', {x:10});
-            expect(ctx.x).to.equal(10);
-            expect(ctx.storeName).to.equal("store2");
-            expect(ctx.__path__).to.equal('/.prot/http/store2/path/to/doc');
         });
         
         describe("context.import function", () => {

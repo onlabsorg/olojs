@@ -14,7 +14,7 @@ require("isomorphic-fetch");
 
 describe("HTTPServer", () => {
 
-    describe("HTTPServer.StoreMiddleware", () => {
+    describe("HTTPServer.createMiddleware", () => {
         var homeStore, server;
 
         before((done) => {
@@ -49,7 +49,7 @@ describe("HTTPServer", () => {
             });
             
             const app = express();
-            app.use('/docs', HTTPServer.StoreMiddleware(router));
+            app.use('/docs', HTTPServer.createMiddleware(router));
             server = http.createServer(app);
             server.listen(8888, done);
         });
@@ -265,7 +265,7 @@ describe("HTTPServer", () => {
         });
     });
     
-    describe("HTTPServer.StoreServer", () => {
+    describe("HTTPServer.create", () => {
         var homeStore, server;
 
         before((done) => {
@@ -299,7 +299,7 @@ describe("HTTPServer", () => {
                 '/error/': new ErrorStore(),
             });
             
-            server = HTTPServer.StoreServer(router);
+            server = HTTPServer.create(router);
             server.listen(8888, done);
         });
 

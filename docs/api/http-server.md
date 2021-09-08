@@ -3,12 +3,21 @@ HTTPServer - module
 The `HTTPServer` module contains functions for serving olojs documents over
 the internet.
   
-HTTPServer.StoreMiddleware - function
+HTTPServer.create - function
+----------------------------------------------------------------------------
+Creates a HTTP Server that mounts a `store middleware` at `/`.
+
+```js
+server = HTTPServer.create(store);
+server.listen(8010);
+```
+  
+HTTPServer.createMiddleware - function
 ----------------------------------------------------------------------------
 Creates an express middleware that exposes a RESTFul API to interact with an
 olojs store via HTTP.
 ```js
-middleware = HTTPServer.StoreMiddleware(store)
+middleware = HTTPServer.createMiddleware(store);
 expressApp.use(mountPath, middleware);
 ```
 - On `GET /paht/to/doc` requests accepting `text/*`, it will respond with
@@ -32,14 +41,5 @@ expressApp.use(mountPath, middleware);
   will respond with the status code 403
 - The `PUT` and `DELETE` handlers, on store's `WriteOperationNotAllowedError`
   will respond with the status code 405
-  
-HTTPServer.StoreServer - function
-----------------------------------------------------------------------------
-Creates a HTTP Server that mounts a `StoreMiddleware` at `/`.
-
-```js
-server = HTTPServer.StoreServer(store);
-selrver.listen(8010);
-```
   
 

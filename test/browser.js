@@ -21,7 +21,7 @@ async function runTests () {
 
 function exec (command) {
     let options = {
-        cwd: __dirname
+        cwd: `${__dirname}/browser`
     };
     return new Promise((resolve, reject) => {
         child_process.exec(command, options, (error, stdout, stderr) => {
@@ -34,7 +34,7 @@ function exec (command) {
 function startServer (port) {
     var app = express();
 
-    app.use( express.static(`${__dirname}/public`) );
+    app.use( express.static(`${__dirname}/browser/public`) );
     
     var server = http.createServer(app);
 

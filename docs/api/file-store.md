@@ -5,10 +5,10 @@ This store handles read/write operations on the local file system.
 fileStore = new FileStore(rootPath, options)
 ```
 - `rootPath` is the base path that will be prepended to the paths passed to
-  the `read`, `list`, `write` and `delete` methods.
-- `options.extension`: define the extension of the document files (defaults
+  the `read`, `list`, `write`, `delete` and `deleteAll` methods.
+- `options.extension`: defines the extension of the document files (defaults
   to `.olo`)
-- `fileStore` is a [olojs.Store](./store.md) object.
+- `fileStore` is a [olo.Store](./store.md) object.
   
 fileStore.read - async method
 ----------------------------------------------------------------------------
@@ -73,12 +73,12 @@ await fileStore.delete("/path/to/doc");
   be deleted
 - If path is `/path/to/dir/`, the file `<rootPath>/path/to/dir/.olo` 
   will be deleted
-- When the file doesn't exist, it will return silently
+- When the file doesn't exist, the method will return silently
 
 The `.olo` default extension can be changed by passing a `options.extension`
 string to the store constructor.
   
-fileStore.delete - async method
+fileStore.deleteAll - async method
 ------------------------------------------------------------------------
 Moves a dirctory to the trash bin, given its absolute path.
 
@@ -86,6 +86,6 @@ Moves a dirctory to the trash bin, given its absolute path.
 await fileStore.deleteAll("/path/to/dir");
 ```
 
-When the dirctory doesn't exist, it will return silently
+When the dirctory doesn't exist, the method will return silently.
   
 

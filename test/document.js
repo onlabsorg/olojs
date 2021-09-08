@@ -33,44 +33,50 @@ describe("document", () => {
             expect(evaluate).to.be.a("function");            
         });
         
-        describe("docns = await evaluateDocument(context)", () => {
+        describe("doc = await evaluateDocument(context)", () => {
             
-            it("should be an object", async () => {
-                var evaluate = document.parse("document source ...");
-                var context = swan.createContext();
-                var namespace = await evaluate(context);
-                expect(namespace).to.be.an("object");                
+            describe("doc.data", () => {
+                
+                it("should be an object", async () => {
+                    var evaluate = document.parse("document source ...");
+                    var context = swan.createContext();
+                    var {data} = await evaluate(context);
+                    expect(data).to.be.an("object");                
+                });
+                
+                it("should contain all the names defined in the swan expressions", async () => {
+                    var source = `<%a=10%><%b=a+10%>`;
+                    var evaluate = document.parse(source);
+                    var context = document.createContext({});
+                    var {data} = await evaluate(context);
+                    expect(data.a).to.equal(10);
+                    expect(data.b).to.equal(20);
+                });
             });
             
-            it("should contain all the names defined in the swan expressions", async () => {
-                var source = `<%a=10%><%b=a+10%>`;
-                var evaluate = document.parse(source);
-                var context = document.createContext({});
-                var namespace = await evaluate(context);
-                expect(namespace.a).to.equal(10);
-                expect(namespace.b).to.equal(20);
-            });
-            
-            it("should strngify to the text obtained replacing the swan expressions with their stringified return value", async () => {
-                var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
-                var evaluate = document.parse(source);
-                var context = document.createContext();
-                var namespace = await evaluate(context);
-                expect(await context.str(namespace)).to.equal("a + b = 30");
-            });
+            describe("doc.text", () => {
+                
+                it("should be string obtained replacing the swan expressions with their stringified return value", async () => {
+                    var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
+                    var evaluate = document.parse(source);
+                    var context = document.createContext();
+                    var {text} = await evaluate(context);
+                    expect(text).to.equal("a + b = 30");
+                });
 
-            it("should decorate the rendered text with the `__render__` function if it exists", async () => {
-                var source = `<% __render__ = text -> text + "!" %>Hello World`;
-                var evaluate = document.parse(source);
-                var context = document.createContext();
-                var namespace = await evaluate(context);
-                expect(await context.str(namespace)).to.equal("Hello World!");
+                it("should decorate the rendered text with the `__render__` function if it exists", async () => {
+                    var source = `<% __render__ = text -> text + "!" %>Hello World`;
+                    var evaluate = document.parse(source);
+                    var context = document.createContext();
+                    var {text} = await evaluate(context);
+                    expect(text).to.equal("Hello World!");
 
-                var source = `<% __render__ = text -> {__str__:text + "!!"} %>Hello World`;
-                var evaluate = document.parse(source);
-                var context = document.createContext();
-                var namespace = await evaluate(context);
-                expect(await context.str(namespace)).to.equal("Hello World!!");
+                    var source = `<% __render__ = text -> {__str__:text + "!!"} %>Hello World`;
+                    var evaluate = document.parse(source);
+                    var context = document.createContext();
+                    var {text} = await evaluate(context);
+                    expect(text).to.equal("Hello World!!");
+                });
             });
         });        
     });

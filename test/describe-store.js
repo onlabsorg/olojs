@@ -280,20 +280,27 @@ module.exports = (description, options={}) => describe(description, () => {
     
     describe("store.createContext(path, presets)", () => {
         
-        it("should be a document context", async () => {
-            const context = await store.createContext('/path/to/doc1');
+        it("should be a document context", () => {
+            const context = store.createContext('/path/to/doc1');
             
             const documentContextPrototype = Object.getPrototypeOf(document.createContext());
             expect(documentContextPrototype.isPrototypeOf(context)).to.be.true;
         })
         
-        it("should contain the document path as '__path__'", async () => {
-            const context = await store.createContext('path/to/./doc1');            
+        it("should contain the document path as '__path__'", () => {
+            const context = store.createContext('path/to/./doc1');            
             expect(context.__path__).to.equal('/path/to/doc1');
         });
         
-        it("should contain an 'import' function", async () => {
-            const context = await store.createContext('/path/to/doc1');                
+        it("should contain the passed presets", () => {
+            const context = store.createContext('path/to/./doc1', {x:10, y:20});            
+            expect(context.__path__).to.equal('/path/to/doc1');
+            expect(context.x).to.equal(10);
+            expect(context.y).to.equal(20);
+        });
+        
+        it("should contain an 'import' function", () => {
+            const context = store.createContext('/path/to/doc1');                
             expect(context.import).to.be.a("function");
         });
 
@@ -304,9 +311,23 @@ module.exports = (description, options={}) => describe(description, () => {
                     await store.write('/path/to/doc1', "<% docnum = 1 %>");
                     await store.write('/path/to/doc2', "<% docnum = 2 %>");
                     
-                    const ctx1 = await store.createContext('/path/to/doc1');
+                    const ctx1 = store.createContext('/path/to/doc1');
                     const doc2_ns = await ctx1.import('/path/to/doc2');
                     expect(doc2_ns.docnum).to.equal(2);
+                });
+                
+                it("should resolve docId query string as __query__ context namespace", async () => {
+                    await store.write('/path/to/doc1', "<% docnum = 1 %>");
+                    await store.write('/path/to/doc2', "<% docnum = 2 %>");
+                    
+                    const ctx1 = store.createContext('/path/to/doc1');
+                    const doc2_ns = await ctx1.import('/path/to/doc2?x=10;b&s=abc');
+                    expect(doc2_ns.docnum).to.equal(2);                    
+                    expect(doc2_ns.__query__).to.deep.equal({
+                        x: 10,
+                        s: "abc",
+                        b: true
+                    });
                 });
 
                 it("should resolve relative ids", async () => {
@@ -314,13 +335,14 @@ module.exports = (description, options={}) => describe(description, () => {
                     await store.write('/path/to/doc2', "<% docnum = 2 %>");
                     await store.write('/path/to/doc3', "<% docnum = 3 %>");
                     
-                    const ctx1 = await store.createContext('/path/to/doc1');
+                    const ctx1 = store.createContext('/path/to/doc1');
                     
                     const doc2_ns = await ctx1.import('doc2');
                     expect(doc2_ns.docnum).to.equal(2);
 
-                    const doc3_ns = await ctx1.import('./doc3');
+                    const doc3_ns = await ctx1.import('./doc3?x=10');
                     expect(doc3_ns.docnum).to.equal(3);
+                    expect(doc3_ns.__query__).to.deep.equal({x:10});
                 });
 
                 it("should cache the documents", async () => {
@@ -330,7 +352,7 @@ module.exports = (description, options={}) => describe(description, () => {
                         return `doc @ ${path}<% p = __path__ %>`;
                     }
 
-                    const ctx = await store.createContext('/path/to/doc');
+                    const ctx = store.createContext('/path/to/doc');
                     count = 0;
 
                     var ns = await ctx.import("/path/to/doc1");
@@ -351,6 +373,19 @@ module.exports = (description, options={}) => describe(description, () => {
                 });
             });            
         }
+    });
+    
+    describe("store.createContextFromId(docId)", () => {
+        
+        it("should extract the query string from the docId and add its content to the context as __query__", () => {
+            const ctx = store.createContextFromId("/path/to/doc?x=10&b;s=abc");
+            expect(ctx.__path__).to.equal("/path/to/doc")
+            expect(ctx.__query__).to.deep.equal({
+                x: 10, 
+                s: "abc", 
+                b: true
+            });
+        });
     });
     
     after(async () => {

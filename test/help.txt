@@ -1,0 +1,4 @@
+olojs test:
+
+- enter `npm run node-test` to tests olojs in NodeJS
+- enter `npm run browser-test` to tests olojs in your default browser

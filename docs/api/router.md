@@ -1,7 +1,8 @@
 Router
 ============================================================================
 This store is a container for other stores and routes the `read`, `list`,
-`write` and `delete` requests to the store best matching the path.
+`write`, `delete` and `deleteAll` requests to the store best matching the 
+path.
 
 ```js
 routes = {
@@ -29,8 +30,9 @@ return an empty string, `list` will return an empty array, `write`,
 
 The constructor will ignore the properties of the `routes` object which are 
 not valid stores, that is objects that do not have any of the methods 
-`read`, `list`, `write`, `delete`, `deleteAll`, `createContext`, `load`.
-The easiest way to create a valid store is by extending the `Store` class.
+`read`, `list`, `write`, `delete`, `deleteAll`, `createContext`.
+The easiest way to create a valid store is by extending the 
+[Store](./store.md) class.
   
 router.read - async method
 ------------------------------------------------------------------------
@@ -69,7 +71,7 @@ entries = await router.list("/path/to");
 In the given example, the array `entries` will contain `["a/", "b/",
 "s2"]`, plus all the items returned by `await store0.list("/")`.
 
-If no mounted stores matches the given path, then an empty array is
+If no mounted store matches the given path, then an empty array is
 returned.
   
 router.write - async method
@@ -128,5 +130,24 @@ await router.deleteAll("/path/to/store_i/sub/path/to/doc");
   `await store_i.deleteAll('/sub/path/to/doc')`.
 - When no store is mounted on `/path/to/store_i/`, it throws a
   `Router.WriteOperationNotAllowedError`.
+  
+router.createContext - method
+------------------------------------------------------------------------
+Return the matching sub-store context bound to the current router.
+
+```js
+router = new Router({
+    "/path/to/store_1/": store_1,
+    "/path/to/store_2/": store_2,
+    ...
+})
+
+await router.createContext("/path/to/store_i/sub/path/to/doc");
+```
+
+- When `/path/to/store_i/sub/path/to/doc` is passed, it calls
+  `await store_i.createContext('/path/to/store_i/sub/path/to/doc')`.
+- When no store is mounted on `/path/to/store_i/`, it falls back to the 
+  `Store` context.
   
 
