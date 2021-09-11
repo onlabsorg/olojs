@@ -119,6 +119,24 @@ following standard:
 When instantiated directly, the base store `deleteAll` method always throws
 `Store.WriteOperationNotAllowedError`.
   
+store.parseDocument - function
+----------------------------------------------------------------------------
+Compiles a document source into an `evaluate` function that takes as input
+a document context object and returns the document namespace object and its
+rendered text.
+```js
+evaluate = store.parseDocument(source);
+{data, text} = await evaluate(context);
+```
+- `source` is a string containing the source of the olojs document to be
+  evaluated
+- `evaluate` is an asynchronous function that evaluates the document and
+  returns its namespace and its rendered text
+- `data` is an object containing all the names defined by the inline
+  expressions of the document (the document namespace).
+- `text` is a string obtained by replacing every inline expression with its 
+  strigified value. 
+  
 store.createContext - method
 ------------------------------------------------------------------------
 Create a document context bound to this store.

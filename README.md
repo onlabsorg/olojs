@@ -88,7 +88,7 @@ Load, evaluate and render a [document]:
 ```js
 docPath = '/path/to/doc';
 source = await store.read(docPath);             // fetch the document source
-evaluate = olo.document.parse(source);          // compile the source
+evaluate = store.parseDocument(source);         // compile the source
 context = await store.createContext(docPath);   // create an evaluation context
 {data, text} = await evaluate(context);         // evaluate the document
 ```

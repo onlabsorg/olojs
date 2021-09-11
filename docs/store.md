@@ -9,6 +9,8 @@ which can be summarized as follows:
   given path
 * `store.delete(path)` removes the document mapped to the given path
 * `store.deleteAll(path)` removes all the document matching the given path
+* `store.parseDocument(source)` compiles a document source into an `evaluate`
+  function
 * `store.createContext(path)` creates a document context specific to a 
   particular document of this store
 

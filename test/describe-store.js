@@ -388,6 +388,62 @@ module.exports = (description, options={}) => describe(description, () => {
         });
     });
     
+    describe("store.parseDocument(source)", () => {
+        
+        it("should return a function", () => {
+            var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
+            var evaluate = store.parseDocument(source);
+            expect(evaluate).to.be.a("function");            
+        });
+        
+        describe("doc = await evaluateDocument(context)", () => {
+            
+            describe("doc.data", () => {
+                
+                it("should be an object", async () => {
+                    var evaluate = store.parseDocument("document source ...");
+                    var context = document.createContext();
+                    var {data} = await evaluate(context);
+                    expect(data).to.be.an("object");                
+                });
+                
+                it("should contain all the names defined in the swan expressions", async () => {
+                    var source = `<%a=10%><%b=a+10%>`;
+                    var evaluate = store.parseDocument(source);
+                    var context = document.createContext({});
+                    var {data} = await evaluate(context);
+                    expect(data.a).to.equal(10);
+                    expect(data.b).to.equal(20);
+                });
+            });
+            
+            describe("doc.text", () => {
+                
+                it("should be string obtained replacing the swan expressions with their stringified return value", async () => {
+                    var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
+                    var evaluate = store.parseDocument(source);
+                    var context = document.createContext();
+                    var {text} = await evaluate(context);
+                    expect(text).to.equal("a + b = 30");
+                });
+
+                it("should decorate the rendered text with the `__render__` function if it exists", async () => {
+                    var source = `<% __render__ = text -> text + "!" %>Hello World`;
+                    var evaluate = store.parseDocument(source);
+                    var context = document.createContext();
+                    var {text} = await evaluate(context);
+                    expect(text).to.equal("Hello World!");
+
+                    var source = `<% __render__ = text -> {__str__:text + "!!"} %>Hello World`;
+                    var evaluate = store.parseDocument(source);
+                    var context = document.createContext();
+                    var {text} = await evaluate(context);
+                    expect(text).to.equal("Hello World!!");
+                });
+            });
+        });                
+    });
+    
     after(async () => {
         if (typeof options.destroy === 'function') {
             await options.destroy(store);
