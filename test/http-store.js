@@ -246,13 +246,13 @@ describe("HTTPStore - with custom extension", () => {
         expect(lastRequest).to.equal("GET /path/to/doc");
     });
 
-    it("should add the extendsion to each `write` requst", async () => {
+    it("should add the extendsion to each `write` request", async () => {
         var httpStore = new HTTPStore("http://localhost:8020", {extension:".olo"});
         await httpStore.write('/path/to/doc', "...");
         expect(lastRequest).to.equal("PUT /path/to/doc.olo");
     });
 
-    it("should add the extension to each `delete` requst", async () => {
+    it("should add the extension to each `delete` request", async () => {
         var httpStore = new HTTPStore("http://localhost:8020", {extension:".olo"});
         await httpStore.delete('/path/to/doc');
         expect(lastRequest).to.equal("DELETE /path/to/doc.olo");
