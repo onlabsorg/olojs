@@ -11,6 +11,8 @@ httpStore = new HTTPStore(rootURL, options)
   the `read`, `list`, `write`, `delete` and `deleteAll` methods.
 - `options.headers` are custom headers that will be added to every HTTP
   request.
+- `options.extension` is a custom file extension to be appended to the path
+  of each `read`, `write` and `delete` request.
 - `httpStore` is a [olojs.Store](./store.md) object
   
 httpStore.read - async method

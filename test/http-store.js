@@ -166,7 +166,7 @@ describeStore('HTTPStore - access denied', {
 
 
 describe("HTTPStore - with custom headers", () => {
-    var server;
+    var server, TestHeader;
     
     before((done) => {
         const app = express();
@@ -209,6 +209,61 @@ describe("HTTPStore - with custom headers", () => {
         expect(TestHeader).to.equal(customHeaders.Test);
     });
     
+    after(() => {
+        server.close();
+    });
+});
+
+
+
+describe("HTTPStore - with custom extension", () => {
+    var server, lastRequest;
+    
+    before((done) => {
+        const app = express();
+        
+        app.all("/*", (req, res, next) => {
+            lastRequest = `${req.method} ${req.path}`;
+            res.status(200).send("[]");
+        })
+               
+        server = app.listen(8020, done);
+    });
+    
+    it("should add the extension to each `read` requst", async () => {
+        var httpStore = new HTTPStore("http://localhost:8020", {extension:".olo"});
+        await httpStore.read('/path/to/doc');
+        expect(lastRequest).to.equal("GET /path/to/doc.olo");
+
+        var httpStore = new HTTPStore("http://localhost:8020", {extension:"olo"});
+        await httpStore.read('/path/to/doc');
+        expect(lastRequest).to.equal("GET /path/to/doc.olo");
+    });
+
+    it("should not add the extension to any `list` request", async () => {
+        var httpStore = new HTTPStore("http://localhost:8020", {extension:".olo"});
+        await httpStore.list('/path/to/doc');
+        expect(lastRequest).to.equal("GET /path/to/doc");
+    });
+
+    it("should add the extendsion to each `write` requst", async () => {
+        var httpStore = new HTTPStore("http://localhost:8020", {extension:".olo"});
+        await httpStore.write('/path/to/doc', "...");
+        expect(lastRequest).to.equal("PUT /path/to/doc.olo");
+    });
+
+    it("should add the extension to each `delete` requst", async () => {
+        var httpStore = new HTTPStore("http://localhost:8020", {extension:".olo"});
+        await httpStore.delete('/path/to/doc');
+        expect(lastRequest).to.equal("DELETE /path/to/doc.olo");
+    });
+    
+    it("should not add the extension to any `deleteAll` request", async () => {
+        var httpStore = new HTTPStore("http://localhost:8020", {extension:".olo"});
+        await httpStore.deleteAll('/path/to/doc');
+        expect(lastRequest).to.equal("DELETE /path/to/doc");
+    });
+
     after(() => {
         server.close();
     });
