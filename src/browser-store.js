@@ -19,8 +19,9 @@ class BrowserStore extends Store {
     
     constructor (storeId) {
         super();
+        this.id = storeId;
         this._backend = localForage.createInstance({
-            name: 'storeId',
+            name: storeId,
             version: 0.1
         });
     }

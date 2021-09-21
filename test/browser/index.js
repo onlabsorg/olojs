@@ -13,6 +13,13 @@ describe("olojs", () => {
     require("../browser-store");
     // require("./http-store");
     require("../router");
+    require("../hub")(olo.Hub, (hub) => {
+        const [store, subPath] = hub._match('/local/path/to/doc');
+        expect(store).to.be.instanceof(olo.BrowserStore);
+        expect(store.id).to.equal('olojs_local_store');
+        expect(subPath).to.equal('/path/to/doc');
+    });
+    
     
     describe("index", () => {
 
@@ -42,6 +49,11 @@ describe("olojs", () => {
 
         it("should export the `Router` class", () => {
             expect(olo.Router).to.equal(require("../../lib/router"));
-        });        
+        });    
+        
+        it("should export the `Hub` class", () => {
+            const hub = new olo.Hub(new olo.MemoryStore());
+            expect(hub).to.be.instanceof(require("../../lib/hub"));
+        });            
     });    
 });

@@ -1,15 +1,23 @@
 
-module.exports = {
+const olo = module.exports = {};
 
-    get expression () {return require("./lib/expression")},
-    get document   () {return require("./lib/document")},
+olo.expression = require("./lib/expression");
 
-    get Store       () {return require('./lib/store')},
-    get MemoryStore () {return require('./lib/memory-store')},
-    get FileStore   () {return require('./lib/file-store')},
-    get HTTPStore   () {return require('./lib/http-store')},
-    get Router      () {return require('./lib/router')},
+olo.document = require("./lib/document");
 
-    get HTTPServer () {return require('./lib/http-server')}
-};
+olo.Store = require('./lib/store');
+olo.MemoryStore = require('./lib/memory-store');
+olo.FileStore = require('./lib/file-store');
+olo.HTTPStore = require('./lib/http-store');
+olo.Router = require('./lib/router');
+
+olo.Hub = class extends require('./lib/hub') {
+    
+    constructor (homeStore) {
+        super(homeStore, new olo.FileStore('/'))
+    }
+}
+
+olo.HTTPServer = require('./lib/http-server');
+
 
