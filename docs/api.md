@@ -53,8 +53,8 @@ A `Router` is a Store that bundles together multiple stores making them appear
 as a single store.
 
 ### [olo.Hub](./api/hub.md)
-A `Hub` is a router providing a standard set of store in order to allow 
-interoperability between documents stored in different location.
+A `Hub` is a router mounting a standard set of stores in order to allow 
+interoperability between documents stored at different location.
 
 ### [olo.HTTPServer](./api/http-server.md) [NodeJS only]
 The `HTTPServer` module contains functions for creating HTTP servers exposing

@@ -33,6 +33,9 @@ not valid stores, that is objects that do not have any of the methods
 `read`, `list`, `write`, `delete`, `deleteAll`, `createContext`.
 The easiest way to create a valid store is by extending the 
 [Store](./store.md) class.
+
+> Router inherits from the [Store](./store.md) class and overrides the 
+> methods described below.
   
 router.read - async method
 ------------------------------------------------------------------------

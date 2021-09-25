@@ -14,6 +14,9 @@ const localForage = require('localforage');
  *
  *  - `storeId` is a name that uniquely identifies your store in the browser
  *    storage.
+ *  
+ *  > BrowserStore inherits from the [Store](./store.md) class and overrides the 
+ *  > methods described below.
  */
 class BrowserStore extends Store {
     

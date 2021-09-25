@@ -14,6 +14,9 @@ httpStore = new HTTPStore(rootURL, options)
 - `options.extension` is a custom file extension to be appended to the path
   of each `read`, `write` and `delete` request.
 - `httpStore` is a [olojs.Store](./store.md) object
+
+> HTTPStore inherits from the [Store](./store.md) class and overrides the 
+> methods described below.
   
 httpStore.read - async method
 ------------------------------------------------------------------------

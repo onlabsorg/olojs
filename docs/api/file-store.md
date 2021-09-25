@@ -9,6 +9,9 @@ fileStore = new FileStore(rootPath, options)
 - `options.extension`: defines the extension of the document files (defaults
   to `.olo`)
 - `fileStore` is a [olo.Store](./store.md) object.
+
+> FileStore inherits from the [Store](./store.md) class and overrides the 
+> methods described below.
   
 fileStore.read - async method
 ----------------------------------------------------------------------------

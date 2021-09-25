@@ -25,6 +25,8 @@ olojs comes with the following pre-defined stores:
   via HTTP (see also [HTTPServer])
 * [Router](./api/router.md) which bounds together multiple stores while
   behaving like a single store
+* [Hub](./api/hub.md) a router mounting a standard set of stores in order to 
+  allow interoperability between documents stored at different location.
   
 More stores can be created by extending the [Store] class.
 

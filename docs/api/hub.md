@@ -1,6 +1,6 @@
 Hub
 ============================================================================
-The Hub is a standard Router containing the following paths:
+The Hub is a standard [Router](./router.md) containing the following paths:
 
 - `/home` mounting a custom store passed as parameter
 - `/local` in NodeJS this path mounts a FileStore with root path `/`, while

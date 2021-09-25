@@ -8,8 +8,9 @@ memStore = new MemoryStore({
     ...
 })
 ```
-The MemoryStore inherits from the `Store` class and overrides the `read`,
-`list`, `write`, `delete` and `deleteAll` methods.
+
+> MemoryStore inherits from the [Store](./store.md) class and overrides the 
+> methods described below.
   
 memStore.read - method
 ------------------------------------------------------------------------
