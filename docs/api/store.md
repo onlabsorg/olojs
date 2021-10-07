@@ -1,3 +1,5 @@
+<!--<% __render__ = require 'markdown' %>-->
+
 Store
 ============================================================================
 This is the base class to be used to create olojs document stores.

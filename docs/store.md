@@ -1,3 +1,4 @@
+<!--<% __render__ = require 'markdown' %>-->
 # olojs stores
 A store is an olojs document container. It implements the [Store] interface, 
 which can be summarized as follows:

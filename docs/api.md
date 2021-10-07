@@ -1,3 +1,4 @@
+<!--<% __render__ = require 'markdown' %>-->
 # olojs API
 In NodeJS you can load `olojs` as follows:
 

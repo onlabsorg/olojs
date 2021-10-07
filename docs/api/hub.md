@@ -1,3 +1,5 @@
+<!--<% __render__ = require 'markdown' %>-->
+
 Hub
 ============================================================================
 The Hub is a standard [Router](./router.md) containing the following paths:

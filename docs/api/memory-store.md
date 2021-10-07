@@ -1,3 +1,5 @@
+<!--<% __render__ = require 'markdown' %>-->
+
 MemoryStore
 ============================================================================
 This store handles read/write operations on an in-memory map object.

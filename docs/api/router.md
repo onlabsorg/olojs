@@ -1,3 +1,5 @@
+<!--<% __render__ = require 'markdown' %>-->
+
 Router
 ============================================================================
 This store is a container for other stores and routes the `read`, `list`,

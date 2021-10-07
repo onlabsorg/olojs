@@ -1,3 +1,4 @@
+<!--<% __render__ = require 'markdown' %>-->
 olojs.document
 ============================================================================
 This module contains functions to parse, evaluate and render olojs

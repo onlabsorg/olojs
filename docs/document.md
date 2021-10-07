@@ -1,3 +1,4 @@
+<!--<% __render__ = require 'markdown' %>-->
 # olojs documents
 
 An olojs document is just plain text with [swan] inline expressions enclosed

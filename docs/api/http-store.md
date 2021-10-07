@@ -1,3 +1,5 @@
+<!--<% __render__ = require 'markdown' %>-->
+
 HTTPStore
 ============================================================================
 This store handles read/write operations on remote olo-documents

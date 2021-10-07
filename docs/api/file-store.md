@@ -1,3 +1,5 @@
+<!--<% __render__ = require 'markdown' %>-->
+
 FileStore
 ============================================================================
 This store handles read/write operations on the local file system.

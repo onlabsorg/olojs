@@ -3,6 +3,8 @@ const localForage = require('localforage');
 
 
 /**
+ *  <!--<% __render__ = require 'markdown' %>-->
+ *  
  *  BrowserStore
  *  ============================================================================
  *  This is a [Store](./store.md) object backed by the browser permanent storage

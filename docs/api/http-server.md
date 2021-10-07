@@ -1,3 +1,5 @@
+<!--<% __render__ = require 'markdown' %>-->
+
 HTTPServer - module
 ============================================================================
 The `HTTPServer` module contains functions for serving olojs documents over
