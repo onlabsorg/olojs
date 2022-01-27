@@ -12,7 +12,8 @@ describe("olojs expression stdlib", () => {
                 markdown = require 'markdown',
                 html = markdown '*bold*'
             }.html`);
-            var html = await evaluate(expression.createContext())
+            console.log(await evaluate(expression.createContext()))
+            var html = await evaluate(expression.createContext());
             expect(html).to.equal("<p><em>bold</em></p>\n");
         });
     });

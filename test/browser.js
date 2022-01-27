@@ -5,7 +5,7 @@ var child_process = require('child_process');
 
 async function runTests () {
     console.log("Compiling tests for the browser with webpack ...")
-    await exec('npx webpack --mode development')
+    await exec(`"${__dirname}/../node_modules/.bin/webpack" -c "${__dirname}/browser/webpack.config.js" --mode development`)
     
     console.log("Starting the server ...")
     var server = await startServer(8011);

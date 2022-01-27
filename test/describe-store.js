@@ -281,10 +281,11 @@ module.exports = (description, options={}) => describe(description, () => {
     describe("store.createContext(path, presets)", () => {
         
         it("should be a document context", () => {
-            const context = store.createContext('/path/to/doc1');
-            
-            const documentContextPrototype = Object.getPrototypeOf(document.createContext());
-            expect(documentContextPrototype.isPrototypeOf(context)).to.be.true;
+            const doc_context = document.createContext();
+            const store_context = store.createContext('/path/to/doc1');
+            for (let key in doc_context) {
+                expect(store_context[key]).to.equal(doc_context[key]);
+            }
         })
         
         it("should contain the document path as '__path__'", () => {
@@ -434,7 +435,7 @@ module.exports = (description, options={}) => describe(description, () => {
                     var {text} = await evaluate(context);
                     expect(text).to.equal("Hello World!");
 
-                    var source = `<% __render__ = text -> {__str__:text + "!!"} %>Hello World`;
+                    var source = `<% __render__ = text -> {__str__: this -> text + "!!"} %>Hello World`;
                     var evaluate = store.parseDocument(source);
                     var context = document.createContext();
                     var {text} = await evaluate(context);
