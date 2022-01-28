@@ -1,1 +1,1 @@
-(self.webpackChunk_onlabsorg_olojs=self.webpackChunk_onlabsorg_olojs||[]).push([[757],{904:o=>{o.exports=o=>{const e={};let l=0;return e.log=(...e)=>{const n=new o.Tuple(...e).normalize();return l++,console.log(`Log ${l}:`,n),`[[Log ${l}]]`},e}}}]);
+(self.webpackChunk_onlabsorg_olojs=self.webpackChunk_onlabsorg_olojs||[]).push([[757],{8:o=>{o.exports=o=>{const e={};let l=0;return e.log=(...e)=>{const n=new o.Tuple(...e).normalize();return l++,console.log(`Log ${l}:`,n),`[[Log ${l}]]`},e}}}]);
