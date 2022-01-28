@@ -330,8 +330,6 @@ describe("Router", () => {
         });
 
         it("should delegate to the parent store if no match is found", () => {
-            Store.contextPrototype.storeName = "void store";
-            
             var router = new Router({
                 '/store1': new MemoryStore(),
                 '/store2': new MemoryStore()
@@ -339,10 +337,8 @@ describe("Router", () => {
             
             const ctx = router.createContext('/store3/path/to/doc', {x:10});
             expect(ctx.x).to.equal(10);
-            expect(ctx.storeName).to.equal("void store");
+            expect(ctx.storeName).to.be.undefined;
             expect(ctx.__path__).to.equal('/store3/path/to/doc');
-
-            delete Store.contextPrototype.storeName;
         });
         
         describe("context.import function", () => {

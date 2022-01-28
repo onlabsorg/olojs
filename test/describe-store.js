@@ -309,12 +309,21 @@ module.exports = (description, options={}) => describe(description, () => {
             describe("doc.context.import", () => {
                 
                 it("should return the namespace of the passed object", async () => {
-                    await store.write('/path/to/doc1', "<% docnum = 1 %>");
-                    await store.write('/path/to/doc2', "<% docnum = 2 %>");
+                    await store.write('/path/to/doc1', "<% docnum = 1 %>doc1");
+                    await store.write('/path/to/doc2', "<% docnum = 2 %>doc2");
                     
                     const ctx1 = store.createContext('/path/to/doc1');
                     const doc2_ns = await ctx1.import('/path/to/doc2');
                     expect(doc2_ns.docnum).to.equal(2);
+                    expect(await ctx1.str(doc2_ns)).to.equal("doc2");
+                    
+                    
+                    await store.write('/path/to/doc3', "<% doc1 = import './doc1' %>");
+                    const source3 = await store.read('/path/to/doc3');
+                    const ctx3 = store.createContext('/path/to/doc3');
+                    const evaluate = document.parse(source3);
+                    const doc3 = await evaluate(ctx3);
+                    expect(doc3.data.doc1.docnum).to.equal(1);
                 });
                 
                 it("should resolve docId query string as __query__ context namespace", async () => {
