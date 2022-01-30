@@ -50,7 +50,7 @@ describe("Router", () => {
                 ['/', routes["/"]],
             ]);
         });
-
+        
         it("should fail silently is store is not a valid store", () => {
             var routes = {
                 "path/to": new MemoryStore(),
@@ -110,6 +110,34 @@ describe("Router", () => {
             expect(router._match('/path/to/store2/path/to/doc')).to.deep.equal([routes['/path/to/store2'], "/path/to/doc"]);
             expect(router._match('/path/to/store2/')).to.deep.equal([routes['/path/to/store2'], "/"]);
             expect(router._match('/path_to/doc')).to.deep.equal([routes['/'], "/path_to/doc"]);
+        });
+
+        it("should yield also the routes in Router.defaultRoutes", () => {
+            Router.defaultRoutes["/path/to/store2"] = new MemoryStore();
+            var routes = {
+                "path/to": new MemoryStore(),
+                "/": new MemoryStore()
+            }
+            var router = new Router(routes);
+            expect(router._match('/path/to/')).to.deep.equal([routes['path/to'], "/"]);
+            expect(router._match('/path/to/doc')).to.deep.equal([routes['path/to'], "/doc"]);
+            expect(router._match('/path/to/store2/path/to/doc')).to.deep.equal([Router.defaultRoutes['/path/to/store2'], "/path/to/doc"]);
+            expect(router._match('/path/to/store2/')).to.deep.equal([Router.defaultRoutes['/path/to/store2'], "/"]);
+            expect(router._match('/path_to/doc')).to.deep.equal([routes['/'], "/path_to/doc"]);
+            delete Router.defaultRoutes["/path/to/store2"];
+        });
+        
+        it("should treat `scheme:/path/to/doc` routes as shortcut for `/.protocolos/scheme/path/to/doc`", async () => {
+            var routes = {
+                "http:/": new MemoryStore(),
+                "/.protocols/https": new MemoryStore(),
+                "/": new MemoryStore()
+            }
+            var router = new Router(routes);
+            expect(router._match('https:/path/to/doc')).to.deep.equal([routes['/.protocols/https'], "/path/to/doc"]);
+            expect(router._match('/.protocols/https/path/to/doc')).to.deep.equal([routes['/.protocols/https'], "/path/to/doc"]);
+            expect(router._match('http:/path/to/doc')).to.deep.equal([routes['http:/'], "/path/to/doc"]);
+            expect(router._match('/.protocols/http/path/to/doc')).to.deep.equal([routes['http:/'], "/path/to/doc"]);
         });
 
         it("should return [null, path] if no match is found", () => {
