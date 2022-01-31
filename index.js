@@ -11,6 +11,7 @@ olo.FileStore = require('./lib/file-store');
 olo.HTTPStore = require('./lib/http-store');
 olo.Router = require('./lib/router');
 
+
 olo.Hub = class extends require('./lib/hub') {
     
     constructor (homeStore) {
