@@ -36,6 +36,9 @@ not valid stores, that is objects that do not have any of the methods
 The easiest way to create a valid store is by extending the 
 [Store](./store.md) class.
 
+URI-like paths `scheme:/path/to/doc` are treated as shortcuts to the
+path `/.protocolos/scheme/path/to/doc`.
+
 > Router inherits from the [Store](./store.md) class and overrides the 
 > methods described below.
   
