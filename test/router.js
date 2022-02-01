@@ -115,14 +115,14 @@ describe("Router", () => {
         it("should treat `scheme:/path/to/doc` routes as shortcut for `/.protocolos/scheme/path/to/doc`", async () => {
             var routes = {
                 "http:/": new MemoryStore(),
-                "/.protocols/https": new MemoryStore(),
+                "/.schemes/https": new MemoryStore(),
                 "/": new MemoryStore()
             }
             var router = new Router(routes);
-            expect(router._match('https:/path/to/doc')).to.deep.equal([routes['/.protocols/https'], "/path/to/doc"]);
-            expect(router._match('/.protocols/https/path/to/doc')).to.deep.equal([routes['/.protocols/https'], "/path/to/doc"]);
+            expect(router._match('https:/path/to/doc')).to.deep.equal([routes['/.schemes/https'], "/path/to/doc"]);
+            expect(router._match('/.schemes/https/path/to/doc')).to.deep.equal([routes['/.schemes/https'], "/path/to/doc"]);
             expect(router._match('http:/path/to/doc')).to.deep.equal([routes['http:/'], "/path/to/doc"]);
-            expect(router._match('/.protocols/http/path/to/doc')).to.deep.equal([routes['http:/'], "/path/to/doc"]);
+            expect(router._match('/.schemes/http/path/to/doc')).to.deep.equal([routes['http:/'], "/path/to/doc"]);
         });
 
         it("should return [null, path] if no match is found", () => {
