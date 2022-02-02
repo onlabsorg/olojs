@@ -11,12 +11,6 @@ describe("olojs", () => {
     require("./file-store");
     require("./http-store");
     require("./router");
-    require("./hub")(olo.Hub, (hub) => {
-        const [store, subPath] = hub._match('/local/path/to/doc');
-        expect(store).to.be.instanceof(olo.FileStore);
-        expect(store.rootPath).to.equal('/');
-        expect(subPath).to.equal('/path/to/doc');
-    });
     require("./http-server");
 
     describe("index", () => {
@@ -49,13 +43,26 @@ describe("olojs", () => {
             expect(olo.Router).to.equal(require("../lib/router"));
         });
         
-        it("should export the `Hub` class", () => {
-            const hub = new olo.Hub(new olo.MemoryStore());
-            expect(hub).to.be.instanceof(require("../lib/hub"));
-        });
-
         it("should export the `http-server` module", () => {
             expect(olo.HTTPServer).to.equal(require("../lib/http-server"));
+        });
+
+
+        // LEGACY
+        
+        describe("*** LEGACY TESTS ***", () => {
+            
+            require("./hub")(olo.Hub, (hub) => {
+                const [store, subPath] = hub._match('/local/path/to/doc');
+                expect(store).to.be.instanceof(olo.FileStore);
+                expect(store.rootPath).to.equal('/');
+                expect(subPath).to.equal('/path/to/doc');
+            });
+
+            it("should export the `Hub` class", () => {
+                const hub = new olo.Hub(new olo.MemoryStore());
+                expect(hub).to.be.instanceof(require("../lib/hub"));
+            });
         });
     });    
 });

@@ -1,6 +1,6 @@
 {
   "name": "@onlabsorg/olojs",
-  "version": "0.21.7",
+  "version": "0.21.8",
   "description": "a document-based distributed content management framework",
   "keywords": [
     "store",
@@ -42,7 +42,7 @@
     "webpack-cli": "^4.7.2"
   },
   "dependencies": {
-    "@onlabsorg/swan-js": "^0.9.1",
+    "@onlabsorg/swan-js": "0.9.x",
     "body-parser": "^1.19.0",
     "dompurify": "^2.2.6",
     "express": "^4.17.1",
