@@ -235,7 +235,7 @@ describe("Router", () => {
         });
     });
 
-    describe(`source = router.write(id, source)`, () => {
+    describe(`router.write(id, source)`, () => {
 
         it("should delegate to the matching mounted store", async () => {
             var store1 = new MemoryStore();
@@ -262,7 +262,7 @@ describe("Router", () => {
         });
     });
 
-    describe(`source = router.delete(id)`, () => {
+    describe(`router.delete(id)`, () => {
 
         it("should delegate to the matching mounted store", async () => {
             var store1 = new MemoryStore();
@@ -289,7 +289,7 @@ describe("Router", () => {
         })
     });
 
-    describe(`source = router.deleteAll(id)`, () => {
+    describe(`router.deleteAll(id)`, () => {
 
         it("should delegate to the matching mounted store", async () => {
             var store1 = new MemoryStore();
@@ -374,6 +374,33 @@ describe("Router", () => {
                 const doc3_ns = await ctx1.import('/store1/path/to/doc3');
                 expect(doc3_ns.docnum).to.equal(3);                
                 expect(doc3_ns.__path__).to.equal('/store1/path/to/doc3')
+            });
+            
+            it("should correctly resolve url-like path", async () => {
+                
+                const router = new Router({
+                    '/store1': new MemoryStore({
+                        '/path/to/doc1': "<% docnum = 11 %>",
+                        '/path/to/doc2': "<% docnum = 12 %>",
+                        '/path/to/doc3': "<% docnum = 13 %>",
+                    }),
+                    
+                    'xxx:/': new MemoryStore({
+                        '/path/to/doc1': "<% docnum = 21 %>",
+                        '/path/to/doc2': "<% docnum = 22 %>",
+                        '/path/to/doc3': "<% docnum = 23 %>",
+                    })
+                });
+                
+                const ctx1 = await router.createContext('/store1/path/to/doc1');
+                
+                const doc2_ns = await ctx1.import('doc2');
+                expect(doc2_ns.docnum).to.equal(12);
+                expect(doc2_ns.__path__).to.equal('/store1/path/to/doc2')
+
+                const doc3_ns = await ctx1.import('xxx:/path/to/doc3');
+                expect(doc3_ns.docnum).to.equal(23);                
+                expect(doc3_ns.__path__).to.equal('/.schemes/xxx/path/to/doc3')
             });
         });
     });
