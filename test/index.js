@@ -46,23 +46,5 @@ describe("olojs", () => {
         it("should export the `http-server` module", () => {
             expect(olo.HTTPServer).to.equal(require("../lib/http-server"));
         });
-
-
-        // LEGACY
-        
-        describe("*** LEGACY TESTS ***", () => {
-            
-            require("./hub")(olo.Hub, (hub) => {
-                const [store, subPath] = hub._match('/local/path/to/doc');
-                expect(store).to.be.instanceof(olo.FileStore);
-                expect(store.rootPath).to.equal('/');
-                expect(subPath).to.equal('/path/to/doc');
-            });
-
-            it("should export the `Hub` class", () => {
-                const hub = new olo.Hub(new olo.MemoryStore());
-                expect(hub).to.be.instanceof(require("../lib/hub"));
-            });
-        });
     });    
 });

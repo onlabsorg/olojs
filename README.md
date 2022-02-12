@@ -133,8 +133,6 @@ doc = await remoteStore.read('/path/to/doc');
 ### Related projects
 * [stilo] is a command-line interface written in NodeJS that allows you to
   create and mange local olojs document repositories.
-* [oloviewer] is a HTTP client and [stilo] plugin for rendering olojs
-  documents in the browser
 * [olowiki] is a HTTP client and [stilo] plugin for editing and rendering 
   olojs documents in the browser
 
@@ -149,5 +147,4 @@ doc = await remoteStore.read('/path/to/doc');
 [Router]: ./docs/api/router.md
 [BrowserStore]: ./docs/api/browser-store.md
 [stilo]: https://github.com/onlabsorg/stilo/blob/main/README.md
-[oloviewer]: https://github.com/onlabsorg/oloviewer/blob/main/README.md
 [olowiki]: https://github.com/onlabsorg/olowiki/blob/master/README.md
