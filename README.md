@@ -1,7 +1,7 @@
 # olojs
 
-`olojs` is a content management system based on a distributed network of
-documents having the following properties:
+`olojs` is a JavaScript library for managing olo-docs, which are text documents
+characterized as follows:
 
 * Documents are templates containing inline [swan] expressions enclosed between
   `<%` and `%>`.
