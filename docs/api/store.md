@@ -167,6 +167,7 @@ The `context` object is a document context that contains the following
 properties:
 
 - A `__path__` string equal to `doc.path`
+- A `__dirpath__` string equal to the directory path of `doc.path`
 - A `__query__` namespace equal to `doc.query`
 - All the names contained in the passed namespaces
 - An `import` function that given a document path, loads it from the

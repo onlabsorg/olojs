@@ -406,6 +406,12 @@ module.exports = (description, options={}) => describe(description, () => {
                     expect(context.__path__).to.equal('/path/to/doc1');
                 });
                 
+                it("should contain the document directory path as '__dirpath__'", async () => {
+                    const doc = await store.load('/path/to/doc1');
+                    const context = doc.createContext();
+                    expect(context.__dirpath__).to.equal('/path/to');
+                });
+                
                 it("should contain the document query as '__query__'", async () => {
                     const doc = await store.load('/path/to/doc1?n=10;s=abc');
                     const context = doc.createContext();
