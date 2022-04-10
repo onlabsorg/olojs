@@ -12,7 +12,7 @@ characterized as follows:
   A store can be any repository (local, remote or a combination of both)
   implementing the [Store] interface.
 * Each document can import and use the narrative content and data held by
-  any other document of the same store.
+  any other documents of the same store.
 
 ### Example
 
@@ -87,9 +87,9 @@ Load, evaluate and render a [document]:
 
 ```js
 docPath = '/path/to/doc';
-source = await store.read(docPath);         // fetch the document source
-evaluate = store.parseDocument(source);     // compile the source
-context = store.createContext(docPath);     // create an evaluation context
+doc = await store.load(docPath);            // fetch the document
+evaluate = doc.parse();                     // compile the document
+context = doc.createContext({pi:3.14});     // create an evaluation context
 {data, text} = await evaluate(context);     // evaluate the document
 ```
 
@@ -104,7 +104,7 @@ Interface to your store via HTTP:
 
 ```js
 remoteStore = new olo.HTTPStore('http://localhost:8010');
-doc = await remoteStore.read('/path/to/doc');
+doc = await remoteStore.load('/path/to/doc');
 ```
 
 > olojs works also in the browser, although it has been tested only on Chrome.

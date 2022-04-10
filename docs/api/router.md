@@ -139,23 +139,4 @@ await router.deleteAll("/path/to/store_i/sub/path/to/doc");
 - When no store is mounted on `/path/to/store_i/`, it throws a
   `Router.WriteOperationNotAllowedError`.
   
-router.createContext - method
-------------------------------------------------------------------------
-Return the matching sub-store context bound to the current router.
-
-```js
-router = new Router({
-    "/path/to/store_1/": store_1,
-    "/path/to/store_2/": store_2,
-    ...
-})
-
-await router.createContext("/path/to/store_i/sub/path/to/doc");
-```
-
-- When `/path/to/store_i/sub/path/to/doc` is passed, it calls
-  `await store_i.createContext('/path/to/store_i/sub/path/to/doc')`.
-- When no store is mounted on `/path/to/store_i/`, it falls back to the 
-  `Store` context.
-  
 

@@ -121,13 +121,30 @@ following standard:
 When instantiated directly, the base store `deleteAll` method always throws
 `Store.WriteOperationNotAllowedError`.
   
-store.parseDocument - function
-----------------------------------------------------------------------------
+store.load - async method
+------------------------------------------------------------------------
+Returns the Store.Document object representing the document mapped in 
+this store to the given document id.
+```js
+doc = await store.load("/path/to/doc?key1=val1;key2=val2;...");
+```
+
+The returned doc object contains the following properties ...
+
+- `doc.id`: the passed document id
+- `doc.path`: the normalized path portion of the document id (before '?')
+- `doc.query`: an object containing the properties defined in the query
+  string following the '?' in the document id
+- `doc.source`: the source of the document (return value of store.read(doc.path))
+
+... and the following two functions:
+
+### doc.parse
 Compiles a document source into an `evaluate` function that takes as input
 a document context object and returns the document namespace object and its
 rendered text.
 ```js
-evaluate = store.parseDocument(source);
+evaluate = doc.parse();
 {data, text} = await evaluate(context);
 ```
 - `source` is a string containing the source of the olojs document to be
@@ -138,41 +155,25 @@ evaluate = store.parseDocument(source);
   expressions of the document (the document namespace).
 - `text` is a string obtained by replacing every inline expression with its 
   strigified value. 
-  
-store.createContext - method
-------------------------------------------------------------------------
+
+### doc.createContext
 Create a document context bound to this store.
 
 ```
-context = store.createContext(path, presets)
+context = doc.createContext(ns1, ns2, ...)
 ```
 
 The `context` object is a document context that contains the following
 properties:
 
-- A `__path__` string equal to the passed document path
-- All the names contained in the `presets` object
+- A `__path__` string equal to `doc.path`
+- A `__query__` namespace equal to `doc.query`
+- All the names contained in the passed namespaces
 - An `import` function that given a document path, loads it from the
   current store, evaluates it and returns its namespace. The import
   parameter is a path that can optionally contain a `?query-string`, in 
   which case, the string will be parsed and its values added to the
   target document context under the `__query__` namespace.
-  
-store.createContextFromId - method
-------------------------------------------------------------------------
-Create a document context given a document id.
-
-```
-context = store.createContextFromId(docId)
-```
-
-Where:
-
-- `docId` is a string in the form `/path/to/doc?query`, with query
-  being a string like `name1=val1&name2=val2&...`
-- `context` is a Store context (see store.createContext) which contains
-  a `__query__` namespace with all the name=value pairs contained in the
-  docId query string
   
 Store.ReadPermissionDeniedError - class
 ----------------------------------------------------------------------------

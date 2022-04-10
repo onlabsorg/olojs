@@ -321,87 +321,78 @@ describe("Router", () => {
         })
     });
     
-    describe(`context = router.createContext(path, presets)`, () => {
+    describe(`doc = router.load(path)`, () => {
         
-        it("should delegate the context creation to the first matching store", () => {
-            const store1 = new MemoryStore();
-            const store2 = Object.create(store1);
-            store2.createContext = (path, presets) => {
-                const context = store1.createContext(path, presets);
-                context.storeName = "store2";
-                return context;
-            }
-            var router = new Router({
-                '/store1': store1,
-                '/store2': store2
+        it("should return a Router.Document object", async () => {
+            const router = new Router({
+                '/store1': new MemoryStore({
+                    '/path/to/doc': "docnum = <% docnum : 1 %>"
+                })
             });
-            
-            const ctx = router.createContext('/store2/path/to/doc', {x:10});
-            expect(ctx.x).to.equal(10);
-            expect(ctx.storeName).to.equal("store2");
-            expect(ctx.__path__).to.equal('/store2/path/to/doc');
-        });
-
-        it("should delegate to the parent store if no match is found", () => {
-            var router = new Router({
-                '/store1': new MemoryStore(),
-                '/store2': new MemoryStore()
-            });
-            
-            const ctx = router.createContext('/store3/path/to/doc', {x:10});
-            expect(ctx.x).to.equal(10);
-            expect(ctx.storeName).to.be.undefined;
-            expect(ctx.__path__).to.equal('/store3/path/to/doc');
+            const doc = await router.load('/store1/./path/to/doc?n=10;s=abc')
+            expect(doc).to.be.instanceof(router.constructor.Document);
+            expect(doc.id).to.equal('/store1/./path/to/doc?n=10;s=abc');
+            expect(doc.path).to.equal('/store1/path/to/doc');
+            expect(doc.query).to.deep.equal({n:10, s:"abc"});
+            const evaluate = doc.parse();
+            const {data, text} = await evaluate(doc.createContext());
+            expect(data.docnum).to.equal(1);
+            expect(text).to.equal("docnum = 1");
         });
         
-        describe("context.import function", () => {
+        describe("context = doc.createContex(...namesaces)", () => {
             
-            it("should resolve paths relative to the router, not to the context store", async () => {
-                const router = new Router({
-                    '/store1': new MemoryStore({
-                        '/path/to/doc1': "<% docnum = 1 %>",
-                        '/path/to/doc2': "<% docnum = 2 %>",
-                        '/path/to/doc3': "<% docnum = 3 %>",
-                    })
-                });
+            describe("context.import function", () => {
                 
-                const ctx1 = await router.createContext('/store1/path/to/doc1');
-                
-                const doc2_ns = await ctx1.import('doc2');
-                expect(doc2_ns.docnum).to.equal(2);
-                expect(doc2_ns.__path__).to.equal('/store1/path/to/doc2')
-
-                const doc3_ns = await ctx1.import('/store1/path/to/doc3');
-                expect(doc3_ns.docnum).to.equal(3);                
-                expect(doc3_ns.__path__).to.equal('/store1/path/to/doc3')
-            });
-            
-            it("should correctly resolve url-like path", async () => {
-                
-                const router = new Router({
-                    '/store1': new MemoryStore({
-                        '/path/to/doc1': "<% docnum = 11 %>",
-                        '/path/to/doc2': "<% docnum = 12 %>",
-                        '/path/to/doc3': "<% docnum = 13 %>",
-                    }),
+                it("should resolve paths relative to the router, not to the context store", async () => {
+                    const router = new Router({
+                        '/store1': new MemoryStore({
+                            '/path/to/doc1': "<% docnum = 1 %>",
+                            '/path/to/doc2': "<% docnum = 2 %>",
+                            '/path/to/doc3': "<% docnum = 3 %>",
+                        })
+                    });
                     
-                    'xxx:/': new MemoryStore({
-                        '/path/to/doc1': "<% docnum = 21 %>",
-                        '/path/to/doc2': "<% docnum = 22 %>",
-                        '/path/to/doc3': "<% docnum = 23 %>",
-                    })
+                    const doc1 = await router.load('/store1/path/to/doc1')
+                    const ctx1 = await doc1.createContext();
+                    
+                    const doc2_ns = await ctx1.import('doc2');
+                    expect(doc2_ns.docnum).to.equal(2);
+                    expect(doc2_ns.__path__).to.equal('/store1/path/to/doc2')
+
+                    const doc3_ns = await ctx1.import('/store1/path/to/doc3');
+                    expect(doc3_ns.docnum).to.equal(3);                
+                    expect(doc3_ns.__path__).to.equal('/store1/path/to/doc3')
                 });
                 
-                const ctx1 = await router.createContext('/store1/path/to/doc1');
-                
-                const doc2_ns = await ctx1.import('doc2');
-                expect(doc2_ns.docnum).to.equal(12);
-                expect(doc2_ns.__path__).to.equal('/store1/path/to/doc2')
+                it("should correctly resolve url-like path", async () => {
+                    
+                    const router = new Router({
+                        '/store1': new MemoryStore({
+                            '/path/to/doc1': "<% docnum = 11 %>",
+                            '/path/to/doc2': "<% docnum = 12 %>",
+                            '/path/to/doc3': "<% docnum = 13 %>",
+                        }),
+                        
+                        'xxx:/': new MemoryStore({
+                            '/path/to/doc1': "<% docnum = 21 %>",
+                            '/path/to/doc2': "<% docnum = 22 %>",
+                            '/path/to/doc3': "<% docnum = 23 %>",
+                        })
+                    });
+                    
+                    const doc1 = await router.load('/store1/path/to/doc1')
+                    const ctx1 = await doc1.createContext();
+                    
+                    const doc2_ns = await ctx1.import('doc2');
+                    expect(doc2_ns.docnum).to.equal(12);
+                    expect(doc2_ns.__path__).to.equal('/store1/path/to/doc2')
 
-                const doc3_ns = await ctx1.import('xxx:/path/to/doc3');
-                expect(doc3_ns.docnum).to.equal(23);                
-                expect(doc3_ns.__path__).to.equal('/.schemes/xxx/path/to/doc3')
-            });
+                    const doc3_ns = await ctx1.import('xxx:/path/to/doc3');
+                    expect(doc3_ns.docnum).to.equal(23);                
+                    expect(doc3_ns.__path__).to.equal('/.schemes/xxx/path/to/doc3')
+                });
+            });            
         });
     });
 });
