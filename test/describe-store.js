@@ -278,6 +278,235 @@ module.exports = (description, options={}) => describe(description, () => {
         }
     });
     
+    describe("doc = await store.create(docId, source)", () => {
+        
+        it("should return a Store.Document object", () => {
+            expect(store.create('/path/to/doc')).to.be.instanceof(store.constructor.Document);
+        });
+        
+        describe("doc.id", () => {
+            
+            it("should contain the document id", () => {
+                const doc = store.create('/path/to/doc?x=10;y=20');
+                expect(doc.id).to.equal('/path/to/doc?x=10;y=20');
+            });
+        });
+
+        describe("doc.path", () => {
+            
+            it("should contain the normalized document path", () => {
+                const doc = store.create('path/to/./doc?x=10;y=20');
+                expect(doc.path).to.equal('/path/to/doc');
+            });
+        });
+
+        describe("doc.query", () => {
+            
+            it("should contain the id query parsed into an object", () => {
+                const doc = store.create('/path/to/doc?n=10;s=abc');
+                expect(doc.query).to.deep.equal({n:10, s:"abc"});
+            });
+        });
+            
+        describe("doc.source", () => {
+            
+            it("should contain the passed document source property", async () => {
+                const doc = store.create('/path/to/doc1', "doc source ...");
+                expect(doc.source).to.equal("doc source ...");
+            });
+
+            it("should default to an empty string if no source parameter is passed", async () => {
+                const doc = store.create('/path/to/doc1');
+                expect(doc.source).to.equal("");
+            });
+        });
+        
+        describe("evaluate = doc.parse()", () => {
+            
+            it("should return a function", () => {
+                const doc = store.create('/path/to/doc1',
+                        `<%a=10%><%b=a+10%>a + b = <%a+b%>`);
+                const evaluate = doc.parse();
+                expect(evaluate).to.be.a("function");            
+            });
+            
+            describe("(await evaluate(context)).data", () => {
+                
+                it("should be an object", async () => {
+                    const doc = store.create('/path/to/doc1');
+                    const evaluate = doc.parse();
+                    const context = document.createContext();
+                    const {data} = await evaluate(context);
+                    expect(data).to.be.an("object");                
+                });
+                
+                it("should contain all the names defined in the swan expressions", async () => {
+                    const doc = store.create('/path/to/doc1',
+                            `<%a=10%><%b=a+10%>`);
+                    const evaluate = doc.parse();
+                    const context = document.createContext({});
+                    const {data} = await evaluate(context);
+                    expect(data.a).to.equal(10);
+                    expect(data.b).to.equal(20);
+                });
+            });
+                
+            describe("(await evaluate(context)).text", () => {
+                
+                it("should be string obtained replacing the swan expressions with their stringified return value", async () => {
+                    const doc = store.create('/path/to/doc1',
+                            `<%a=10%><%b=a+10%>a + b = <%a+b%>`);
+                    const evaluate = doc.parse();
+                    const context = document.createContext();
+                    const {text} = await evaluate(context);
+                    expect(text).to.equal("a + b = 30");
+                });
+
+                it("should decorate the rendered text with the `__render__` function if it exists", async () => {
+                    const doc = store.create('/path/to/doc1');
+                    
+                    doc.source = `<% __render__ = text -> text + "!" %>Hello World`;
+                    var evaluate = doc.parse();
+                    const context = document.createContext();
+                    var {text} = await evaluate(context);
+                    expect(text).to.equal("Hello World!");
+
+                    doc.source = `<% __render__ = text -> {__str__: this -> text + "!!"} %>Hello World`;
+                    var evaluate = doc.parse();
+                    var {text} = await evaluate(context);
+                    expect(text).to.equal("Hello World!!");
+                });
+            });
+        });
+        
+        describe("context = doc.createContext(...namespaces)", () => {
+            
+            it("should be a document context", () => {
+                const document_context = document.createContext();
+                const doc = store.create('/path/to/doc1');
+                const context = doc.createContext();
+                for (let key in document_context) {
+                    expect(context[key]).to.equal(document_context[key]);
+                }
+            })
+            
+            it("should contain the document path as '__path__'", () => {
+                const doc = store.create('/path/to/doc1');
+                const context = doc.createContext();
+                expect(context.__path__).to.equal('/path/to/doc1');
+            });
+            
+            it("should contain the document directory path as '__dirpath__'", () => {
+                const doc = store.create('/path/to/doc1');
+                const context = doc.createContext();
+                expect(context.__dirpath__).to.equal('/path/to');
+            });
+            
+            it("should contain the document query as '__query__'", () => {
+                const doc = store.create('/path/to/doc1?n=10;s=abc');
+                const context = doc.createContext();
+                expect(context.__query__).to.deep.equal(doc.query);
+            });
+            
+            it("should contain the passed namespaces properties", () => {
+                const doc = store.create('/path/to/doc1?n=10;s=abc');
+                const context = doc.createContext({x:10, y:20}, {y:30, z:40});
+                expect(context.x).to.equal(10);
+                expect(context.y).to.equal(30);
+                expect(context.z).to.equal(40);
+            });
+
+            it("should contain an 'import' function", () => {
+                const doc = store.create('/path/to/doc1?n=10;s=abc');
+                const context = doc.createContext();
+                expect(context.import).to.be.a("function");
+            });
+
+            if (!(options.readAccessDenied || options.writeAccessDenied || options.voidStore || options.readOnly)) {
+                describe("context.import", () => {
+                    
+                    it("should return the namespace of the passed object", async () => {
+                        await store.write('/path/to/doc1', "<% docnum = 1 %>doc1");
+                        await store.write('/path/to/doc2', "<% docnum = 2 %>doc2");
+
+                        const source1 = await store.read('/path/to/doc1');
+                        const doc1 = store.create('/path/to/doc1', source1);
+                        const ctx1 = doc1.createContext();
+                        const doc2_ns = await ctx1.import('/path/to/doc2');
+                        expect(doc2_ns.docnum).to.equal(2);
+                        expect(await ctx1.str(doc2_ns)).to.equal("doc2");
+                        
+                        const doc3 = store.create('/path/to/doc3', "<% doc1 = import './doc1' %>");
+                        const ctx3 = doc3.createContext();
+                        const data3 = (await doc3.parse()(ctx3)).data;
+                        expect(data3.doc1.docnum).to.equal(1);
+                    });
+                    
+                    it("should resolve docId query string as __query__ context namespace", async () => {
+                        await store.write('/path/to/doc1', "<% docnum = 1 %>");
+                        await store.write('/path/to/doc2', "<% docnum = 2 %>");
+                        
+                        const source1 = await store.read('/path/to/doc1');
+                        const doc1 = store.create('/path/to/doc1', source1);
+                        const ctx1 = doc1.createContext();
+                        const doc2_ns = await ctx1.import('/path/to/doc2?x=10;b&s=abc');
+                        expect(doc2_ns.docnum).to.equal(2);
+                        expect(doc2_ns.__query__).to.deep.equal({
+                            x: 10,
+                            s: "abc",
+                            b: true
+                        });
+                    });
+
+                    it("should resolve relative ids", async () => {
+                        await store.write('/path/to/doc1', "<% docnum = 1 %>");
+                        await store.write('/path/to/doc2', "<% docnum = 2 %>");
+                        await store.write('/path/to/doc3', "<% docnum = 3 %>");
+                        
+                        const source1 = await store.read('/path/to/doc1');
+                        const doc1 = store.create('/path/to/doc1', source1);
+                        const ctx1 = doc1.createContext();
+                        
+                        const doc2_ns = await ctx1.import('doc2');
+                        expect(doc2_ns.docnum).to.equal(2);
+
+                        const doc3_ns = await ctx1.import('./doc3?x=10');
+                        expect(doc3_ns.docnum).to.equal(3);
+                        expect(doc3_ns.__query__).to.deep.equal({x:10});
+                    });
+
+                    it("should cache the documents", async () => {
+                        var count;
+                        store.read = path => {
+                            count += 1;
+                            return `doc @ ${path}<% p = __path__ %>`;
+                        }
+
+                        const doc = store.create('/path/to/doc');
+                        const ctx = doc.createContext();
+                        count = 0;
+
+                        var ns = await ctx.import("/path/to/doc1");
+                        expect(count).to.equal(1);
+
+                        var ns = await ctx.import("/path/to/doc1");
+                        expect(count).to.equal(1);
+
+                        var ns = await ctx.import("/path/to/doc2");
+                        expect(count).to.equal(2);
+                        expect(ns.p).to.equal("/path/to/doc2");
+
+                        var ns = await ctx.import("/path/to/doc2");
+                        expect(count).to.equal(2);
+                        expect(ns.p).to.equal("/path/to/doc2");
+                        
+                        delete store.read;
+                    });
+                });            
+            }
+        });
+    });
+    
     describe("doc = await store.load(docId)", () => {
         
         if (options.readAccessDenied) {
@@ -295,223 +524,13 @@ module.exports = (description, options={}) => describe(description, () => {
         
         else {
             
-            it("should return a Store.Document object", async () => {
-                expect(await store.load('/path/to/doc')).to.be.instanceof(store.constructor.Document);
-            });
-            
-            describe("doc.id", () => {
-                
-                it("should contain the document id", async () => {
-                    const doc = await store.load('/path/to/doc?x=10;y=20');
-                    expect(doc.id).to.equal('/path/to/doc?x=10;y=20');
-                });
-            });
-
-            describe("doc.path", () => {
-                
-                it("should contain the normalized document path", async () => {
-                    const doc = await store.load('path/to/./doc?x=10;y=20');
-                    expect(doc.path).to.equal('/path/to/doc');
-                });
-            });
-
-            describe("doc.query", () => {
-                
-                it("should contain the id query parsed into an object", async () => {
-                    const doc = await store.load('/path/to/doc?n=10;s=abc');
-                    expect(doc.query).to.deep.equal({n:10, s:"abc"});
-                });
-            });
-                
-            describe("doc.source", () => {
-                
-                it("should contain the document source property", async () => {
-                    const doc = await store.load('/path/to/doc1');
-                    expect(doc.source).to.equal(await store.read('/path/to/doc1'));
-                });
-            });
-            
-            describe("evaluate = doc.parse()", () => {
-                
-                it("should return a function", async () => {
-                    const doc = await store.load('/path/to/doc1');
-                    doc.source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
-                    const evaluate = doc.parse();
-                    expect(evaluate).to.be.a("function");            
-                });
-                
-                describe("(await evaluate(context)).data", () => {
-                    
-                    it("should be an object", async () => {
-                        const doc = await store.load('/path/to/doc1');
-                        const evaluate = doc.parse();
-                        const context = document.createContext();
-                        const {data} = await evaluate(context);
-                        expect(data).to.be.an("object");                
-                    });
-                    
-                    it("should contain all the names defined in the swan expressions", async () => {
-                        const doc = await store.load('/path/to/doc1');
-                        doc.source = `<%a=10%><%b=a+10%>`;
-                        const evaluate = doc.parse();
-                        const context = document.createContext({});
-                        const {data} = await evaluate(context);
-                        expect(data.a).to.equal(10);
-                        expect(data.b).to.equal(20);
-                    });
-                });
-                    
-                describe("(await evaluate(context)).text", () => {
-                    
-                    it("should be string obtained replacing the swan expressions with their stringified return value", async () => {
-                        const doc = await store.load('/path/to/doc1');
-                        doc.source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
-                        const evaluate = doc.parse();
-                        const context = document.createContext();
-                        const {text} = await evaluate(context);
-                        expect(text).to.equal("a + b = 30");
-                    });
-
-                    it("should decorate the rendered text with the `__render__` function if it exists", async () => {
-                        const doc = await store.load('/path/to/doc1');
-                        
-                        doc.source = `<% __render__ = text -> text + "!" %>Hello World`;
-                        var evaluate = doc.parse();
-                        const context = document.createContext();
-                        var {text} = await evaluate(context);
-                        expect(text).to.equal("Hello World!");
-
-                        doc.source = `<% __render__ = text -> {__str__: this -> text + "!!"} %>Hello World`;
-                        var evaluate = doc.parse();
-                        var {text} = await evaluate(context);
-                        expect(text).to.equal("Hello World!!");
-                    });
-                });
-            });
-            
-            describe("context = doc.createContext(...namespaces)", () => {
-                
-                it("should be a document context", async () => {
-                    const document_context = document.createContext();
-                    const doc = await store.load('/path/to/doc1');
-                    const context = doc.createContext();
-                    for (let key in document_context) {
-                        expect(context[key]).to.equal(document_context[key]);
-                    }
-                })
-                
-                it("should contain the document path as '__path__'", async () => {
-                    const doc = await store.load('/path/to/doc1');
-                    const context = doc.createContext();
-                    expect(context.__path__).to.equal('/path/to/doc1');
-                });
-                
-                it("should contain the document directory path as '__dirpath__'", async () => {
-                    const doc = await store.load('/path/to/doc1');
-                    const context = doc.createContext();
-                    expect(context.__dirpath__).to.equal('/path/to');
-                });
-                
-                it("should contain the document query as '__query__'", async () => {
-                    const doc = await store.load('/path/to/doc1?n=10;s=abc');
-                    const context = doc.createContext();
-                    expect(context.__query__).to.deep.equal(doc.query);
-                });
-                
-                it("should contain the passed namespaces properties", async () => {
-                    const doc = await store.load('/path/to/doc1?n=10;s=abc');
-                    const context = doc.createContext({x:10, y:20}, {y:30, z:40});
-                    expect(context.x).to.equal(10);
-                    expect(context.y).to.equal(30);
-                    expect(context.z).to.equal(40);
-                });
-
-                it("should contain an 'import' function", async () => {
-                    const doc = await store.load('/path/to/doc1?n=10;s=abc');
-                    const context = doc.createContext();
-                    expect(context.import).to.be.a("function");
-                });
-
-                if (!(options.readAccessDenied || options.writeAccessDenied || options.voidStore || options.readOnly)) {
-                    describe("context.import", () => {
-                        
-                        it("should return the namespace of the passed object", async () => {
-                            await store.write('/path/to/doc1', "<% docnum = 1 %>doc1");
-                            await store.write('/path/to/doc2', "<% docnum = 2 %>doc2");
-                            
-                            const doc1 = await store.load('/path/to/doc1');
-                            const ctx1 = doc1.createContext();
-                            const doc2_ns = await ctx1.import('/path/to/doc2');
-                            expect(doc2_ns.docnum).to.equal(2);
-                            expect(await ctx1.str(doc2_ns)).to.equal("doc2");
-                            
-                            await store.write('/path/to/doc3', "<% doc1 = import './doc1' %>");
-                            const doc3 = await store.load('/path/to/doc3');
-                            const ctx3 = doc3.createContext();
-                            const data3 = (await doc3.parse()(ctx3)).data;
-                            expect(data3.doc1.docnum).to.equal(1);
-                        });
-                        
-                        it("should resolve docId query string as __query__ context namespace", async () => {
-                            await store.write('/path/to/doc1', "<% docnum = 1 %>");
-                            await store.write('/path/to/doc2', "<% docnum = 2 %>");
-                            
-                            const doc1 = await store.load('/path/to/doc1');
-                            const ctx1 = doc1.createContext();
-                            const doc2_ns = await ctx1.import('/path/to/doc2?x=10;b&s=abc');
-                            expect(doc2_ns.docnum).to.equal(2);
-                            expect(doc2_ns.__query__).to.deep.equal({
-                                x: 10,
-                                s: "abc",
-                                b: true
-                            });
-                        });
-
-                        it("should resolve relative ids", async () => {
-                            await store.write('/path/to/doc1', "<% docnum = 1 %>");
-                            await store.write('/path/to/doc2', "<% docnum = 2 %>");
-                            await store.write('/path/to/doc3', "<% docnum = 3 %>");
-                            
-                            const doc1 = await store.load('/path/to/doc1');
-                            const ctx1 = doc1.createContext();
-                            
-                            const doc2_ns = await ctx1.import('doc2');
-                            expect(doc2_ns.docnum).to.equal(2);
-
-                            const doc3_ns = await ctx1.import('./doc3?x=10');
-                            expect(doc3_ns.docnum).to.equal(3);
-                            expect(doc3_ns.__query__).to.deep.equal({x:10});
-                        });
-
-                        it("should cache the documents", async () => {
-                            var count;
-                            store.read = path => {
-                                count += 1;
-                                return `doc @ ${path}<% p = __path__ %>`;
-                            }
-
-                            const doc = await store.load('/path/to/doc');
-                            const ctx = doc.createContext();
-                            count = 0;
-
-                            var ns = await ctx.import("/path/to/doc1");
-                            expect(count).to.equal(1);
-
-                            var ns = await ctx.import("/path/to/doc1");
-                            expect(count).to.equal(1);
-
-                            var ns = await ctx.import("/path/to/doc2");
-                            expect(count).to.equal(2);
-                            expect(ns.p).to.equal("/path/to/doc2");
-
-                            var ns = await ctx.import("/path/to/doc2");
-                            expect(count).to.equal(2);
-                            expect(ns.p).to.equal("/path/to/doc2");
-                            
-                            delete store.read;
-                        });
-                    });            
-                }
+            it("should return a Store.Document object with the source stored at the given id path", async () => {
+                const doc = await store.load('/path/to/doc1?n=10;s=abc');
+                expect(doc).to.be.instanceof(store.constructor.Document);
+                expect(doc.id).to.equal('/path/to/doc1?n=10;s=abc');
+                expect(doc.path).to.equal('/path/to/doc1');
+                expect(doc.query).to.deep.equal({n:10, s:"abc"});
+                expect(doc.source).to.equal(await store.read('/path/to/doc1'));
             });
         }        
     });

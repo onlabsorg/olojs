@@ -121,12 +121,12 @@ following standard:
 When instantiated directly, the base store `deleteAll` method always throws
 `Store.WriteOperationNotAllowedError`.
   
-store.load - async method
+store.create - async method
 ------------------------------------------------------------------------
-Returns the Store.Document object representing the document mapped in 
-this store to the given document id.
+Creates a Store.Document object representing a document with a given 
+id and a given source
 ```js
-doc = await store.load("/path/to/doc?key1=val1;key2=val2;...");
+doc = await store.create("/path/to/doc?key1=val1;key2=val2;...", source);
 ```
 
 The returned doc object contains the following properties ...
@@ -135,7 +135,7 @@ The returned doc object contains the following properties ...
 - `doc.path`: the normalized path portion of the document id (before '?')
 - `doc.query`: an object containing the properties defined in the query
   string following the '?' in the document id
-- `doc.source`: the source of the document (return value of store.read(doc.path))
+- `doc.source`: the source of the document
 
 ... and the following two functions:
 
@@ -147,10 +147,10 @@ rendered text.
 evaluate = doc.parse();
 {data, text} = await evaluate(context);
 ```
-- `source` is a string containing the source of the olojs document to be
-  evaluated
 - `evaluate` is an asynchronous function that evaluates the document and
   returns its namespace and its rendered text
+- `context` is a valid document context created either with
+  `doc.createContext` or with `document.createContext`.
 - `data` is an object containing all the names defined by the inline
   expressions of the document (the document namespace).
 - `text` is a string obtained by replacing every inline expression with its 
@@ -175,6 +175,15 @@ properties:
   parameter is a path that can optionally contain a `?query-string`, in 
   which case, the string will be parsed and its values added to the
   target document context under the `__query__` namespace.
+  
+store.load - async method
+------------------------------------------------------------------------
+Given a document id, reads a document source and creates the 
+corresponding Store.Document object.
+
+```js
+doc = await store.load("/path/to/doc?key1=val1;key2=val2;...");
+```     
   
 Store.ReadPermissionDeniedError - class
 ----------------------------------------------------------------------------
