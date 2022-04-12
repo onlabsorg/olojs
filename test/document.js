@@ -77,6 +77,15 @@ describe("document", () => {
                     var {text} = await evaluate(context);
                     expect(text).to.equal("Hello World!!");
                 });
+                
+                it("should render [[Undefined Syntax]] for expression with syntax error", async () => {
+                    var source = `<% $x = 10 %>!`;
+                    var evaluate = document.parse(source);
+                    expect(evaluate).to.be.a("function");
+                    var context = document.createContext();
+                    var {text} = await evaluate(context);
+                    expect(text).to.equal("[[Undefined Syntax]]!");
+                });
             });
         });        
     });
