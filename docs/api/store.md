@@ -121,7 +121,7 @@ following standard:
 When instantiated directly, the base store `deleteAll` method always throws
 `Store.WriteOperationNotAllowedError`.
   
-store.create - async method
+store.create - method
 ------------------------------------------------------------------------
 Creates a Store.Document object representing a document with a given 
 id and a given source
