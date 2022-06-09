@@ -5,7 +5,7 @@ const Store = require('../lib/store');
 
 module.exports = (description, options={}) => describe(description, () => {
     var store;
-    
+
     before(async () => {
         store = await options.create({
             "/doc1": "doc @ /doc1",
@@ -22,9 +22,9 @@ module.exports = (description, options={}) => describe(description, () => {
     })
 
     describe("source = await store.read(path)", () => {
-        
+
         if (options.readAccessDenied) {
-            
+
             it("should always throw a `ReadPermissionDenied` error", async () => {
                 try {
                     await store.read("/path/to/doc1");
@@ -35,14 +35,14 @@ module.exports = (description, options={}) => describe(description, () => {
                 }
             });
         }
-        
+
         else if (options.voidStore) {
-                        
+
             it("Should always return an empty document", async () => {
                 // file path
                 var doc = await store.read(`/path/to/doc1`);
                 expect(doc).to.equal("");
-                
+
                 // directory path
                 var doc = await store.read(`/path/to/`);
                 expect(doc).to.equal("")
@@ -53,17 +53,17 @@ module.exports = (description, options={}) => describe(description, () => {
 
                 // non-existing path
                 var doc = await store.read(`/non/existing/doc`);
-                expect(doc).to.equal("");                
+                expect(doc).to.equal("");
             });
 
         } else {
-        
+
             it("should return the document stored at the normalized given path", async () => {
-                
+
                 // file path
                 var doc = await store.read(`/path/to/doc1`);
                 expect(doc).to.equal("doc @ /path/to/doc1");
-                
+
                 // directory path
                 var doc = await store.read(`/path/to/`);
                 expect(doc).to.equal("doc @ /path/to/")
@@ -76,14 +76,14 @@ module.exports = (description, options={}) => describe(description, () => {
             it("should return an empty string if the path doesn't exist", async () => {
                 var doc = await store.read(`/non/existing/doc`);
                 expect(doc).to.equal("");
-            });    
+            });
         }
     });
 
     describe("entries = await store.list(path)", () => {
-        
+
         if (options.readAccessDenied) {
-            
+
             it("should always throw a `ReadPermissionDenied` error", async () => {
                 try {
                     await store.list("/path/to/doc1");
@@ -94,9 +94,9 @@ module.exports = (description, options={}) => describe(description, () => {
                 }
             });
         }
-        
+
         else if (options.voidStore) {
-                        
+
             it("should always return an empty array", async () => {
 
                 var items = await store.list(`/`);
@@ -104,7 +104,7 @@ module.exports = (description, options={}) => describe(description, () => {
 
                 var items = await store.list(`/path/to/`);
                 expect(items.sort()).to.deep.equal([]);
-                
+
                 var items = await store.list(`/non/existing/dir/index/`);
                 expect(items.sort()).to.deep.equal([]);
             });
@@ -125,11 +125,11 @@ module.exports = (description, options={}) => describe(description, () => {
             });
         }
     });
-    
+
     describe("await store.write(path, source)", () => {
-        
+
         if (options.writeAccessDenied) {
-            
+
             it("should always throw a `ReadPermissionDenied` error", async () => {
                 try {
                     await store.write("/path/to/doc1", "...");
@@ -140,9 +140,9 @@ module.exports = (description, options={}) => describe(description, () => {
                 }
             });
         }
-        
+
         else if (options.voidStore || options.readOnly) {
-                        
+
             it("should always throw a `WriteOperationNotAllowed` error", async () => {
                 try {
                     await store.write("/path/to/doc1", "source of doc 1");
@@ -154,14 +154,14 @@ module.exports = (description, options={}) => describe(description, () => {
             });
 
         } else {
-            
+
             it("should change the source of the document maped to the given path", async () => {
-                
+
                 // file-like path
                 expect(await store.read(`/path/to/doc1`)).to.equal("doc @ /path/to/doc1");
                 await store.write(`/path/to/doc1`, "new doc @ /path/to/doc1");
                 expect(await store.read(`/path/to/doc1`)).to.equal("new doc @ /path/to/doc1");
-                
+
                 //directory-like path
                 expect(await store.read(`/path/to/`)).to.equal("doc @ /path/to/");
                 await store.write(`/path/to/`, "new doc @ /path/to/");
@@ -172,14 +172,14 @@ module.exports = (description, options={}) => describe(description, () => {
                 expect(await store.read(`/path/to/doc4`)).to.equal("");
                 await store.write(`/path/to/doc4`, "doc @ /path/to/doc4");
                 expect(await store.read(`/path/to/doc4`)).to.equal("doc @ /path/to/doc4");
-            });            
+            });
         }
     });
 
     describe("await store.delete(path)", () => {
-        
+
         if (options.writeAccessDenied) {
-            
+
             it("should always throw a `ReadPermissionDenied` error", async () => {
                 try {
                     await store.delete("/path/to/doc1");
@@ -190,9 +190,9 @@ module.exports = (description, options={}) => describe(description, () => {
                 }
             });
         }
-        
+
         else if (options.voidStore || options.readOnly) {
-                        
+
             it("should always throw a `WriteOperationNotAllowed` error", async () => {
                 try {
                     await store.delete("/path/to/doc1");
@@ -218,11 +218,11 @@ module.exports = (description, options={}) => describe(description, () => {
             });
         }
     });
-    
+
     describe("await store.deleteAll(path)", () => {
-        
+
         if (options.writeAccessDenied) {
-            
+
             it("should always throw a `ReadPermissionDenied` error", async () => {
                 try {
                     await store.deleteAll("/path/to/dir");
@@ -233,9 +233,9 @@ module.exports = (description, options={}) => describe(description, () => {
                 }
             });
         }
-        
+
         else if (options.voidStore || options.readOnly) {
-                        
+
             it("should always throw a `WriteOperationNotAllowed` error", async () => {
                 try {
                     await store.deleteAll("/path/to/");
@@ -253,7 +253,7 @@ module.exports = (description, options={}) => describe(description, () => {
                 expect(await store.read(`/path/to/dir/doc2`)).to.equal("doc @ /path/to/dir/doc2");
                 expect(await store.read(`/path/to/dir/doc3`)).to.equal("doc @ /path/to/dir/doc3");
                 expect((await store.list(`/path/to/dir`)).sort()).to.deep.equal(['doc1', 'doc2', 'doc3']);
-                
+
                 await store.deleteAll(`/path/to/dir`);
 
                 expect(await store.read(`/path/to/dir/doc1`)).to.equal("");
@@ -267,7 +267,7 @@ module.exports = (description, options={}) => describe(description, () => {
                 expect(await store.read(`/path/to/dir/doc2`)).to.equal("");
                 expect(await store.read(`/path/to/dir/doc3`)).to.equal("");
                 expect(await store.list(`/path/to/dir`)).to.deep.equal([]);
-                
+
                 await store.deleteAll(`/path/to/dir`);
 
                 expect(await store.read(`/path/to/dir/doc1`)).to.equal("");
@@ -277,39 +277,23 @@ module.exports = (description, options={}) => describe(description, () => {
             });
         }
     });
-    
-    describe("doc = await store.create(docId, source)", () => {
-        
+
+    describe("doc = await store.create(path, source)", () => {
+
         it("should return a Store.Document object", () => {
             expect(store.create('/path/to/doc')).to.be.instanceof(store.constructor.Document);
         });
-        
-        describe("doc.id", () => {
-            
-            it("should contain the document id", () => {
-                const doc = store.create('/path/to/doc?x=10;y=20');
-                expect(doc.id).to.equal('/path/to/doc?x=10;y=20');
-            });
-        });
 
         describe("doc.path", () => {
-            
+
             it("should contain the normalized document path", () => {
-                const doc = store.create('path/to/./doc?x=10;y=20');
+                const doc = store.create('path/to/./doc');
                 expect(doc.path).to.equal('/path/to/doc');
             });
         });
 
-        describe("doc.query", () => {
-            
-            it("should contain the id query parsed into an object", () => {
-                const doc = store.create('/path/to/doc?n=10;s=abc');
-                expect(doc.query).to.deep.equal({n:10, s:"abc"});
-            });
-        });
-            
         describe("doc.source", () => {
-            
+
             it("should contain the passed document source property", async () => {
                 const doc = store.create('/path/to/doc1', "doc source ...");
                 expect(doc.source).to.equal("doc source ...");
@@ -320,26 +304,26 @@ module.exports = (description, options={}) => describe(description, () => {
                 expect(doc.source).to.equal("");
             });
         });
-        
+
         describe("evaluate = doc.parse()", () => {
-            
+
             it("should return a function", () => {
                 const doc = store.create('/path/to/doc1',
                         `<%a=10%><%b=a+10%>a + b = <%a+b%>`);
                 const evaluate = doc.parse();
-                expect(evaluate).to.be.a("function");            
+                expect(evaluate).to.be.a("function");
             });
-            
+
             describe("(await evaluate(context)).data", () => {
-                
+
                 it("should be an object", async () => {
                     const doc = store.create('/path/to/doc1');
                     const evaluate = doc.parse();
                     const context = document.createContext();
                     const {data} = await evaluate(context);
-                    expect(data).to.be.an("object");                
+                    expect(data).to.be.an("object");
                 });
-                
+
                 it("should contain all the names defined in the swan expressions", async () => {
                     const doc = store.create('/path/to/doc1',
                             `<%a=10%><%b=a+10%>`);
@@ -350,9 +334,9 @@ module.exports = (description, options={}) => describe(description, () => {
                     expect(data.b).to.equal(20);
                 });
             });
-                
+
             describe("(await evaluate(context)).text", () => {
-                
+
                 it("should be string obtained replacing the swan expressions with their stringified return value", async () => {
                     const doc = store.create('/path/to/doc1',
                             `<%a=10%><%b=a+10%>a + b = <%a+b%>`);
@@ -364,7 +348,7 @@ module.exports = (description, options={}) => describe(description, () => {
 
                 it("should decorate the rendered text with the `__render__` function if it exists", async () => {
                     const doc = store.create('/path/to/doc1');
-                    
+
                     doc.source = `<% __render__ = text -> text + "!" %>Hello World`;
                     var evaluate = doc.parse();
                     const context = document.createContext();
@@ -378,9 +362,9 @@ module.exports = (description, options={}) => describe(description, () => {
                 });
             });
         });
-        
+
         describe("context = doc.createContext(...namespaces)", () => {
-            
+
             it("should be a document context", () => {
                 const document_context = document.createContext();
                 const doc = store.create('/path/to/doc1');
@@ -389,25 +373,19 @@ module.exports = (description, options={}) => describe(description, () => {
                     expect(context[key]).to.equal(document_context[key]);
                 }
             })
-            
+
             it("should contain the document path as '__path__'", () => {
                 const doc = store.create('/path/to/doc1');
                 const context = doc.createContext();
                 expect(context.__path__).to.equal('/path/to/doc1');
             });
-            
+
             it("should contain the document directory path as '__dirpath__'", () => {
                 const doc = store.create('/path/to/doc1');
                 const context = doc.createContext();
                 expect(context.__dirpath__).to.equal('/path/to');
             });
-            
-            it("should contain the document query as '__query__'", () => {
-                const doc = store.create('/path/to/doc1?n=10;s=abc');
-                const context = doc.createContext();
-                expect(context.__query__).to.deep.equal(doc.query);
-            });
-            
+
             it("should contain the passed namespaces properties", () => {
                 const doc = store.create('/path/to/doc1?n=10;s=abc');
                 const context = doc.createContext({x:10, y:20}, {y:30, z:40});
@@ -424,7 +402,7 @@ module.exports = (description, options={}) => describe(description, () => {
 
             if (!(options.readAccessDenied || options.writeAccessDenied || options.voidStore || options.readOnly)) {
                 describe("context.import", () => {
-                    
+
                     it("should return the namespace of the passed object", async () => {
                         await store.write('/path/to/doc1', "<% docnum = 1 %>doc1");
                         await store.write('/path/to/doc2', "<% docnum = 2 %>doc2");
@@ -435,44 +413,27 @@ module.exports = (description, options={}) => describe(description, () => {
                         const doc2_ns = await ctx1.import('/path/to/doc2');
                         expect(doc2_ns.docnum).to.equal(2);
                         expect(await ctx1.str(doc2_ns)).to.equal("doc2");
-                        
+
                         const doc3 = store.create('/path/to/doc3', "<% doc1 = import './doc1' %>");
                         const ctx3 = doc3.createContext();
                         const data3 = (await doc3.parse()(ctx3)).data;
                         expect(data3.doc1.docnum).to.equal(1);
-                    });
-                    
-                    it("should resolve docId query string as __query__ context namespace", async () => {
-                        await store.write('/path/to/doc1', "<% docnum = 1 %>");
-                        await store.write('/path/to/doc2', "<% docnum = 2 %>");
-                        
-                        const source1 = await store.read('/path/to/doc1');
-                        const doc1 = store.create('/path/to/doc1', source1);
-                        const ctx1 = doc1.createContext();
-                        const doc2_ns = await ctx1.import('/path/to/doc2?x=10;b&s=abc');
-                        expect(doc2_ns.docnum).to.equal(2);
-                        expect(doc2_ns.__query__).to.deep.equal({
-                            x: 10,
-                            s: "abc",
-                            b: true
-                        });
                     });
 
                     it("should resolve relative ids", async () => {
                         await store.write('/path/to/doc1', "<% docnum = 1 %>");
                         await store.write('/path/to/doc2', "<% docnum = 2 %>");
                         await store.write('/path/to/doc3', "<% docnum = 3 %>");
-                        
+
                         const source1 = await store.read('/path/to/doc1');
                         const doc1 = store.create('/path/to/doc1', source1);
                         const ctx1 = doc1.createContext();
-                        
+
                         const doc2_ns = await ctx1.import('doc2');
                         expect(doc2_ns.docnum).to.equal(2);
 
-                        const doc3_ns = await ctx1.import('./doc3?x=10');
+                        const doc3_ns = await ctx1.import('./doc3');
                         expect(doc3_ns.docnum).to.equal(3);
-                        expect(doc3_ns.__query__).to.deep.equal({x:10});
                     });
 
                     it("should cache the documents", async () => {
@@ -499,18 +460,18 @@ module.exports = (description, options={}) => describe(description, () => {
                         var ns = await ctx.import("/path/to/doc2");
                         expect(count).to.equal(2);
                         expect(ns.p).to.equal("/path/to/doc2");
-                        
+
                         delete store.read;
                     });
-                });            
+                });
             }
         });
     });
-    
+
     describe("doc = await store.load(docId)", () => {
-        
+
         if (options.readAccessDenied) {
-            
+
             it("should always throw a `ReadPermissionDenied` error", async () => {
                 try {
                     await store.load("/path/to/doc1");
@@ -521,28 +482,21 @@ module.exports = (description, options={}) => describe(description, () => {
                 }
             });
         }
-        
+
         else {
-            
+
             it("should return a Store.Document object with the source stored at the given id path", async () => {
-                const doc = await store.load('/path/to/doc1?n=10;s=abc');
+                const doc = await store.load('/path/to/doc1');
                 expect(doc).to.be.instanceof(store.constructor.Document);
-                expect(doc.id).to.equal('/path/to/doc1?n=10;s=abc');
                 expect(doc.path).to.equal('/path/to/doc1');
-                expect(doc.query).to.deep.equal({n:10, s:"abc"});
                 expect(doc.source).to.equal(await store.read('/path/to/doc1'));
             });
-        }        
+        }
     });
-    
+
     after(async () => {
         if (typeof options.destroy === 'function') {
             await options.destroy(store);
         }
     });
 });
-
-
-
-
-
