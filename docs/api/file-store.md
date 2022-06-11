@@ -1,5 +1,4 @@
 <!--<% __render__ = require 'markdown' %>-->
-
 FileStore
 ============================================================================
 This store handles read/write operations on the local file system.
@@ -7,22 +6,20 @@ This store handles read/write operations on the local file system.
 fileStore = new FileStore(rootPath, options)
 ```
 - `rootPath` is the base path that will be prepended to the paths passed to
-  the `read`, `list`, `write`, `delete` and `deleteAll` methods.
+  the `read`, `write`, and `delete` methods.
 - `options.extension`: defines the extension of the document files (defaults
   to `.olo`)
 - `fileStore` is a [olo.Store](./store.md) object.
 
-> FileStore inherits from the [Store](./store.md) class and overrides the 
+> FileStore inherits from the [Store](./store.md) class and overrides the
 > methods described below.
   
-fileStore.read - async method
+async fileStore.read: String path -> String source
 ----------------------------------------------------------------------------
 Retrieves a `.olo` file given its absolute path.
-
 ```js
 const source = await fileStore.read("/path/to/doc");
 ```
-
 - When requesting `/path/to/doc`, the content of `<rootPath>/path/to/doc.olo`
   will be returned
 - When requesting `/path/to/dir/`, the content of `<rootPath>/path/to/dir/.olo`
@@ -32,65 +29,34 @@ const source = await fileStore.read("/path/to/doc");
 The `.olo` default extension can be changed by passing a `options.extension`
 string to the store constructor.
   
-fileStore.list - async method
-----------------------------------------------------------------------------
-Retruns the list of the entry names of a given directory.
-
-```js
-entries = await fileStore.list("/path/to/dir/");
-```
-
-- If `/path/to/dir` contains the items `doc1.olo`, `doc2.olo` and
-  `dir/`, then `entries` will be `['doc1', 'doc2', 'dir/']`.
-- The files with an extension different that `.olo` are ignored.
-- Files named `.olo` will result in the entry name `""`
-- When the given directory doesn't exist, `entries` is `[]`
-
-The `.olo` default extension can be changed by passing a `options.extension`
-string to the store constructor.
-  
-fileStore.write - async method
+async fileStore.write: (String path, String source) -> undefined
 ----------------------------------------------------------------------------
 Modifies the content of a `.olo` file given its absolute path.
-
 ```js
 await fileStore.write("/path/to/doc", source);
 ```
-
 - If path is `/path/to/doc`, the content of `<rootPath>/path/to/doc.olo`
   will be modified with the passed source
 - If path is `/path/to/dir/`, the content of `<rootPath>/path/to/dir/.olo`
   will be modified with the passed source
 - When the file that doesn't exist, it will be created
-
+ 
 The `.olo` default extension can be changed by passing a `options.extension`
 string to the store constructor.
   
-fileStore.delete - async method
+async fileStore.delete: String path -> undefined
 ------------------------------------------------------------------------
 Moves a `.olo` file to the trash bin, given its absolute path.
-
 ```js
 await fileStore.delete("/path/to/doc");
 ```
-
-- If path is `/path/to/doc`, the file `<rootPath>/path/to/doc.olo` will 
+- If path is `/path/to/doc`, the file `<rootPath>/path/to/doc.olo` will
   be deleted
-- If path is `/path/to/dir/`, the file `<rootPath>/path/to/dir/.olo` 
+- If path is `/path/to/dir/`, the file `<rootPath>/path/to/dir/.olo`
   will be deleted
 - When the file doesn't exist, the method will return silently
-
+ 
 The `.olo` default extension can be changed by passing a `options.extension`
 string to the store constructor.
-  
-fileStore.deleteAll - async method
-------------------------------------------------------------------------
-Moves a dirctory to the trash bin, given its absolute path.
-
-```js
-await fileStore.deleteAll("/path/to/dir");
-```
-
-When the dirctory doesn't exist, the method will return silently.
   
 

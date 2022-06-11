@@ -80,17 +80,17 @@ store = new olo.FileStore('/home/my-olodocs-store');
 
 > In this example a file-system-based store is used, but a store can be any
 > object implementing the [Store] interface. olojs comes with a number of
-> predefined stores, namely [MemoryStore], [FileStore], [HTTPStore], 
+> predefined stores, namely [MemoryStore], [FileStore], [HTTPStore],
 > [BrowserStore] and a multi-store [Router].
 
 Load, evaluate and render a [document]:
 
 ```js
 docPath = '/path/to/doc';
-doc = await store.load(docPath);            // fetch the document
-evaluate = doc.parse();                     // compile the document
-context = doc.createContext({pi:3.14});     // create an evaluation context
-{data, text} = await evaluate(context);     // evaluate the document
+source = await store.read(docPath);                 // fetch the document source
+evaluate = store.parse(source);                     // compile the document
+context = store.createContext(docPath, {pi:3.14});  // create an evaluation context
+{data, text} = await evaluate(context);             // evaluate the document
 ```
 
 Serve the store via HTTP:
@@ -104,14 +104,14 @@ Interface to your store via HTTP:
 
 ```js
 remoteStore = new olo.HTTPStore('http://localhost:8010');
-doc = await remoteStore.load('/path/to/doc');
+source = await remoteStore.read('/path/to/doc');
 ```
 
 > olojs works also in the browser, although it has been tested only on Chrome.
 > In order to use the olojs library in the browser, you should require
 > the module `@onlabsorg/olojs/browser`. The only difference between the NodeJS
 > version and the browser version is that the latter doesn't contain the
-> [FileStore] class and the [HTTPServer] object, but it contains the 
+> [FileStore] class and the [HTTPServer] object, but it contains the
 > [BrowserStore] instead.
 
 
@@ -133,7 +133,7 @@ doc = await remoteStore.load('/path/to/doc');
 ### Related projects
 * [stilo] is a command-line interface written in NodeJS that allows you to
   create and mange local olojs document repositories.
-* [olowiki] is a HTTP client and [stilo] plugin for editing and rendering 
+* [olowiki] is a HTTP client and [stilo] plugin for editing and rendering
   olojs documents in the browser
 
 

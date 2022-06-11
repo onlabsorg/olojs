@@ -174,68 +174,7 @@ describe("Router", () => {
         })
     });
 
-    describe(`entries = router.list(id)`, () => {
-
-        it("should delegate to the matching mounted store", async () => {
-            var memStore = new MemoryStore({
-                "/path/to/doc1": "...",
-                "/path/to/doc2": "...",
-                "/path/to/dir1/": "...",
-                "/path/to/dir1/doc1": "...",
-                "/path/to/dir1/doc2": "...",
-                "/path/to/dir2/": "...",
-            });
-            var router = new Router({
-                '/stores/mem': memStore
-            })
-
-            expect((await router.list("/stores/mem/path/to/")).sort()).to.deep.equal(['dir1/', 'dir2/', 'doc1', 'doc2']);
-            expect(await router.list("/stores/mem/path/")).to.deep.equal(['to/']);
-            expect(await router.list("/stores/mem/")).to.deep.equal(['path/']);
-            expect(await router.list("/stores/mem")).to.deep.equal(['path/']);
-        });
-
-        it("should return an empty array if no match is found", async () => {
-            var memStore = new MemoryStore({
-                "/path/to/doc1": "...",
-                "/path/to/doc2": "...",
-                "/path/to/dir1/": "...",
-                "/path/to/dir1/doc1": "...",
-                "/path/to/dir1/doc2": "...",
-                "/path/to/dir2/": "...",
-            });
-            var router = new Router({
-                '/stores/mem': memStore
-            })
-            expect(await router.list("/path/to/dir")).to.deep.equal([]);
-        });
-
-        it("should include mounted routes in the entries list", async () => {
-            var router = new Router({
-                '/store': new MemoryStore({
-                    "/path/to/doc1": "...",
-                    "/path/to/doc2": "...",
-                }),
-                '/store/path': new MemoryStore({
-                    "/to/doc1": "...",
-                    "/to/doc3": "...",
-                    "/to/dir1/doc": "...",
-                }),
-                '/': new MemoryStore({
-                    "/store/path/to/doc1": "...",
-                    "/store/path/to/doc4": "...",
-                    "/doc5": "...",
-                }),
-                '/store/path/to/dir2/': new MemoryStore(),
-                '/store/path/to/dir2/dir/': new MemoryStore(),
-                '/path/to/dir3': new MemoryStore(),
-            })
-            expect((await router.list("/store/path/to/")).sort()).to.deep.equal(['dir1/', 'dir2/', 'doc1', 'doc2', 'doc3', 'doc4']);
-            expect((await router.list("/")).sort()).to.deep.equal(['doc5', 'path/', 'store/']);
-        });
-    });
-
-    describe(`router.write(id, source)`, () => {
+    describe(`router.write(path, source)`, () => {
 
         it("should delegate to the matching mounted store", async () => {
             var store1 = new MemoryStore();
@@ -262,7 +201,7 @@ describe("Router", () => {
         });
     });
 
-    describe(`router.delete(id)`, () => {
+    describe(`router.delete(path)`, () => {
 
         it("should delegate to the matching mounted store", async () => {
             var store1 = new MemoryStore();
@@ -289,107 +228,183 @@ describe("Router", () => {
         })
     });
 
-    describe(`router.deleteAll(id)`, () => {
+    describe("evaluate = router.parse(source)", () => {
 
-        it("should delegate to the matching mounted store", async () => {
+        it("should return a function", () => {
             var store1 = new MemoryStore();
             var store2 = new MemoryStore();
             var router = new Router({
                 s1: store1,
                 s2: store2,
             });
-
-            var called = "";
-            store1.deleteAll = path => {
-                called = `store1.deleteAll ${path}`;
-            }
-
-            await router.deleteAll('/s1/path/to/dir');
-
-            expect(called).to.equal("store1.deleteAll /path/to/dir");
+            const evaluate = router.parse(`<%a=10%><%b=a+10%>a + b = <%a+b%>`);
+            expect(evaluate).to.be.a("function");
         });
 
-        it("should throw an error if no match is found", async () => {
-            var router = new Router();
-            try {
-                await router.deleteAll('/s1/path/to/doc');
-                throw new Error("Id did not throw");
-            } catch (error) {
-                expect(error).to.be.instanceof(Router.WriteOperationNotAllowedError);
-                expect(error.message).to.equal('Operation not allowed: WRITE /s1/path/to/doc')
-            }
-        })
+        describe("(await evaluate(context)).data", () => {
+
+            it("should be an object", async () => {
+                var store1 = new MemoryStore();
+                var store2 = new MemoryStore();
+                var router = new Router({
+                    s1: store1,
+                    s2: store2,
+                });
+                const evaluate = router.parse("");
+                const context = document.createContext();
+                const {data} = await evaluate(context);
+                expect(data).to.be.an("object");
+            });
+
+            it("should contain all the names defined in the swan expressions", async () => {
+                var store1 = new MemoryStore();
+                var store2 = new MemoryStore();
+                var router = new Router({
+                    s1: store1,
+                    s2: store2,
+                });
+                const evaluate = router.parse(`<%a=10%><%b=a+10%>`);
+                const context = document.createContext({});
+                const {data} = await evaluate(context);
+                expect(data.a).to.equal(10);
+                expect(data.b).to.equal(20);
+            });
+        });
+
+        describe("(await evaluate(context)).text", () => {
+
+            it("should be string obtained replacing the swan expressions with their stringified return value", async () => {
+                var store1 = new MemoryStore();
+                var store2 = new MemoryStore();
+                var router = new Router({
+                    s1: store1,
+                    s2: store2,
+                });
+                const evaluate = router.parse(`<%a=10%><%b=a+10%>a + b = <%a+b%>`);
+                const context = document.createContext();
+                const {text} = await evaluate(context);
+                expect(text).to.equal("a + b = 30");
+            });
+
+            it("should decorate the rendered text with the `__render__` function if it exists", async () => {
+                var store1 = new MemoryStore();
+                var store2 = new MemoryStore();
+                var router = new Router({
+                    s1: store1,
+                    s2: store2,
+                });
+
+                var evaluate = router.parse(`<% __render__ = text -> text + "!" %>Hello World`);
+                var context = document.createContext();
+                var {text} = await evaluate(context);
+                expect(text).to.equal("Hello World!");
+
+                var evaluate = router.parse(`<% __render__ = text -> {__str__: this -> text + "!!"} %>Hello World`);
+                var {text} = await evaluate(context);
+                expect(text).to.equal("Hello World!!");
+            });
+        });
     });
 
-    describe(`doc = router.load(path)`, () => {
+    describe("context = router.createContext(docPath, ...namespaces)", () => {
 
-        it("should return a Router.Document object", async () => {
-            const router = new Router({
-                '/store1': new MemoryStore({
-                    '/path/to/doc': "docnum = <% docnum : 1 %>"
-                })
+        it("should be a document context", () => {
+            var router = new Router({
+                s1: new MemoryStore(),
+                s2: new MemoryStore()
             });
-            const doc = await router.load('/store1/./path/to/doc')
-            expect(doc).to.be.instanceof(router.constructor.Document);
-            expect(doc.path).to.equal('/store1/path/to/doc');
-            const evaluate = doc.parse();
-            const {data, text} = await evaluate(doc.createContext());
-            expect(data.docnum).to.equal(1);
-            expect(text).to.equal("docnum = 1");
+            const document_context = document.createContext();
+            const context = router.createContext('/path/to/doc1');
+            for (let key in document_context) {
+                expect(context[key]).to.equal(document_context[key]);
+            }
+        })
+
+        it("should contain the document path as '__path__'", () => {
+            var router = new Router({
+                '/path/to/s1': new MemoryStore(),
+                '/path/to/s2': new MemoryStore()
+            });
+            const context = router.createContext('/path/to/s1/dir1/doc1');
+            expect(context.__path__).to.equal('/path/to/s1/dir1/doc1');
         });
 
-        describe("context = doc.createContex(...namesaces)", () => {
+        it("should contain the document directory path as '__dirpath__'", () => {
+            var router = new Router({
+                '/path/to/s1': new MemoryStore(),
+                '/path/to/s2': new MemoryStore()
+            });
+            const context = router.createContext('/path/to/s1/dir1/doc1');
+            expect(context.__dirpath__).to.equal('/path/to/s1/dir1');
+        });
 
-            describe("context.import function", () => {
+        it("should contain the passed namespaces properties", () => {
+            var router = new Router({
+                '/path/to/s1': new MemoryStore(),
+                '/path/to/s2': new MemoryStore()
+            });
+            const context = router.createContext('/path/to/doc1', {x:10, y:20}, {y:30, z:40});
+            expect(context.x).to.equal(10);
+            expect(context.y).to.equal(30);
+            expect(context.z).to.equal(40);
+        });
 
-                it("should resolve paths relative to the router, not to the context store", async () => {
-                    const router = new Router({
-                        '/store1': new MemoryStore({
-                            '/path/to/doc1': "<% docnum = 1 %>",
-                            '/path/to/doc2': "<% docnum = 2 %>",
-                            '/path/to/doc3': "<% docnum = 3 %>",
-                        })
-                    });
+        it("should contain an 'import' function", () => {
+            var router = new Router({
+                '/path/to/s1': new MemoryStore(),
+                '/path/to/s2': new MemoryStore()
+            });
+            const context = router.createContext('/path/to/doc1');
+            expect(context.import).to.be.a("function");
+        });
 
-                    const doc1 = await router.load('/store1/path/to/doc1')
-                    const ctx1 = await doc1.createContext();
+        describe("context.import function", () => {
 
-                    const doc2_ns = await ctx1.import('doc2');
-                    expect(doc2_ns.docnum).to.equal(2);
-                    expect(doc2_ns.__path__).to.equal('/store1/path/to/doc2')
-
-                    const doc3_ns = await ctx1.import('/store1/path/to/doc3');
-                    expect(doc3_ns.docnum).to.equal(3);
-                    expect(doc3_ns.__path__).to.equal('/store1/path/to/doc3')
+            it("should resolve paths relative to the router, not to the context store", async () => {
+                const router = new Router({
+                    '/store1': new MemoryStore({
+                        '/path/to/doc1': "<% docnum = 1 %>",
+                        '/path/to/doc2': "<% docnum = 2 %>",
+                        '/path/to/doc3': "<% docnum = 3 %>",
+                    })
                 });
 
-                it("should correctly resolve url-like path", async () => {
+                const ctx1 = await router.createContext('/store1/path/to/doc1');
 
-                    const router = new Router({
-                        '/store1': new MemoryStore({
-                            '/path/to/doc1': "<% docnum = 11 %>",
-                            '/path/to/doc2': "<% docnum = 12 %>",
-                            '/path/to/doc3': "<% docnum = 13 %>",
-                        }),
+                const doc2_ns = await ctx1.import('doc2');
+                expect(doc2_ns.docnum).to.equal(2);
+                expect(doc2_ns.__path__).to.equal('/store1/path/to/doc2')
 
-                        'xxx:/': new MemoryStore({
-                            '/path/to/doc1': "<% docnum = 21 %>",
-                            '/path/to/doc2': "<% docnum = 22 %>",
-                            '/path/to/doc3': "<% docnum = 23 %>",
-                        })
-                    });
+                const doc3_ns = await ctx1.import('/store1/path/to/doc3');
+                expect(doc3_ns.docnum).to.equal(3);
+                expect(doc3_ns.__path__).to.equal('/store1/path/to/doc3')
+            });
 
-                    const doc1 = await router.load('/store1/path/to/doc1')
-                    const ctx1 = await doc1.createContext();
+            it("should correctly resolve url-like path", async () => {
 
-                    const doc2_ns = await ctx1.import('doc2');
-                    expect(doc2_ns.docnum).to.equal(12);
-                    expect(doc2_ns.__path__).to.equal('/store1/path/to/doc2')
+                const router = new Router({
+                    '/store1': new MemoryStore({
+                        '/path/to/doc1': "<% docnum = 11 %>",
+                        '/path/to/doc2': "<% docnum = 12 %>",
+                        '/path/to/doc3': "<% docnum = 13 %>",
+                    }),
 
-                    const doc3_ns = await ctx1.import('xxx:/path/to/doc3');
-                    expect(doc3_ns.docnum).to.equal(23);
-                    expect(doc3_ns.__path__).to.equal('/.schemes/xxx/path/to/doc3')
+                    'xxx:/': new MemoryStore({
+                        '/path/to/doc1': "<% docnum = 21 %>",
+                        '/path/to/doc2': "<% docnum = 22 %>",
+                        '/path/to/doc3': "<% docnum = 23 %>",
+                    })
                 });
+
+                const ctx1 = await router.createContext('/store1/path/to/doc1');
+
+                const doc2_ns = await ctx1.import('doc2');
+                expect(doc2_ns.docnum).to.equal(12);
+                expect(doc2_ns.__path__).to.equal('/store1/path/to/doc2')
+
+                const doc3_ns = await ctx1.import('xxx:/path/to/doc3');
+                expect(doc3_ns.docnum).to.equal(23);
+                expect(doc3_ns.__path__).to.equal('/.schemes/xxx/path/to/doc3')
             });
         });
     });

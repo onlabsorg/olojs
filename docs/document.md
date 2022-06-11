@@ -15,9 +15,9 @@ will render to
 The sum of 1 and 2 is 3.
 ```
 
-A particular type of [swan] expression is the assignment `<% name = value %>` 
+A particular type of [swan] expression is the assignment `<% name = value %>`
 which renders to an empty string but creates a mapping between a name and a
-value. Once defined, names can be used in other expressions. For example, 
+value. Once defined, names can be used in other expressions. For example,
 the following template
 
 ```
@@ -31,13 +31,13 @@ The sum of 10 and 20 is 30.
 ```
 
 This is almost all you need to know about the olojs documents markup. It's pretty
-straight forward and yet powerful, due to the flexibility of the [swan] language.
+straight forward and yet powerful, thanks to the flexibility of the [swan] language.
 
 
 
 ## Evaluating and rendering documents
 
-An olojs document source template can be evaluated and rendered using the 
+An olojs document source template can be evaluated and rendered using the
 `olo.document` module as shown in the following example:
 
 ```js
@@ -52,27 +52,27 @@ context = document.createContext({name:"Bob", age:27});
         // text: "Bob is 27 years old."
 ```
 
-For a more in depth documentation of the `document` module, read the 
+For a more in depth documentation of the `document` module, read the
 [olo.document API](./api/document.md).
 
 
 
 ## Documents custom markup
 
-Olojs documents are markup-agnostic in that the rendered content is just the 
-plain text obtained by replacing the inline expressions with their stringified 
+Olojs documents are markup-agnostic in that the rendered content is just the
+plain text obtained by replacing the inline expressions with their stringified
 value. Nonetheless any markup language can theoretically be used; let's see how.
 
 The `evaluate` function returns a `text` string and a `data` namespace.
 
 - the `data` object contains all the names defined in the [swan] expressions
-- the `text` string obtained by replacing each [swan] expression with its 
-  stringified value (plain text) and decorating it via 
+- the `text` string is obtained by replacing each [swan] expression with its
+  stringified value (plain text) and decorating it via
   `returnedText = await data.__render__(plainText)`.
-  
-Therefore, if you want to render the document as markdown, you can decorate its 
-plain text by defining a `__render__` function that takes a markdown text as 
-input and returns HTML markup as output. Such a function is buit-in in the 
+
+Therefore, if you want to render the document as markdown, you can decorate its
+plain text by defining a `__render__` function that takes a markdown text as
+input and returns HTML markup as output. Such a function is buit-in in the
 olojs expression library. For example, the following text will render as markdown:
 
 ```
@@ -88,7 +88,7 @@ This is a paragraph.
 - list
 ```
 
-> A the moment, the only built-in decorator is the `markdown` function shown in 
+> A the moment, the only built-in decorator is the `markdown` function shown in
 > the example above, but more may follow in the future.
 
 
@@ -96,7 +96,7 @@ This is a paragraph.
 
 ## Reusing documents content
 
-An olojs store is a collection of documents, each identified by an unique path. 
+An olojs store is a collection of documents, each identified by an unique path.
 Documents contained in the same store can import and re-use each other's content.
 
 > Any type of storage can work as a olo-documents store, as long as it
@@ -112,7 +112,7 @@ This document defines some helper functions that create html tags.
 ```
 
 Once evaluated, this document returns a `data` namespace containing two functions:
-`bold` and `img` and the `text` string `"This document defines some helper functions 
+`bold` and `img` and the `text` string `"This document defines some helper functions
 that create html tags."`
 
 Let's now assume that the same store contains also the following document mapped
@@ -126,7 +126,7 @@ I have a <% tags.bold(kind) %> cat named <% tags.italic(name) %>!
 ```
 
 The `/path/to/mycat` document imports the namespace of `/tools/tags` under the
-name `tags` and uses the functions contained in it (namely `tags.bold` and 
+name `tags` and uses the functions contained in it (namely `tags.bold` and
 `tags.italic`) to generate part of its own content.
 
 Once evaluated, the `/path/to/mycat` document returns the following object:
@@ -141,7 +141,7 @@ Once evaluated, the `/path/to/mycat` document returns the following object:
             italic: text => '<i>' + text + '</i>'
         }
     },
-    
+
     text: "I have a <b>persian</b> cat named <i>Izad</i>!"
 }
 ```
@@ -164,7 +164,7 @@ The content of /path/to/mycat is "I have a <b>persian</b> cat named <i>Izad</i>!
 ```
 
 Notice that the expression `import '/path/to/mycat'` returns the namespace of
-the `/path/to/mycat` document, which then gets stringified and injected in the 
+the `/path/to/mycat` document, which then gets stringified and injected in the
 host document.
 
 

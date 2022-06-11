@@ -21,14 +21,12 @@ describe("HTTPServer", () => {
 
             class PrivateStore extends Store {
                 read (path) {throw new Store.ReadPermissionDeniedError(path)}
-                list (path) {throw new Store.ReadPermissionDeniedError(path)}
                 write (path,src) {throw new Store.WritePermissionDeniedError(path)}
                 delete (path) {throw new Store.WritePermissionDeniedError(path)}
             }
 
             class NotAllowedStore extends Store {
                 read (path) {throw new Store.ReadOperationNotAllowedError(path)}
-                list (path) {throw new Store.ReadOperationNotAllowedError(path)}
                 write (path, src) {throw new Store.WriteOperationNotAllowedError(path)}
                 delete (path) {throw new Store.WriteOperationNotAllowedError(path)}
             }
@@ -47,7 +45,7 @@ describe("HTTPServer", () => {
                 '/hidden/': new NotAllowedStore(),
                 '/error/': new ErrorStore(),
             });
-            
+
             const app = express();
             app.use('/docs', HTTPServer.createMiddleware(router));
             server = http.createServer(app);
@@ -101,22 +99,7 @@ describe("HTTPServer", () => {
                 expect(response.status).to.equal(500);
             });
 
-            it("should respond with the JSON-stringified entries list if the accepted MimeType is `apprication/json`", async () => {
-                var docPath = "/path/to/doc1";
-                var docSource = "document source ...";
-                await homeStore.write(docPath, docSource);
-
-                var response = await fetch(`http://localhost:8888/docs/`, {
-                    method: 'get',
-                    headers: {
-                        'Accept': 'application/json'
-                    },
-                });
-                expect(response.status).to.equal(200);
-                expect((await response.json()).sort()).to.deep.equal(['error/', 'hidden/', 'path/', 'private/']);
-            });
-
-            it("should return the status code 413 if the accepted MimeType is neither `text/*` nor `application/json`", async () => {
+            it("should return the status code 413 if the accepted MimeType is not `text/*`", async () => {
                 var response = await fetch(`http://localhost:8888/docs/env/path/to/img`, {
                     method: 'get',
                     headers: {
@@ -203,29 +186,6 @@ describe("HTTPServer", () => {
                 expect(homeStore.read(docPath)).to.equal("");
             });
 
-            it("should remove all the resources matching the path if Content-Type is `text/directory`", async () => {
-                await homeStore.write("/path/to/doc1", "doc @ /path/to/doc1");
-                await homeStore.write("/path/to/dir/", "doc @ /path/to/dir/");
-                await homeStore.write("/path/to/dir/doc2", "doc @ /path/to/dir/doc2");
-
-                expect(await homeStore.read("/path/to/doc1")).to.equal("doc @ /path/to/doc1");
-                expect(await homeStore.read("/path/to/dir/")).to.equal("doc @ /path/to/dir/");
-                expect(await homeStore.read("/path/to/dir/doc2")).to.equal("doc @ /path/to/dir/doc2");
-
-                var response = await fetch(`http://localhost:8888/docs/path/to/dir`, {
-                    method: 'delete',
-                    headers: {
-                        'Accept': 'text/*',
-                        'Content-Type': 'text/directory',
-                    },
-                });
-
-                expect(response.status).to.equal(200);
-                expect(await homeStore.read("/path/to/doc1")).to.equal("doc @ /path/to/doc1");
-                expect(await homeStore.read("/path/to/dir/")).to.equal("");
-                expect(await homeStore.read("/path/to/dir/doc2")).to.equal("");
-            });
-
             it("should return the status code 403 if the backend environment throws WritePermissionDenied", async () => {
                 var response = await fetch(`http://localhost:8888/docs/private/path/to/doc`, {
                     method: 'delete',
@@ -264,7 +224,7 @@ describe("HTTPServer", () => {
             server.close(done);
         });
     });
-    
+
     describe("HTTPServer.create", () => {
         var homeStore, server;
 
@@ -298,7 +258,7 @@ describe("HTTPServer", () => {
                 '/hidden/': new NotAllowedStore(),
                 '/error/': new ErrorStore(),
             });
-            
+
             server = HTTPServer.create(router);
             server.listen(8888, done);
         });
@@ -350,22 +310,7 @@ describe("HTTPServer", () => {
                 expect(response.status).to.equal(500);
             });
 
-            it("should respond with the JSON-stringified entries list if the accepted MimeType is `apprication/json`", async () => {
-                var docPath = "/path/to/doc1";
-                var docSource = "document source ...";
-                await homeStore.write(docPath, docSource);
-
-                var response = await fetch(`http://localhost:8888/`, {
-                    method: 'get',
-                    headers: {
-                        'Accept': 'application/json'
-                    },
-                });
-                expect(response.status).to.equal(200);
-                expect((await response.json()).sort()).to.deep.equal(['error/', 'hidden/', 'path/', 'private/']);
-            });
-
-            it("should return the status code 413 if the accepted MimeType is neither `text/*` nor `application/json`", async () => {
+            it("should return the status code 413 if the accepted MimeType is not `text/*``", async () => {
                 var response = await fetch(`http://localhost:8888/env/path/to/img`, {
                     method: 'get',
                     headers: {
@@ -450,29 +395,6 @@ describe("HTTPServer", () => {
 
                 expect(response.status).to.equal(200);
                 expect(homeStore.read(docPath)).to.equal("");
-            });
-
-            it("should remove all the resources matching the path if Content-Type is `text/directory`", async () => {
-                await homeStore.write("/path/to/doc1", "doc @ /path/to/doc1");
-                await homeStore.write("/path/to/dir/", "doc @ /path/to/dir/");
-                await homeStore.write("/path/to/dir/doc2", "doc @ /path/to/dir/doc2");
-
-                expect(await homeStore.read("/path/to/doc1")).to.equal("doc @ /path/to/doc1");
-                expect(await homeStore.read("/path/to/dir/")).to.equal("doc @ /path/to/dir/");
-                expect(await homeStore.read("/path/to/dir/doc2")).to.equal("doc @ /path/to/dir/doc2");
-
-                var response = await fetch(`http://localhost:8888/path/to/dir`, {
-                    method: 'delete',
-                    headers: {
-                        'Accept': 'text/*',
-                        'Content-Type': 'text/directory',
-                    },
-                });
-
-                expect(response.status).to.equal(200);
-                expect(await homeStore.read("/path/to/doc1")).to.equal("doc @ /path/to/doc1");
-                expect(await homeStore.read("/path/to/dir/")).to.equal("");
-                expect(await homeStore.read("/path/to/dir/doc2")).to.equal("");
             });
 
             it("should return the status code 403 if the backend environment throws WritePermissionDenied", async () => {

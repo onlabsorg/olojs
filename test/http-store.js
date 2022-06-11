@@ -215,7 +215,6 @@ describe("HTTPStore - with custom headers", () => {
 });
 
 
-
 describe("HTTPStore - with custom extension", () => {
     var server, lastRequest;
     
@@ -240,12 +239,6 @@ describe("HTTPStore - with custom extension", () => {
         expect(lastRequest).to.equal("GET /path/to/doc.olo");
     });
 
-    it("should not add the extension to any `list` request", async () => {
-        var httpStore = new HTTPStore("http://localhost:8020", {extension:".olo"});
-        await httpStore.list('/path/to/doc');
-        expect(lastRequest).to.equal("GET /path/to/doc");
-    });
-
     it("should add the extendsion to each `write` request", async () => {
         var httpStore = new HTTPStore("http://localhost:8020", {extension:".olo"});
         await httpStore.write('/path/to/doc', "...");
@@ -256,12 +249,6 @@ describe("HTTPStore - with custom extension", () => {
         var httpStore = new HTTPStore("http://localhost:8020", {extension:".olo"});
         await httpStore.delete('/path/to/doc');
         expect(lastRequest).to.equal("DELETE /path/to/doc.olo");
-    });
-    
-    it("should not add the extension to any `deleteAll` request", async () => {
-        var httpStore = new HTTPStore("http://localhost:8020", {extension:".olo"});
-        await httpStore.deleteAll('/path/to/doc');
-        expect(lastRequest).to.equal("DELETE /path/to/doc");
     });
 
     after(() => {
