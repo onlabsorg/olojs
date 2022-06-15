@@ -103,6 +103,22 @@ properties:
   current store, evaluates it and returns its namespace. The import
   document path is parsed as relative to `docPath`.
   
+store.load: (String path, ...Object namespace) -> {String source, Object context, Function evaluate, Object data, String text}
+------------------------------------------------------------------------
+Read, parse and evaluate a document.
+
+```
+{source, context, evaluate, data, text} = store.load(docPath, ns1, ns2, ...)
+```
+
+where:
+
+- `source` is the document source mapped to docPath
+- `context` is the document context including the preset namespaces ns1, ns2, ...
+- `evaluate` is the source compiled into a function
+- `data` is the document namespace as returned by `evaluate`
+- `text` is the document rendered text as returned by `evaluate`
+  
 Store.ReadPermissionDeniedError - class
 ----------------------------------------------------------------------------
 Error thrown when attempting a read operation for which the store instance

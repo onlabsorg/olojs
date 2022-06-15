@@ -15,6 +15,7 @@ module.exports = (description, options={}) => describe(description, () => {
             "/path/to/doc1": "doc @ /path/to/doc1",
             "/path/to/doc2": "doc @ /path/to/doc2",
             "/path/to/doc3": "doc @ /path/to/doc3",
+            "/path/to/doc7": "doc @ <% path : '/path/to/doc7' %>",
             "/path/to/dir/doc1": "doc @ /path/to/dir/doc1",
             "/path/to/dir/doc2": "doc @ /path/to/dir/doc2",
             "/path/to/dir/doc3": "doc @ /path/to/dir/doc3",
@@ -324,6 +325,64 @@ module.exports = (description, options={}) => describe(description, () => {
                 });
             });
         }
+    });
+    
+    describe("await store.load(docPath, ...namespaces)", () => {
+
+        if (options.readAccessDenied) {
+
+            it("should always throw a `ReadPermissionDenied` error", async () => {
+                try {
+                    await store.load("/path/to/doc1");
+                    throw new Error("Id didn't throw");
+                } catch (error) {
+                    expect(error).to.be.instanceof(Store.ReadPermissionDeniedError);
+                    expect(error.message).to.equal("Permission denied: READ /path/to/doc1");
+                }
+            });
+        }
+
+        else if (options.voidStore) {
+
+            it("Should always return an empty document", async () => {
+                var doc = await store.load(`/path/to/doc7`);
+                expect(doc.source).to.equal("");
+                expect(doc.text).to.equal("");
+            });
+
+        } else {
+
+            it("should return an object containing the document source as 'source' property", async () => {
+                var doc = await store.load(`/path/to/doc7`);
+                expect(doc.source).to.equal("doc @ <% path : '/path/to/doc7' %>");
+            });
+
+            it("should return an object containing the document context as 'context' property", async () => {
+                var doc = await store.load(`/path/to/doc7`);
+                const document_context = document.createContext();
+                for (let key in document_context) {
+                    expect(doc.context[key]).to.equal(document_context[key]);
+                }
+                expect(doc.context.__path__).to.equal(`/path/to/doc7`)
+            });
+            
+            it("should return an object containing the document namespace as 'data' property", async () => {
+                var doc = await store.load(`/path/to/doc7`);
+                expect(doc.data.path).to.equal('/path/to/doc7');
+            });
+
+            it("should return an object containing the rendered document as 'text' property", async () => {
+                var doc = await store.load(`/path/to/doc7`);
+                expect(doc.text).to.equal('doc @ /path/to/doc7');                
+            });
+            
+            it("should return an object containing the document evaluator as 'evaluate' property", async () => {
+                var doc = await store.load(`/path/to/doc7`);
+                var {data, text} = await doc.evaluate(doc.context);
+                expect(text).to.equal(doc.text);                
+                expect(data).to.deep.equal(doc.data);                
+            });
+        }        
     });
 
     after(async () => {
