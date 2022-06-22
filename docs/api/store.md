@@ -119,6 +119,22 @@ where:
 - `data` is the document namespace as returned by `evaluate`
 - `text` is the document rendered text as returned by `evaluate`
   
+store.subStore: String path -> Store subStore
+------------------------------------------------------------------------
+Returns a new store rooted in a directory of this store.
+
+```
+subStore = store.subStore(rootPath)
+```
+
+where:
+
+- `rootPath` is a directory path of this store
+- `subStore.read` delegates to `store.read(rootPath+path)`
+- `subStore.write` delegates to `store.write(rootPath+path, source)`
+- `subStore.delete` delegates to `store.delete(rootPath+path)`
+- `subStore.subStore` delegates to `store.subStore(rootPath+path)`
+  
 Store.ReadPermissionDeniedError - class
 ----------------------------------------------------------------------------
 Error thrown when attempting a read operation for which the store instance
