@@ -13,6 +13,7 @@ which can be summarized as follows:
 * `store.createContext(path, ...namespaces)` creates a document context to be
   passed to the `evaluate` function returned by `store.parse`.
 * `store.load(path, ...namespaces)` reads, parses and evaluates a document.
+* `store.subStore(path)` returns a sub-store, rooted in the given store path.
 
 olojs comes with the following pre-defined stores:
 
