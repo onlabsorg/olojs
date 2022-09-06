@@ -13,8 +13,11 @@ describe("document", () => {
             var expContext = swan.createContext();
             var docContext = document.createContext();
             for (let name in expContext) {
-                expect(docContext[name]).to.equal(expContext[name]);
+                if (name !== 'this') {
+                    expect(docContext[name]).to.equal(expContext[name]);
+                }
             }
+            expect(docContext.this).to.equal(docContext);
         });
         
         it("should contain the passed namespace properties as own properties", () => {
@@ -71,7 +74,7 @@ describe("document", () => {
                     var {text} = await evaluate(context);
                     expect(text).to.equal("Hello World!");
 
-                    var source = `<% __render__ = text -> {__str__: this -> text + "!!"} %>Hello World`;
+                    var source = `<% __render__ = text -> {__str__: ns -> text + "!!"} %>Hello World`;
                     var evaluate = document.parse(source);
                     var context = document.createContext();
                     var {text} = await evaluate(context);

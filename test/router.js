@@ -299,7 +299,7 @@ describe("Router", () => {
                 var {text} = await evaluate(context);
                 expect(text).to.equal("Hello World!");
 
-                var evaluate = router.parse(`<% __render__ = text -> {__str__: this -> text + "!!"} %>Hello World`);
+                var evaluate = router.parse(`<% __render__ = text -> {__str__: ns -> text + "!!"} %>Hello World`);
                 var {text} = await evaluate(context);
                 expect(text).to.equal("Hello World!!");
             });
@@ -316,8 +316,11 @@ describe("Router", () => {
             const document_context = document.createContext();
             const context = router.createContext('/path/to/doc1');
             for (let key in document_context) {
-                expect(context[key]).to.equal(document_context[key]);
+                if (key !== "this") {
+                    expect(context[key]).to.equal(document_context[key]);
+                }
             }
+            expect(context.this).to.equal(context);
         })
 
         it("should contain the document path as '__path__'", () => {

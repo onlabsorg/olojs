@@ -214,7 +214,7 @@ module.exports = (description, options={}) => describe(description, () => {
                 var {text} = await evaluate(context);
                 expect(text).to.equal("Hello World!");
 
-                var evaluate = store.parse(`<% __render__ = text -> {__str__: this -> text + "!!"} %>Hello World`);
+                var evaluate = store.parse(`<% __render__ = text -> {__str__: ns -> text + "!!"} %>Hello World`);
                 var {text} = await evaluate(context);
                 expect(text).to.equal("Hello World!!");
             });
@@ -227,8 +227,11 @@ module.exports = (description, options={}) => describe(description, () => {
             const document_context = document.createContext();
             const context = store.createContext('/path/to/doc1');
             for (let key in document_context) {
-                expect(context[key]).to.equal(document_context[key]);
+                if (key !== "this") {
+                    expect(context[key]).to.equal(document_context[key]);
+                }
             }
+            expect(context.this).to.equal(context);
         })
 
         it("should contain the document path as '__path__'", () => {
@@ -361,8 +364,11 @@ module.exports = (description, options={}) => describe(description, () => {
                 var doc = await store.load(`/path/to/doc7`);
                 const document_context = document.createContext();
                 for (let key in document_context) {
-                    expect(doc.context[key]).to.equal(document_context[key]);
+                    if (key !== "this") {
+                        expect(doc.context[key]).to.equal(document_context[key]);
+                    }
                 }
+                expect(document_context.this).to.equal(document_context);
                 expect(doc.context.__path__).to.equal(`/path/to/doc7`)
             });
             
