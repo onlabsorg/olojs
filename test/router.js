@@ -299,7 +299,7 @@ describe("Router", () => {
                 var {text} = await evaluate(context);
                 expect(text).to.equal("Hello World!");
 
-                var evaluate = router.parse(`<% __render__ = text -> {__str__: ns -> text + "!!"} %>Hello World`);
+                var evaluate = router.parse(`<% __render__ = text -> {__text__: text + "!!"} %>Hello World`);
                 var {text} = await evaluate(context);
                 expect(text).to.equal("Hello World!!");
             });

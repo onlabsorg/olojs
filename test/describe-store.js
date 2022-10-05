@@ -214,7 +214,7 @@ module.exports = (description, options={}) => describe(description, () => {
                 var {text} = await evaluate(context);
                 expect(text).to.equal("Hello World!");
 
-                var evaluate = store.parse(`<% __render__ = text -> {__str__: ns -> text + "!!"} %>Hello World`);
+                var evaluate = store.parse(`<% __render__ = text -> {__text__: text + "!!"} %>Hello World`);
                 var {text} = await evaluate(context);
                 expect(text).to.equal("Hello World!!");
             });
@@ -266,7 +266,7 @@ module.exports = (description, options={}) => describe(description, () => {
                     const ctx1 = store.createContext('/path/to/doc1');
                     const doc2_ns = await ctx1.import('/path/to/doc2');
                     expect(doc2_ns.docnum).to.equal(2);
-                    expect(await ctx1.str(doc2_ns)).to.equal("doc2");
+                    expect(await ctx1.Text.__apply__(doc2_ns)).to.equal("doc2");
 
                     const eval3 = store.parse("<% doc1 = import './doc1' %>");
                     const ctx3 = store.createContext('/path/to/doc3');

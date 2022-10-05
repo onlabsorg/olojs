@@ -29,10 +29,6 @@ evaluate = olojs.document.parse(source);
   expressions of the document (the document namespace).
 - `text` is a string obtained by replacing every inline expression with its 
   strigified value. 
-
-> Notice that in a swan expression context, `str(data)` will return `text`,
-> therefore `await context.str(data)` is a way to obtain `text` given `data`
-> in JavaScript.
   
 olojs.document.createContext - function
 ----------------------------------------------------------------------------

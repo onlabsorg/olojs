@@ -74,7 +74,7 @@ describe("document", () => {
                     var {text} = await evaluate(context);
                     expect(text).to.equal("Hello World!");
 
-                    var source = `<% __render__ = text -> {__str__: ns -> text + "!!"} %>Hello World`;
+                    var source = `<% __render__ = text -> {__text__: text + "!!"} %>Hello World`;
                     var evaluate = document.parse(source);
                     var context = document.createContext();
                     var {text} = await evaluate(context);
