@@ -1,0 +1,1 @@
+<% docnum = 1, doc2 = import 'doc2' %>doc1

@@ -173,7 +173,181 @@ module.exports = (description, options={}) => describe(description, () => {
             });
         }
     });
+    
+    if (!options.voidStore && !options.readOnly && !options.readAccessDenied && !options.writeAccessDenied) {
+        
+        describe(`doc = store.createDocument(path, source)`, () => {
+            
+            describe('doc.store', () => {
+                
+                it("should contain a reference to the store that created the document", () => {
+                    const doc = store.createDocument('/path/to/doc');
+                    expect(doc.store).to.equal(store);
+                });
+            });
+            
+            describe('doc.path', () => {
+                
+                it("should contain the normalized path of the documet in the store", () => {
+                    const doc = store.createDocument('path/to/../to/doc');
+                    expect(doc.path).to.equal('/path/to/doc');
+                });
+            });
+            
+            describe('doc.source', () => {
+                
+                it("should contain the stringified source passed to the constructor", () => {
+                    const doc = store.createDocument('/path/to/doc', {toString: () => 'doc @ /path/to/doc'});
+                    expect(doc.source).to.equal('doc @ /path/to/doc');
+                });            
+                
+                it("should default to an empty string if the source parameter is omitted", () => {
+                    const doc = store.createDocument('/path/to/doc');
+                    expect(doc.source).to.equal('');
+                });            
+            });
+            
+            describe('docns = doc.evaluate(context)', () => {
+                
+                it("should contained the compiled source function", async () => {
+                    const doc = store.createDocument('/path/to/doc', '2*x=<% y:2*x %>');
+                    expect(doc.evaluate).to.be.a("function");
+                    const context = document.createContext({x:10});
+                    const docns = await doc.evaluate(context);
+                    expect(docns.y).to.equal(20);
+                    expect(docns.__text__).to.equal('2*x=20');
+                });            
+            });
+            
+            describe('context = doc.createContext(...presets)', () => {
+                
+                it("should return a valid document context", () => {
+                    const doc = store.createDocument('/path/to/doc1');
+                    const context = doc.createContext();
+                    const document_context = document.createContext();
+                    for (let key in document_context) {
+                        if (key !== "this") {
+                            expect(context[key]).to.equal(document_context[key]);
+                        }
+                    }
+                    expect(context.this).to.equal(context);
+                });
+                
+                it("should contain the document path as `__path__`", () => {
+                    const doc = store.createDocument('/path/to/doc1');
+                    const context = doc.createContext();
+                    expect(context.__path__).to.equal('/path/to/doc1');
+                });
+                
+                it("should contain the document parent path as `__dirpath__`", () => {
+                    const doc = store.createDocument('/path/to/doc1');
+                    const context = doc.createContext();
+                    expect(context.__dirpath__).to.equal('/path/to/');
+                });
+                
+                it("should contain the passed namespaces properties", () => {
+                    const doc = store.createDocument('/path/to/doc1');
+                    const context = doc.createContext({x:10, y:20}, {y:30, z:40});
+                    expect(context.x).to.equal(10);
+                    expect(context.y).to.equal(30);
+                    expect(context.z).to.equal(40);
+                });            
+                
+                it("should contain the document load method as `import`", async () => {
+                });
 
+                describe('docns = await context.import(path)', () => {
+                    
+                    it("should be a function", () => {
+                        const doc = store.createDocument('/path/to/doc1');
+                        const context = doc.createContext();
+                        expect(context.import).to.be.a("function");
+                    });
+                    
+                    it("should return the namespace of the passed document", async () => {
+                        await store.write('/path/to/doc1', "<% docnum = 1, doc2 = import '/path/to/doc2' %>doc1");
+                        await store.write('/path/to/doc2', "<% docnum = 2 %>doc2");
+                        
+                        var doc = store.createDocument('/path/to/doc');
+                        const doc1ns = await doc.createContext().import('/path/to/doc1');
+                        expect(doc1ns.docnum).to.equal(1);
+                        expect(doc1ns.__text__).to.equal("doc1");
+                        expect(doc1ns.doc2.docnum).to.equal(2)
+                        expect(doc1ns.doc2.__text__).to.equal('doc2')
+                    });
+
+                    it("should resolve paths relative to the document path", async () => {
+                        await store.write('/path/to/doc1', "<% docnum = 1, doc2 = import 'doc2' %>doc1");
+                        await store.write('/path/to/doc2', "<% docnum = 2 %>doc2");
+                        
+                        var doc = store.createDocument('/path/to/doc');
+                        const doc1ns = await doc.createContext().import('../to/doc1');
+                        expect(doc1ns.docnum).to.equal(1);
+                        expect(doc1ns.__text__).to.equal("doc1");
+                        expect(doc1ns.doc2.docnum).to.equal(2)
+                        expect(doc1ns.doc2.__text__).to.equal('doc2')
+                    });
+
+                    it("should cache the documents", async () => {
+                        const xstore = Object.create(store);
+                        xstore.count = 0;
+                        xstore.read = path => {
+                            xstore.count += 1;
+                            return store.read(path);
+                        }
+
+                        await store.write('/path/to/doc1', "<% docnum = 1, doc2 = import 'doc2' %>doc1");
+                        await store.write('/path/to/doc2', "<% docnum = 2 %>doc2");
+                        
+                        var doc = xstore.createDocument('/path/to/doc');
+
+                        var doc2ns = await doc.createContext().import('/path/to/doc2');
+                        expect(xstore.count).to.equal(1);
+                        expect(doc2ns.docnum).to.equal(2);
+                        expect(doc2ns.__text__).to.equal("doc2");
+
+                        var doc2ns = await doc.createContext().import('/path/to/doc2');
+                        expect(xstore.count).to.equal(1);
+                        expect(doc2ns.docnum).to.equal(2);
+                        expect(doc2ns.__text__).to.equal("doc2");
+                        
+                        var doc1ns = await doc.createContext().import('/path/to/doc1');
+                        expect(xstore.count).to.equal(2);
+                        expect(doc1ns.docnum).to.equal(1);
+                        expect(doc1ns.__text__).to.equal("doc1");
+                        expect(doc1ns.doc2.docnum).to.equal(2)
+                        expect(doc1ns.doc2.__text__).to.equal('doc2')
+                    });
+                });
+            });
+        }); 
+        
+        describe(`doc = await store.loadDocument(path)`, () => {
+            
+            it("shoudl return a document object having the source at the given path", async () => {
+                const doc = await store.loadDocument('/path/to/doc3');
+                expect(doc).to.be.instanceof(store.createDocument('').constructor);
+                expect(doc.store).to.equal(store);
+                expect(doc.path).to.equal('/path/to/doc3');
+                expect(doc.source).to.equal('doc @ /path/to/doc3');
+            });
+        });
+        
+        describe(`doc = await store.evaluateDocument(path, ...presets)`, () => {
+            
+            it("should load and evaluate a document from the store", async () => {
+                await store.write('/path/to/doc1', "<% docnum = 1, doc2 = import 'doc2' %>doc1");
+                await store.write('/path/to/doc2', "<% docnum = 2 %>doc2");
+                
+                const doc1ns = await store.evaluateDocument('/path/to/doc1');
+                expect(doc1ns.docnum).to.equal(1);
+                expect(doc1ns.__text__).to.equal("doc1");
+                expect(doc1ns.doc2.docnum).to.equal(2);
+                expect(doc1ns.doc2.__text__).to.equal('doc2');            
+            });
+        });    
+    }
+    
     describe.skip("evaluate = store.parse(source)", () => {
 
         it("should return a function", () => {
