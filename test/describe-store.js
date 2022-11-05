@@ -565,17 +565,17 @@ module.exports = (description, options={}) => describe(description, () => {
         }        
     });
     
-    describe("substore = store.subStore(rootPath)", () => {
+    describe("substore = store.SubStore(rootPath)", () => {
         
         it("should be a Store object", () => {
-            const substore = store.subStore('/path/to/dir');
+            const substore = store.SubStore('/path/to/dir');
             expect(substore).to.be.instanceof(Store);
         });
         
         describe("substore.read(path)", () => {
 
             it("should delegate to store.read(rootPath+path)", () => {
-                const substore = store.subStore('/path/to/./dir');
+                const substore = store.SubStore('/path/to/./dir');
                 store.read = path => `Called store.read with path ${path}`;
                 expect(substore.read('/path/to/doc')).to.equal("Called store.read with path /path/to/dir/path/to/doc");
                 delete store.read;
@@ -585,7 +585,7 @@ module.exports = (description, options={}) => describe(description, () => {
         describe("substore.write(path, source)", () => {
 
             it("should delegate to store.write(rootPath+path, source)", () => {
-                const substore = store.subStore('/path/to/./dir');
+                const substore = store.SubStore('/path/to/./dir');
                 store.write = (path, source) => `Called store.write with path ${path} and source ${source}`;
                 expect(substore.write('/path/to/doc', "xxx")).to.equal("Called store.write with path /path/to/dir/path/to/doc and source xxx");
                 delete store.write;                
@@ -595,20 +595,20 @@ module.exports = (description, options={}) => describe(description, () => {
         describe("substore.delete(path)", () => {
 
             it("should delegate to store.delete(rootPath+path)", () => {
-                const substore = store.subStore('/path/to/./dir');
+                const substore = store.SubStore('/path/to/./dir');
                 store.delete = path => `Called store.delete with path ${path}`;
                 expect(substore.delete('/path/to/doc')).to.equal("Called store.delete with path /path/to/dir/path/to/doc");
                 delete store.delete;
             });
         });
         
-        describe("substore.subStore(path)", () => {
+        describe("substore.SubStore(path)", () => {
 
-            it("should delegate to store.subStore(rootPath+path)", () => {
-                const substore = store.subStore('/path/to/./dir');
-                store.subStore = path => `Called store.subStore with path ${path}`;
-                expect(substore.subStore('dir2')).to.equal("Called store.subStore with path /path/to/dir/dir2");
-                delete store.subStore;
+            it("should delegate to store.SubStore(rootPath+path)", () => {
+                const substore = store.SubStore('/path/to/./dir');
+                store.SubStore = path => `Called store.SubStore with path ${path}`;
+                expect(substore.SubStore('dir2')).to.equal("Called store.SubStore with path /path/to/dir/dir2");
+                delete store.SubStore;
             });
         });
     });
