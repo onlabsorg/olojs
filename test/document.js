@@ -36,58 +36,49 @@ describe("document", () => {
             expect(evaluate).to.be.a("function");            
         });
         
-        describe("doc = await evaluateDocument(context)", () => {
+        describe("docns = await evaluateDocument(context)", () => {
             
-            describe("doc.data", () => {
-                
-                it("should be an object", async () => {
-                    var evaluate = document.parse("document source ...");
-                    var context = swan.createContext();
-                    var {data} = await evaluate(context);
-                    expect(data).to.be.an("object");                
-                });
-                
-                it("should contain all the names defined in the swan expressions", async () => {
-                    var source = `<%a=10%><%b=a+10%>`;
-                    var evaluate = document.parse(source);
-                    var context = document.createContext({});
-                    var {data} = await evaluate(context);
-                    expect(data.a).to.equal(10);
-                    expect(data.b).to.equal(20);
-                });
+            it("should be an object", async () => {
+                var evaluate = document.parse("document source ...");
+                var context = swan.createContext();
+                var docns = await evaluate(context);
+                expect(docns).to.be.an("object");                
             });
             
-            describe("doc.text", () => {
+            it("should contain all the names defined in the swan expressions", async () => {
+                var source = `<%a=10%><%b=a+10%>`;
+                var evaluate = document.parse(source);
+                var context = document.createContext({});
+                var docns = await evaluate(context);
+                expect(docns.a).to.equal(10);
+                expect(docns.b).to.equal(20);
+            });
+            
+            describe("docns.__text__", () => {
                 
                 it("should be string obtained replacing the swan expressions with their stringified return value", async () => {
                     var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
                     var evaluate = document.parse(source);
                     var context = document.createContext();
-                    var {text} = await evaluate(context);
-                    expect(text).to.equal("a + b = 30");
+                    var docns = await evaluate(context);
+                    expect(docns.__text__).to.equal("a + b = 30");
                 });
 
-                it("should decorate the rendered text with the `__render__` function if it exists", async () => {
-                    var source = `<% __render__ = text -> text + "!" %>Hello World`;
-                    var evaluate = document.parse(source);
-                    var context = document.createContext();
-                    var {text} = await evaluate(context);
-                    expect(text).to.equal("Hello World!");
-
-                    var source = `<% __render__ = text -> {__text__: text + "!!"} %>Hello World`;
-                    var evaluate = document.parse(source);
-                    var context = document.createContext();
-                    var {text} = await evaluate(context);
-                    expect(text).to.equal("Hello World!!");
-                });
-                
                 it("should render [[Undefined Syntax]] for expression with syntax error", async () => {
                     var source = `<% $x = 10 %>!`;
                     var evaluate = document.parse(source);
                     expect(evaluate).to.be.a("function");
                     var context = document.createContext();
-                    var {text} = await evaluate(context);
-                    expect(text).to.equal("[[Undefined Syntax]]!");
+                    var docns = await evaluate(context);
+                    expect(docns.__text__).to.equal("[[Undefined Syntax]]!");
+                });
+                
+                it("should be editable by the inline expressions", async () => {
+                    var source = `delete me <% __text__ = "" %>Hello World!`;
+                    var evaluate = document.parse(source);
+                    var context = document.createContext();
+                    var docns = await evaluate(context);
+                    expect(docns.__text__).to.equal("Hello World!");
                 });
             });
         });        

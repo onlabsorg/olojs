@@ -174,7 +174,7 @@ module.exports = (description, options={}) => describe(description, () => {
         }
     });
 
-    describe("evaluate = store.parse(source)", () => {
+    describe.skip("evaluate = store.parse(source)", () => {
 
         it("should return a function", () => {
             const evaluate = store.parse(`<%a=10%><%b=a+10%>a + b = <%a+b%>`);
@@ -221,7 +221,7 @@ module.exports = (description, options={}) => describe(description, () => {
         });
     });
 
-    describe("context = store.createContext(docPath, ...namespaces)", () => {
+    describe.skip("context = store.createContext(docPath, ...namespaces)", () => {
 
         it("should be a document context", () => {
             const document_context = document.createContext();
@@ -330,7 +330,7 @@ module.exports = (description, options={}) => describe(description, () => {
         }
     });
     
-    describe("await store.load(docPath, ...namespaces)", () => {
+    describe.skip("await store.load(docPath, ...namespaces)", () => {
 
         if (options.readAccessDenied) {
 

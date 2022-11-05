@@ -228,7 +228,7 @@ describe("Router", () => {
         })
     });
 
-    describe("evaluate = router.parse(source)", () => {
+    describe.skip("evaluate = router.parse(source)", () => {
 
         it("should return a function", () => {
             var store1 = new MemoryStore();
@@ -306,7 +306,7 @@ describe("Router", () => {
         });
     });
 
-    describe("context = router.createContext(docPath, ...namespaces)", () => {
+    describe.skip("context = router.createContext(docPath, ...namespaces)", () => {
 
         it("should be a document context", () => {
             var router = new Router({
