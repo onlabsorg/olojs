@@ -56,6 +56,47 @@ class BrowserStore extends Store {
 
 
     /**
+     *  async browserStore.list: String path -> Array items
+     *  ------------------------------------------------------------------------
+     *  Returns the lists of document names and directory names contained
+     *  under the given directory path. The directory names end with a forward
+     *  slash, while the document names don't.
+     *
+     *  ```js
+     *  const items = await browserStore.list("/path/to/dir");
+     *  ```
+     *
+     *  - When requesting `path/to/x/../dir`, the items in `/path/to/dir/`
+     *    will be returned
+     *  - When requesting a directory entry that doesn't exist, an empty array 
+     *    will be returned
+     */
+    async list (path) {
+        const items = [];
+        const dirPath = this.normalizePath(`${path}/`);
+        console.log("backend length:", await this._backend.length())
+        for (let i=0; i<await this._backend.length(); i++) {
+            let itemPath = await this._backend.key(i);
+            console.log(`checking item ${i}: ${itemPath}`);
+            if (itemPath.indexOf(dirPath) === 0) {
+                let subPath = itemPath.slice(dirPath.length);
+                let slashPos = subPath.indexOf('/');
+                if (slashPos === -1) {
+                    items.push(subPath);
+                } else {
+                    let dirName = subPath.slice(0, slashPos+1);
+                    if (items.indexOf(dirName) === -1) {
+                        items.push(dirName);
+                    }
+                }
+            }
+        }
+        return items;
+    }
+
+
+
+    /**
      *  async browserStore.write: (String path, String source) -> undefined
      *  ------------------------------------------------------------------------
      *  Maps a document path to a source, in the browser storage.

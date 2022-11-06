@@ -173,6 +173,51 @@ describe("Router", () => {
             expect(await router.read('/path_to/doc')).to.equal("");
         })
     });
+    
+    describe(`items = await router.list(path)`, () => {
+        
+        it("should return the list of documents and directories contained in the given directory", async () => {
+            var router = new Router({
+                "path/to": new MemoryStore({
+                    "/"    : "...",
+                    "doc1" : "..."
+                }),
+                "/path/to/store2": new MemoryStore({
+                    "/"             : "...",
+                    "/path/to/doc2" : "..."
+                }),
+                "/": new MemoryStore({
+                    "/path/to/doc3"  : "...",
+                    "/path/to/dir/"  : "...",
+                    "/path_to/doc4"  : "..."
+                }),
+            });
+                        
+            var items = await router.list('/path/to/');
+            expect(items.sort()).to.deep.equal(['', 'dir/', 'doc1', 'doc3', 'store2/']);
+        });
+
+        it("should return an empty array if the directory doesn't exist", async () => {
+            var router = new Router({
+                "path/to": new MemoryStore({
+                    "/"    : "...",
+                    "doc1" : "..."
+                }),
+                "/path/to/store2": new MemoryStore({
+                    "/"             : "...",
+                    "/path/to/doc2" : "..."
+                }),
+                "/": new MemoryStore({
+                    "/path/to/doc3"  : "...",
+                    "/path/to/dir/"  : "...",
+                    "/path_to/doc4"  : "..."
+                }),
+            });
+
+            var items = await router.list('/path/to/non-existing/dir/');
+            expect(items.sort()).to.deep.equal([]);
+        });
+    });    
 
     describe(`router.write(path, source)`, () => {
 
