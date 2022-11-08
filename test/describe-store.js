@@ -306,9 +306,6 @@ module.exports = (description, options={}) => describe(description, () => {
                     expect(context.z).to.equal(40);
                 });            
                 
-                it("should contain the document load method as `import`", async () => {
-                });
-
                 describe('docns = await context.import(path)', () => {
                     
                     it("should be a function", () => {
