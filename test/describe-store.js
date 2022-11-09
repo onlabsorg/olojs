@@ -427,6 +427,16 @@ module.exports = (description, options={}) => describe(description, () => {
             });
         });
         
+        describe("substore.list(path)", () => {
+
+            it("should delegate to store.list(rootPath+path)", async () => {
+                const substore = store.SubStore('/path/to/./store_dir');
+                store.list = path => [`Called store.list with path ${path}`];
+                expect(substore.list('/path/to/dir')).to.deep.equal(["Called store.list with path /path/to/store_dir/path/to/dir"]);
+                delete store.list;
+            });
+        });
+        
         describe("substore.write(path, source)", () => {
 
             it("should delegate to store.write(rootPath+path, source)", () => {
