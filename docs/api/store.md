@@ -1,4 +1,3 @@
-<!--<% __render__ = require 'markdown' %>-->
 Store
 ============================================================================
 This is the base class to be used to create olojs document stores.
@@ -10,6 +9,7 @@ store = new Store();
 // A store implementation
 class ChildStore extends Store {
     async read (path) { ... }
+    async list (path) { ... }
     async write (path, source) { ... }
     async delete (path) { ... }
 }
@@ -17,8 +17,7 @@ class ChildStore extends Store {
   
 async store.read: String path -> String source
 ------------------------------------------------------------------------
-Returns the source of the document mapped in this store to the given
-path.
+Returns the source of the document mapped in `store` to the given path.
 ```js
 source = await store.read("/path/to/doc");
 ```
@@ -31,11 +30,28 @@ following standard:
 When instantiated directly, the base store `read` method returns always
 an empty string.
   
+async store.list: String path -> Array items
+------------------------------------------------------------------------
+Returns the list of items contained in the given directory path.
+```js
+items = await store.list("/path/to/dir");
+```
+Every implmenentation of this method should behave according to the
+following standard:
+- It should return the Array of names of all the documents and 
+  diretory contained under the given path. Directory names should end
+  with a forward slash, while document names should not.
+- It should throw `Store.ReadPermissionDeniedError` if the store
+  instance has no read permission on the given path.
+ 
+When instantiated directly, the base store `list` method returns always
+an empty array.
+  
 async store.write: (String path, String source) -> undefined
 ------------------------------------------------------------------------
 Changes the source of the document at the given path.
 ```js
-await store.write("/path/to/doc", "This is the doc content.");
+await store.write("/path/to/doc", "This is the new doc content.");
 ```
 Every implmenentation of this method should behave according to the
 following standard:
@@ -67,73 +83,77 @@ following standard:
 When instantiated directly, the base store `delete` method always throws
 `Store.WriteOperationNotAllowedError`.
   
-store.parse: String source -> Function evalutate
+store.createDocument: (String path, String source) -> Document doc
 ------------------------------------------------------------------------
-Compiles a document source into an `evaluate` function that takes as input
-a document context object and returns the document namespace object and its
-rendered text.
-```js
-evaluate = store.parse(source);
-{data, text} = await evaluate(context);
-```
-- `evaluate` is an asynchronous function that evaluates the document and
-  returns its namespace and its rendered text
-- `context` is a valid document context created either with
-  `store.createContext` or with `document.createContext`.
-- `data` is an object containing all the names defined by the inline
-  expressions of the document (the document namespace).
-- `text` is a string obtained by replacing every inline expression with its
-  strigified value.
+Creates a Document object representing a document stored at the given
+path and having the given source.
+
+See below for the documentation of Document objects.
   
-store.createContext: (String path, ...Object namespace) -> Object context
+store.loadDocument: String path -> Document doc
 ------------------------------------------------------------------------
-Create a document context bound to this store.
+Creates a Document object representing a document stored at the given
+path and source fetched via `read(path)`.
 
-```
-context = store.createContext(docPath, ns1, ns2, ...)
-```
+If a `.info` document is requested (e.g. document /path/to/.info), a 
+document containing the following data is returned:
+- `items`: list of all the siblings of the .info document, as returned
+   by the store.list method, applied to the .info parent folder.
 
-The `context` object is a document context that contains the following
-properties:
-
-- A `__path__` string equal to `docPath`
-- A `__dirpath__` string equal to the directory path of `docPath`
-- All the names contained in the passed namespaces
-- An `import` function that given a document path, loads it from the
-  current store, evaluates it and returns its namespace. The import
-  document path is parsed as relative to `docPath`.
+See below for the documentation of Document objects.
   
-store.load: (String path, ...Object namespace) -> {String source, Object context, Function evaluate, Object data, String text}
+store.evaluateDocument: String path -> Object docns
 ------------------------------------------------------------------------
-Read, parse and evaluate a document.
-
-```
-{source, context, evaluate, data, text} = store.load(docPath, ns1, ns2, ...)
-```
-
-where:
-
-- `source` is the document source mapped to docPath
-- `context` is the document context including the preset namespaces ns1, ns2, ...
-- `evaluate` is the source compiled into a function
-- `data` is the document namespace as returned by `evaluate`
-- `text` is the document rendered text as returned by `evaluate`
+Loads and evaluates a Document, returning the document namespace.
   
 store.subStore: String path -> Store subStore
 ------------------------------------------------------------------------
 Returns a new store rooted in a directory of this store.
 
 ```
-subStore = store.subStore(rootPath)
+subStore = store.SubStore(rootPath)
 ```
 
 where:
 
 - `rootPath` is a directory path of this store
 - `subStore.read` delegates to `store.read(rootPath+path)`
+- `subStore.list` delegates to `store.list(rootPath+path)`
 - `subStore.write` delegates to `store.write(rootPath+path, source)`
 - `subStore.delete` delegates to `store.delete(rootPath+path)`
-- `subStore.subStore` delegates to `store.subStore(rootPath+path)`
+- `subStore.SubStore` delegates to `store.SubStore(rootPath+path)`
+  
+Document object
+------------------------------------------------------------------------
+The document object represents a document stored at a given path of a 
+store and having a given source. A document object can be created using
+either the `createDocument` or the `loadDocument` methods of a store
+object.
+  
+### doc.store: Store
+Points to the store containing the document.
+  
+### doc.path: String
+The path of this document in the store.
+  
+### doc.source: String
+The source of this document.
+  
+### doc.evaluate: Object context -> Object namespace
+This is the source compiled to a function as returned by 
+[document.parse](document.md).
+  
+### doc.createContext: (...Objects preset) -> Object context
+Created a valid evaluation context that can be passed to the 
+`doc.evaluate` function to evaluate this document. The returned context
+contains the following special names:
+
+- `context.__path__`: the path of this document
+- `context.__dirpath__`: the path of this document parent directory
+- `context.import`: a function that loads and evaluates a document and
+  returns its namespace; if a relative path is passed as argument to
+  this function, it will be resolved as relative to this document path
+- All the name contained in the passed preset objects
   
 Store.ReadPermissionDeniedError - class
 ----------------------------------------------------------------------------

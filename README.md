@@ -86,11 +86,9 @@ store = new olo.FileStore('/home/my-olodocs-store');
 Load, evaluate and render a [document]:
 
 ```js
-docPath = '/path/to/doc';
-source = await store.read(docPath);                 // fetch the document source
-evaluate = store.parse(source);                     // compile the document
-context = store.createContext(docPath, {pi:3.14});  // create an evaluation context
-{data, text} = await evaluate(context);             // evaluate the document
+doc = await store.loadDocument('/path/to/doc'); // fetch the document
+context = doc.createContext({pi:3.14});         // create an evaluation context
+docns = await doc.evaluate(context);            // evaluate the document
 ```
 
 Serve the store via HTTP:
@@ -104,11 +102,11 @@ Interface to your store via HTTP:
 
 ```js
 remoteStore = new olo.HTTPStore('http://localhost:8010');
-source = await remoteStore.read('/path/to/doc');
+doc = await remoteStore.loadDocument('/path/to/doc');
 ```
 
-> olojs works also in the browser, although it has been tested only on Chrome.
-> In order to use the olojs library in the browser, you should require
+> olojs works also in the browser, although it has been tested only on Chrome 
+> and Brave. In order to use the olojs library in the browser, you should require
 > the module `@onlabsorg/olojs/browser`. The only difference between the NodeJS
 > version and the browser version is that the latter doesn't contain the
 > [FileStore] class and the [HTTPServer] object, but it contains the

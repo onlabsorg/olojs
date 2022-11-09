@@ -27,9 +27,7 @@ import function).
 
 ### [olo.expression](https://github.com/onlabsorg/swan-js/blob/main/docs/api.md)
 The `expression` module contains low-level functions to manipulate
-[swan](https://github.com/onlabsorg/swan-js) expressions. In addition to the
-swan standard library, olojs adds the following modules:
-- [markdown](./swan_modules/markdown.md): functions to render markdown text to HTML
+[swan](https://github.com/onlabsorg/swan-js) expressions. 
 
 ### [olo.Store](./api/store.md)
 The `Store` class is the base class from which all the other stores inherit.

@@ -47,50 +47,15 @@ source = "<% name %> is <% age %> years old. <% id = name + str(age) %>";
 evaluate = document.parse(source);
 
 context = document.createContext({name:"Bob", age:27});
-{data, text} = await evaluate(context);        
-        // data: {name:"Bob", age:27, id:"Bob27"}
-        // text: "Bob is 27 years old."
+docns = await evaluate(context);        
+        // dons.name: "Bob", 
+        // docns.age: 27, 
+        // docns.id: "Bob27"
+        // dons.__text__: "Bob is 27 years old."
 ```
 
 For a more in depth documentation of the `document` module, read the
 [olo.document API](./api/document.md).
-
-
-
-## Documents custom markup
-
-Olojs documents are markup-agnostic in that the rendered content is just the
-plain text obtained by replacing the inline expressions with their stringified
-value. Nonetheless any markup language can theoretically be used; let's see how.
-
-The `evaluate` function returns a `text` string and a `data` namespace.
-
-- the `data` object contains all the names defined in the [swan] expressions
-- the `text` string is obtained by replacing each [swan] expression with its
-  stringified value (plain text) and decorating it via
-  `returnedText = await data.__render__(plainText)`.
-
-Therefore, if you want to render the document as markdown, you can decorate its
-plain text by defining a `__render__` function that takes a markdown text as
-input and returns HTML markup as output. Such a function is buit-in in the
-olojs expression library. For example, the following text will render as markdown:
-
-```
-<% __render__ = require 'markdown' %>
-
-# This is a header
-
-This is a paragraph.
-
-- This
-- is
-- a
-- list
-```
-
-> A the moment, the only built-in decorator is the `markdown` function shown in
-> the example above, but more may follow in the future.
-
 
 
 
@@ -112,8 +77,8 @@ This document defines some helper functions that create html tags.
 ```
 
 Once evaluated, this document returns a `data` namespace containing two functions:
-`bold` and `img` and the `text` string `"This document defines some helper functions
-that create html tags."`
+`bold` and `img` and the `__text__` string `"This document defines some helper 
+functions that create html tags."`
 
 Let's now assume that the same store contains also the following document mapped
 to the path `/path/to/mycat`:
@@ -133,16 +98,14 @@ Once evaluated, the `/path/to/mycat` document returns the following object:
 
 ```js
 {
-    data: {
-        name: "Izad",
-        kind: "persian",
-        tags: {
-            bold:   text => '<b>' + text + '</b>',
-            italic: text => '<i>' + text + '</i>'
-        }
-    },
-
-    text: "I have a <b>persian</b> cat named <i>Izad</i>!"
+    name: "Izad",
+    kind: "persian",
+    tags: {
+        bold:   text => '<b>' + text + '</b>',
+        italic: text => '<i>' + text + '</i>',
+        __text__: "This document defines some helper functions that create html tags."
+    }
+    __text__: "I have a <b>persian</b> cat named <i>Izad</i>!"
 }
 ```
 

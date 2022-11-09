@@ -1,4 +1,3 @@
-<!--<% __render__ = require 'markdown' %>-->
 FileStore
 ============================================================================
 This store handles read/write operations on the local file system.
@@ -6,7 +5,7 @@ This store handles read/write operations on the local file system.
 fileStore = new FileStore(rootPath, options)
 ```
 - `rootPath` is the base path that will be prepended to the paths passed to
-  the `read`, `write`, and `delete` methods.
+  the `read`, `list`, `write`, and `delete` methods.
 - `options.extension`: defines the extension of the document files (defaults
   to `.olo`)
 - `fileStore` is a [olo.Store](./store.md) object.
@@ -16,7 +15,7 @@ fileStore = new FileStore(rootPath, options)
   
 async fileStore.read: String path -> String source
 ----------------------------------------------------------------------------
-Retrieves a `.olo` file given its absolute path.
+Retrieves a `.olo` file given its path relative to the store root path.
 ```js
 const source = await fileStore.read("/path/to/doc");
 ```
@@ -29,9 +28,23 @@ const source = await fileStore.read("/path/to/doc");
 The `.olo` default extension can be changed by passing a `options.extension`
 string to the store constructor.
   
+async fileStore.list: String path -> Array items
+------------------------------------------------------------------------
+Returns the lists of document names and directory names contained
+under the given directory path. The directory names end with a forward
+slash, while the document names don't.
+```js
+const items = await file.list("/path/to/dir");
+```
+- When requesting `path/to/x/../dir`, the content of `/path/to/dir/`
+  will be returned
+- When requesting an entry that doesn't exist, an empty array will be
+  returned
+  
 async fileStore.write: (String path, String source) -> undefined
 ----------------------------------------------------------------------------
-Modifies the content of a `.olo` file given its absolute path.
+Modifies the content of a `.olo` file given its path relative to the 
+store root path.
 ```js
 await fileStore.write("/path/to/doc", source);
 ```
@@ -46,7 +59,8 @@ string to the store constructor.
   
 async fileStore.delete: String path -> undefined
 ------------------------------------------------------------------------
-Moves a `.olo` file to the trash bin, given its absolute path.
+Moves a `.olo` file to the trash bin, given its path relative to the 
+store root path.
 ```js
 await fileStore.delete("/path/to/doc");
 ```

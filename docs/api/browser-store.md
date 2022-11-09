@@ -1,4 +1,3 @@
-<!--<% __render__ = require 'markdown' %>-->
 BrowserStore
 ============================================================================
 This is a [Store](./store.md) object backed by the browser permanent storage
@@ -22,6 +21,20 @@ The document path gets normalized, therefore `path/to/doc`,
 `/path/to/./doc`, `/path/to/doc`, etc. refer to the same document.
 
 If the passed path doesn't exist, it returns an empty string.
+  
+async browserStore.list: String path -> Array items
+------------------------------------------------------------------------
+Returns the lists of document names and directory names contained
+under the given directory path. The directory names end with a forward
+slash, while the document names don't.
+```js
+const items = await browserStore.list("/path/to/dir");
+```
+The document path gets normalized, therefore `path/to/doc`,
+`/path/to/./doc`, `/path/to/doc`, etc. refer to the same document.
+
+When requesting a directory entry that doesn't exist, an empty array 
+will be returned
   
 async browserStore.write: (String path, String source) -> undefined
 ------------------------------------------------------------------------

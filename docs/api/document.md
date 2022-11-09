@@ -1,4 +1,3 @@
-<!--<% __render__ = require 'markdown' %>-->
 olojs.document
 ============================================================================
 This module contains functions to parse, evaluate and render olojs
@@ -7,28 +6,27 @@ documents.
 source = "Twice x is <% 2*x %>!";
 evaluate = olojs.document.parse(source);
 context = olojs.document.createContext({x:10});
-{data, text} = await evaluate(context);    
-    // data: {x:10}
-    // text: "Twice x is 20"
+docns = await evaluate(context);    
+    // docns.x: :10
+    // docns.__text__: "Twice x is 20"
 ```
   
 olojs.document.parse - function
 ----------------------------------------------------------------------------
-Compiles a document source into an `evaluate` function that takes as input
-a document context object and returns the document namespace object and its
-rendered text.
+Compiles a document source to an `evaluate` function that takes as input
+a document context object and returns the document namespace object.
 ```js
 evaluate = olojs.document.parse(source);
-{data, text} = await evaluate(context);
+docns = await evaluate(context);
 ```
 - `source` is a string containing the source of the olojs document to be
   evaluated
 - `evaluate` is an asynchronous function that evaluates the document and
-  returns its namespace and its rendered text
-- `data` is an object containing all the names defined by the inline
+  returns its namespace
+- `docns` is an object containing all the names defined by the inline
   expressions of the document (the document namespace).
-- `text` is a string obtained by replacing every inline expression with its 
-  strigified value. 
+- `docns.__text__` is a string obtained by replacing every inline expression 
+  with its strigified value. 
   
 olojs.document.createContext - function
 ----------------------------------------------------------------------------

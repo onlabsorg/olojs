@@ -5,15 +5,17 @@ which can be summarized as follows:
 
 * `store.read(path)` returns the source of the document mapped to the given
   path
+* `store.list(path)` returns the array of names of the item contained in the
+  given directory path
 * `store.write(path, source)` modifies the document source mapped to the
   given path
 * `store.delete(path)` removes the document mapped to the given path
-* `store.parse(source)` compiles a document source and returns an `evaluate`
-  function
-* `store.createContext(path, ...namespaces)` creates a document context to be
-  passed to the `evaluate` function returned by `store.parse`.
-* `store.load(path, ...namespaces)` reads, parses and evaluates a document.
-* `store.subStore(path)` returns a sub-store, rooted in the given store path.
+* `store.createDocument(path, source)` create a document object that allows to
+  evaluate the source.
+* `store.loadDocument(path)` returns a document object after fetching its
+  source using `store.read`
+* `store.evaluateDocument(path, ...presets)` loads and evaluates a document
+* `store.SubStore(path)` returns a sub-store, rooted in the given store path.
 
 olojs comes with the following pre-defined stores:
 

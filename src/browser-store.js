@@ -3,8 +3,6 @@ const localForage = require('localforage');
 
 
 /**
- *  <!--<% __render__ = require 'markdown' %>-->
- *
  *  BrowserStore
  *  ============================================================================
  *  This is a [Store](./store.md) object backed by the browser permanent storage
@@ -66,10 +64,11 @@ class BrowserStore extends Store {
      *  const items = await browserStore.list("/path/to/dir");
      *  ```
      *
-     *  - When requesting `path/to/x/../dir`, the items in `/path/to/dir/`
-     *    will be returned
-     *  - When requesting a directory entry that doesn't exist, an empty array 
-     *    will be returned
+     *  The document path gets normalized, therefore `path/to/doc`,
+     *  `/path/to/./doc`, `/path/to/doc`, etc. refer to the same document.
+     *  
+     *  When requesting a directory entry that doesn't exist, an empty array 
+     *  will be returned
      */
     async list (path) {
         const items = [];

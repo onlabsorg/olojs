@@ -1,4 +1,3 @@
-<!--<% __render__ = require 'markdown' %>-->
 MemoryStore
 ============================================================================
 This store handles read/write operations on an in-memory map object.
@@ -20,8 +19,21 @@ const source = await memStore.read("/path/to/doc");
 ```
 - When requesting `path/to/x/../doc`, the content of `/path/to/doc` will
   be returned
-- When requesting an entry that doesn't exist, and empty string will be
+- When requesting an entry that doesn't exist, an empty string will be
   returned
+  
+async memStore.list: String path -> Array items
+------------------------------------------------------------------------
+Returns the lists of document names and directory names contained
+under the given directory path. The directory names end with a forward
+slash, while the document names don't.
+```js
+const items = await memStore.list("/path/to/dir");
+```
+- When requesting `path/to/x/../dir`, the items in `/path/to/dir/`
+  will be returned
+- When requesting a directory entry that doesn't exist, an empty array 
+  will be returned
   
 async memStore.write: (String path, String source) -> undefined
 ------------------------------------------------------------------------
