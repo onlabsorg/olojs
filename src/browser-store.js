@@ -73,10 +73,8 @@ class BrowserStore extends Store {
     async list (path) {
         const items = [];
         const dirPath = this.normalizePath(`${path}/`);
-        console.log("backend length:", await this._backend.length())
         for (let i=0; i<await this._backend.length(); i++) {
             let itemPath = await this._backend.key(i);
-            console.log(`checking item ${i}: ${itemPath}`);
             if (itemPath.indexOf(dirPath) === 0) {
                 let subPath = itemPath.slice(dirPath.length);
                 let slashPos = subPath.indexOf('/');

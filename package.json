@@ -24,6 +24,7 @@
   "license": "MIT",
   "author": "Marcello Del Buono <m.delbuono@onlabs.org>",
   "main": "index.js",
+  "browser": "browser.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/onlabsorg/olojs.git"
@@ -44,6 +45,7 @@
   "dependencies": {
     "@onlabsorg/swan-js": "0.11.x",
     "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
     "dompurify": "^2.2.6",
     "express": "^4.17.1",
     "finalhandler": "^1.1.2",
