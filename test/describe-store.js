@@ -1,4 +1,5 @@
 const expect = require("chai").expect;
+const swan = require('../lib/expression');
 const document = require('../lib/document');
 const Store = require('../lib/store');
 
@@ -283,7 +284,7 @@ module.exports = (description, options={}) => describe(description, () => {
                             expect(context[key]).to.equal(document_context[key]);
                         }
                     }
-                    expect(context.this).to.equal(context);
+                    expect(swan.types.unwrap(context.this)).to.equal(context);
                 });
                 
                 it("should contain the document path as `__path__`", () => {

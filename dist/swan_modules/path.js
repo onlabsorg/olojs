@@ -1,0 +1,1 @@
+(self.webpackChunk_onlabsorg_olojs=self.webpackChunk_onlabsorg_olojs||[]).push([[804],{74:(o,n,s)=>{const e=s(470);o.exports=o=>{const n={join:(...n)=>{const s=n.map((n=>o.wrap(n).toString()));return e.normalize(s.join("/"))},split:(...s)=>{const e=n.join(...s).slice(1);return new o.Tuple(...e.split("/")).normalize()}};return n}}}]);

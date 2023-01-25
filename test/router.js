@@ -1,4 +1,5 @@
 var expect = require("chai").expect;
+var swan = require('../lib/expression');
 var document = require("../lib/document");
 var Store = require('../lib/store');
 var MemoryStore = require('../lib/memory-store');
@@ -340,7 +341,7 @@ describe("Router", () => {
                         expect(context[key]).to.equal(document_context[key]);
                     }
                 }
-                expect(context.this).to.equal(context);
+                expect(swan.types.unwrap(context.this)).to.equal(context);
             });
             
             it("should contain the document path as `__path__`", () => {

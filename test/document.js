@@ -17,7 +17,7 @@ describe("document", () => {
                     expect(docContext[name]).to.equal(expContext[name]);
                 }
             }
-            expect(docContext.this).to.equal(docContext);
+            expect(swan.types.unwrap(docContext.this)).to.equal(docContext);
         });
         
         it("should contain the passed namespace properties as own properties", () => {
