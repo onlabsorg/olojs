@@ -47,6 +47,8 @@ source = await router.read("/path/to/store_i/sub/path/to/doc");
   `await store_i.read('/sub/path/to/doc')`.
 - When no store is mounted on `/path/to/store_i/`, it returns an empty
   string
+If the parameter is an URI `ppp:/path/to/doc` it will resolve to the
+path `/.uri/ppp/path/to/doc`.
   
 async router.list: String path -> Array items
 ------------------------------------------------------------------------
@@ -62,6 +64,8 @@ router = new Router({
 items = await router.list("/path/to/");     
         // [ 'store_1/', 'store_2', ...store_3.list('/to/') ]
 ```
+If the parameter is an URI `ppp:/path/to/doc` it will resolve to the
+path `/.uri/ppp/path/to/doc`.
   
 async router.write: (String path, String source) -> undefined
 ------------------------------------------------------------------------
@@ -78,6 +82,8 @@ await router.write("/path/to/store_i/sub/path/to/doc", source);
   `await store_i.write('/sub/path/to/doc', source)`.
 - When no store is mounted on `/path/to/store_i`, it throws a
   `Router.WriteOperationNotAllowedError`.
+If the first parameter is an URI `ppp:/path/to/doc` it will resolve to the
+path `/.uri/ppp/path/to/doc`.
   
 async router.delete: String path -> undefined
 ------------------------------------------------------------------------
@@ -94,5 +100,7 @@ await router.delete("/path/to/store_i/sub/path/to/doc");
   `await store_i.delete('/sub/path/to/doc')`.
 - When no store is mounted on `/path/to/store_i/`, it throws a
   `Router.WriteOperationNotAllowedError`.
+If the parameter is an URI `ppp:/path/to/doc` it will resolve to the
+path `/.uri/ppp/path/to/doc`.
   
 

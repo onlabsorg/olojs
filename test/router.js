@@ -77,6 +77,27 @@ describe("Router", () => {
             expect(await router.read('/path_to/doc')).to.equal("doc @ root:/path_to/doc");
         });
 
+        it("should resolve .uri:/path/to/doc' paths to '/.uri/scheme/path/to/doc'", async () => {
+            var router = new Router({
+                "ppP.1:/host/": new MemoryStore({
+                    "/"    : "doc @ ppp.1:/host/",
+                    "doc"  : "doc @ ppp.1:/host/doc"
+                }),
+                "/.uri/qqq/": new MemoryStore({
+                    "/"    : "doc @ qqq:/",
+                    "doc"  : "doc @ qqq:/doc"
+                })
+            });
+            expect(await router.read('pPp.1:/host/')).to.equal("doc @ ppp.1:/host/");
+            expect(await router.read('/.uri/ppp.1/host/')).to.equal("doc @ ppp.1:/host/");
+            expect(await router.read('PPP.1:/host/doc')).to.equal("doc @ ppp.1:/host/doc");
+            expect(await router.read('/.uri/ppp.1/host/doc')).to.equal("doc @ ppp.1:/host/doc");
+            expect(await router.read('qqq://')).to.equal("doc @ qqq:/");
+            expect(await router.read('/.uri/qqq/')).to.equal("doc @ qqq:/");
+            expect(await router.read('qqq://doc')).to.equal("doc @ qqq:/doc");
+            expect(await router.read('/.uri/qqq/doc')).to.equal("doc @ qqq:/doc");
+        });
+
         it("should return an empty document if no match is found", async () => {
             var router = new Router({
                 "path/to": new MemoryStore({
@@ -113,6 +134,30 @@ describe("Router", () => {
                         
             var items = await router.list('/path/to/');
             expect(items.sort()).to.deep.equal(['', 'dir/', 'doc1', 'doc3', 'store2/']);
+        });
+
+        it("should resolve .uri:/path/to/doc' paths to '/.uri/scheme/path/to/doc'", async () => {
+            var router = new Router({
+                "ppp:/path/to": new MemoryStore({
+                    "/"    : "...",
+                    "doc1" : "..."
+                }),
+                "ppp:/path/to/store2": new MemoryStore({
+                    "/"             : "...",
+                    "/path/to/doc2" : "..."
+                }),
+                "ppp:/": new MemoryStore({
+                    "/path/to/doc3"  : "...",
+                    "/path/to/dir/"  : "...",
+                    "/path_to/doc4"  : "..."
+                }),
+            });
+
+            var items1 = await router.list('ppp:/path/to/');
+            expect(items1.sort()).to.deep.equal(['', 'dir/', 'doc1', 'doc3', 'store2/']);
+
+            var items2 = await router.list('/.uri/ppp/path/to/');
+            expect(items2.sort()).to.deep.equal(['', 'dir/', 'doc1', 'doc3', 'store2/']);
         });
 
         it("should return an empty array if the directory doesn't exist", async () => {
@@ -152,6 +197,19 @@ describe("Router", () => {
             expect(await store2.read('/path/to/doc')).to.equal("doc @ store2");
         });
 
+        it("should resolve .uri:/path/to/doc' paths to '/.uri/scheme/path/to/doc'", async () => {
+            var store1 = new MemoryStore();
+            var store2 = new MemoryStore();
+            var router = new Router({
+                's1:/': store1,
+                's2:/': store2,
+            });
+            await router.write('s1:/path/to/doc', "doc @ store1");
+            await router.write('/.uri/s2/path/to/doc', "doc @ store2");
+            expect(await store1.read('/path/to/doc')).to.equal("doc @ store1");
+            expect(await store2.read('/path/to/doc')).to.equal("doc @ store2");
+        });
+
         it("should throw an error if no match is found", async () => {
             var router = new Router();
             try {
@@ -177,6 +235,23 @@ describe("Router", () => {
             await store1.write('/path/to/doc', "doc @ store1");
             await router.delete('/s1/path/to/doc');
             expect(store1.read('/path/to/doc')).to.equal("");
+        });
+
+        it("should resolve .uri:/path/to/doc' paths to '/.uri/scheme/path/to/doc'", async () => {
+            var store1 = new MemoryStore();
+            var store2 = new MemoryStore();
+            var router = new Router({
+                's1:/': store1,
+                's2:/': store2,
+            });
+
+            await store1.write('/path/to/doc', "doc @ store1");
+            await router.delete('s1:/path/to/doc');
+            expect(store1.read('/path/to/doc')).to.equal("");
+
+            await store2.write('/path/to/doc', "doc @ store2");
+            await router.delete('/.uri/s2/path/to/doc');
+            expect(store2.read('/path/to/doc')).to.equal("");
         });
 
         it("should throw an error if no match is found", async () => {
