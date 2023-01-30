@@ -9,6 +9,37 @@ var Router = require('../lib/router');
 
 describe("Router", () => {
 
+    describe("normPath = router.normalizePath(path)", () => {
+
+        it("should resolve ., .., double slashes and add a slash at the beginning", () => {
+            const router = new Router();
+            expect(router.normalizePath("path/to/./sub/..//doc")).to.equal("/path/to/doc");
+        });
+
+        it("should resolve URI paths to '/.uri/<scheme>/rest-of-the-uri'", () => {
+            const router = new Router();
+            expect(router.normalizePath("ppp:////host/./path/to/doc")).to.equal("/.uri/ppp/host/path/to/doc");
+        });
+    });
+
+    describe("fullPath = router.resolvePath(basePath, subPath)", () => {
+
+        it("should concatenate and normalize the two paths", () => {
+            const router = new Router();
+            expect(router.resolvePath("path/to/dir//", "../doc")).to.equal("/path/to/doc");
+        });
+
+        it("should return the subpath normalized if it is an absolute path", () => {
+            const router = new Router();
+            expect(router.resolvePath("path/to/dir", "/path2/to/./doc")).to.equal("/path2/to/doc");
+        });
+
+        it("should return the subpath normalized if it is an URI", () => {
+            const router = new Router();
+            expect(router.resolvePath("/path/to/dir", "ppp:/path2/to/doc")).to.equal("/.uri/ppp/path2/to/doc");
+        });
+    });
+
     describe("iterator = router._iterRoutes()", () => {
 
         it("should return an iterator yielding all the [routeId, store] pairs in analphabetic order", () => {
