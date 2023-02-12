@@ -63,3 +63,4 @@ typings/
 # development folders
 *.todo
 .todo
+*.org

@@ -132,6 +132,28 @@ host document.
 
 
 
+Document markup
+--------------------------------------------------------------------------------
+olo-documents are markup agnostic: they are just text with the addition of 
+rendered inline expressions; nevertheless, any markup language can be used.
+
+The document namespace contains a `__text__` that contains the rendered text
+and can be modified by the inline expressions. This varable can be used to 
+render the text as markdown as follows:
+
+```
+# Title
+Paragraph ...
+
+<% render_markdown = require 'markdown' %>
+<% __text__ = render_markdown __text__ %>
+```
+
+At the moment, the only markup available is `markdown`, but more markup languages 
+may be added in the future.
+
+
+
 Learn more
 --------------------------------------------------------------------------------
 * Learn the [swan] language

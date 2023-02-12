@@ -5,6 +5,7 @@ const olo = require("..");
 describe("olojs", () => {
 
     require("./expression");
+    require("./markdown-swan-module");
     require("./document");
     require("./store");
     require("./memory-store");
