@@ -1,6 +1,20 @@
 #+title: Olojs
 
-* PROJ Patch Version 0.27.4
+* PROJ branch read-only
+** TODO Remove write operation from Store class and simplify methods
+** TODO FileStore: remove write operations, test and update documentation
+** TODO MemoryStore: remove write operations, test and update documentation
+** TODO HTTPStore: remove write operations, test and update documentation
+** TODO Router: remove write operations, test and update documentation
+** TODO ProtocolHub: create
+A ProtocolHub is store hat maps protocols to sub-storees.
+** TODO Adattare http-server
+- [ ] Prima di tutto spostare gli stores ed http-server in stilo
+- [ ] Modificare express plugin in un plugin basoto su un dato loader
+- [ ] Modificare server
+
+* PROJ branch olo-document
+** TODO Design
 
 * BACKLOG
 * ARCHIVE
