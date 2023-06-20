@@ -1,10 +1,11 @@
 #+title: Olojs
 
 * PROJ branch read-only
-** TODO Remove write operation from Store class and simplify methods
+** DONE Remove write operation from Store class and simplify methods
 ** TODO FileStore: remove write operations, test and update documentation
 ** TODO MemoryStore: remove write operations, test and update documentation
 ** TODO HTTPStore: remove write operations, test and update documentation
+** TODO BrowserStore: remove write operations, test and update documentation
 ** TODO Router: remove write operations, test and update documentation
 ** TODO ProtocolHub: create
 A ProtocolHub is store hat maps protocols to sub-storees.
