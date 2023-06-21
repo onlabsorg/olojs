@@ -85,7 +85,7 @@ module.exports = (description, options={}) => describe(description, () => {
         }
     });
 
-    if (!options.voidStore && !options.readOnly && !options.readAccessDenied && !options.writeAccessDenied) {
+    if (!options.voidStore && !options.readAccessDenied) {
         
         describe(`doc = await store.loadDocument(path)`, () => {
             

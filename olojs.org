@@ -4,7 +4,7 @@
 ** DONE Remove write operation from Store class and simplify methods
 ** DONE FileStore: remove write operations, test and update documentation
 ** DONE MemoryStore: remove write operations, test and update documentation
-** TODO HTTPStore: remove write operations, test and update documentation
+** DONE HTTPStore: remove write operations, test and update documentation
 ** TODO BrowserStore: remove write operations, test and update documentation
 ** TODO Router: remove write operations, test and update documentation
 ** TODO ProtocolHub: create
