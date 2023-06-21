@@ -9,37 +9,6 @@ var Router = require('../lib/router');
 
 describe("Router", () => {
 
-    describe("normPath = router.normalizePath(path)", () => {
-
-        it("should resolve ., .., double slashes and add a slash at the beginning", () => {
-            const router = new Router();
-            expect(router.normalizePath("path/to/./sub/..//doc")).to.equal("/path/to/doc");
-        });
-
-        it("should resolve URI paths to '/.uri/<scheme>/rest-of-the-uri'", () => {
-            const router = new Router();
-            expect(router.normalizePath("ppp:////host/./path/to/doc")).to.equal("/.uri/ppp/host/path/to/doc");
-        });
-    });
-
-    describe("fullPath = router.resolvePath(basePath, subPath)", () => {
-
-        it("should concatenate and normalize the two paths", () => {
-            const router = new Router();
-            expect(router.resolvePath("path/to/dir//", "../doc")).to.equal("/path/to/doc");
-        });
-
-        it("should return the subpath normalized if it is an absolute path", () => {
-            const router = new Router();
-            expect(router.resolvePath("path/to/dir", "/path2/to/./doc")).to.equal("/path2/to/doc");
-        });
-
-        it("should return the subpath normalized if it is an URI", () => {
-            const router = new Router();
-            expect(router.resolvePath("/path/to/dir", "ppp:/path2/to/doc")).to.equal("/.uri/ppp/path2/to/doc");
-        });
-    });
-
     describe("iterator = router._iterRoutes()", () => {
 
         it("should return an iterator yielding all the [routeId, store] pairs in analphabetic order", () => {
@@ -108,27 +77,6 @@ describe("Router", () => {
             expect(await router.read('/path_to/doc')).to.equal("doc @ root:/path_to/doc");
         });
 
-        it("should resolve .uri:/path/to/doc' paths to '/.uri/scheme/path/to/doc'", async () => {
-            var router = new Router({
-                "ppP.1:/host/": new MemoryStore({
-                    "/"    : "doc @ ppp.1:/host/",
-                    "doc"  : "doc @ ppp.1:/host/doc"
-                }),
-                "/.uri/qqq/": new MemoryStore({
-                    "/"    : "doc @ qqq:/",
-                    "doc"  : "doc @ qqq:/doc"
-                })
-            });
-            expect(await router.read('pPp.1:/host/')).to.equal("doc @ ppp.1:/host/");
-            expect(await router.read('/.uri/ppp.1/host/')).to.equal("doc @ ppp.1:/host/");
-            expect(await router.read('PPP.1:/host/doc')).to.equal("doc @ ppp.1:/host/doc");
-            expect(await router.read('/.uri/ppp.1/host/doc')).to.equal("doc @ ppp.1:/host/doc");
-            expect(await router.read('qqq://')).to.equal("doc @ qqq:/");
-            expect(await router.read('/.uri/qqq/')).to.equal("doc @ qqq:/");
-            expect(await router.read('qqq://doc')).to.equal("doc @ qqq:/doc");
-            expect(await router.read('/.uri/qqq/doc')).to.equal("doc @ qqq:/doc");
-        });
-
         it("should return an empty document if no match is found", async () => {
             var router = new Router({
                 "path/to": new MemoryStore({
@@ -144,188 +92,11 @@ describe("Router", () => {
         })
     });
     
-    describe(`items = await router.list(path)`, () => {
-        
-        it("should return the list of documents and directories contained in the given directory", async () => {
-            var router = new Router({
-                "path/to": new MemoryStore({
-                    "/"    : "...",
-                    "doc1" : "..."
-                }),
-                "/path/to/store2": new MemoryStore({
-                    "/"             : "...",
-                    "/path/to/doc2" : "..."
-                }),
-                "/": new MemoryStore({
-                    "/path/to/doc3"  : "...",
-                    "/path/to/dir/"  : "...",
-                    "/path_to/doc4"  : "..."
-                }),
-            });
-                        
-            var items = await router.list('/path/to/');
-            expect(items.sort()).to.deep.equal(['', 'dir/', 'doc1', 'doc3', 'store2/']);
-        });
-
-        it("should resolve .uri:/path/to/doc' paths to '/.uri/scheme/path/to/doc'", async () => {
-            var router = new Router({
-                "ppp:/path/to": new MemoryStore({
-                    "/"    : "...",
-                    "doc1" : "..."
-                }),
-                "ppp:/path/to/store2": new MemoryStore({
-                    "/"             : "...",
-                    "/path/to/doc2" : "..."
-                }),
-                "ppp:/": new MemoryStore({
-                    "/path/to/doc3"  : "...",
-                    "/path/to/dir/"  : "...",
-                    "/path_to/doc4"  : "..."
-                }),
-            });
-
-            var items1 = await router.list('ppp:/path/to/');
-            expect(items1.sort()).to.deep.equal(['', 'dir/', 'doc1', 'doc3', 'store2/']);
-
-            var items2 = await router.list('/.uri/ppp/path/to/');
-            expect(items2.sort()).to.deep.equal(['', 'dir/', 'doc1', 'doc3', 'store2/']);
-        });
-
-        it("should return an empty array if the directory doesn't exist", async () => {
-            var router = new Router({
-                "path/to": new MemoryStore({
-                    "/"    : "...",
-                    "doc1" : "..."
-                }),
-                "/path/to/store2": new MemoryStore({
-                    "/"             : "...",
-                    "/path/to/doc2" : "..."
-                }),
-                "/": new MemoryStore({
-                    "/path/to/doc3"  : "...",
-                    "/path/to/dir/"  : "...",
-                    "/path_to/doc4"  : "..."
-                }),
-            });
-
-            var items = await router.list('/path/to/non-existing/dir/');
-            expect(items.sort()).to.deep.equal([]);
-        });
-    });    
-
-    describe(`router.write(path, source)`, () => {
-
-        it("should delegate to the matching mounted store", async () => {
-            var store1 = new MemoryStore();
-            var store2 = new MemoryStore();
-            var router = new Router({
-                s1: store1,
-                s2: store2,
-            });
-            await router.write('/s1/path/to/doc', "doc @ store1");
-            await router.write('s2/path/to/doc', "doc @ store2");
-            expect(await store1.read('/path/to/doc')).to.equal("doc @ store1");
-            expect(await store2.read('/path/to/doc')).to.equal("doc @ store2");
-        });
-
-        it("should resolve .uri:/path/to/doc' paths to '/.uri/scheme/path/to/doc'", async () => {
-            var store1 = new MemoryStore();
-            var store2 = new MemoryStore();
-            var router = new Router({
-                's1:/': store1,
-                's2:/': store2,
-            });
-            await router.write('s1:/path/to/doc', "doc @ store1");
-            await router.write('/.uri/s2/path/to/doc', "doc @ store2");
-            expect(await store1.read('/path/to/doc')).to.equal("doc @ store1");
-            expect(await store2.read('/path/to/doc')).to.equal("doc @ store2");
-        });
-
-        it("should throw an error if no match is found", async () => {
-            var router = new Router();
-            try {
-                await router.write('/s1/path/to/doc', "...");
-                throw new Error("Id did not throw");
-            } catch (error) {
-                expect(error).to.be.instanceof(Router.WriteOperationNotAllowedError);
-                expect(error.message).to.equal('Operation not allowed: WRITE /s1/path/to/doc')
-            }
-        });
-    });
-
-    describe(`router.delete(path)`, () => {
-
-        it("should delegate to the matching mounted store", async () => {
-            var store1 = new MemoryStore();
-            var store2 = new MemoryStore();
-            var router = new Router({
-                s1: store1,
-                s2: store2,
-            });
-
-            await store1.write('/path/to/doc', "doc @ store1");
-            await router.delete('/s1/path/to/doc');
-            expect(store1.read('/path/to/doc')).to.equal("");
-        });
-
-        it("should resolve .uri:/path/to/doc' paths to '/.uri/scheme/path/to/doc'", async () => {
-            var store1 = new MemoryStore();
-            var store2 = new MemoryStore();
-            var router = new Router({
-                's1:/': store1,
-                's2:/': store2,
-            });
-
-            await store1.write('/path/to/doc', "doc @ store1");
-            await router.delete('s1:/path/to/doc');
-            expect(store1.read('/path/to/doc')).to.equal("");
-
-            await store2.write('/path/to/doc', "doc @ store2");
-            await router.delete('/.uri/s2/path/to/doc');
-            expect(store2.read('/path/to/doc')).to.equal("");
-        });
-
-        it("should throw an error if no match is found", async () => {
-            var router = new Router();
-            try {
-                await router.delete('/s1/path/to/doc');
-                throw new Error("Id did not throw");
-            } catch (error) {
-                expect(error).to.be.instanceof(Router.WriteOperationNotAllowedError);
-                expect(error.message).to.equal('Operation not allowed: WRITE /s1/path/to/doc')
-            }
-        })
-    });
-    
-    describe(`doc = store.createDocument(path, source)`, () => {
-        
-        describe('doc.store', () => {
-            
-            it("should contain a reference to the store that created the document", () => {
-                var router = new Router({
-                    "path/to": new MemoryStore({
-                        "/"    : "doc @ /path/to/",
-                        "doc1" : "doc @ /path/to/doc1"
-                    }),
-                    "/path/to/store2": new MemoryStore({
-                        "/"             : "doc @ /path/to/store2/",
-                        "/path/to/doc2" : "doc @ /path/to/store2/path/to/doc2"
-                    }),
-                    "/": new MemoryStore({
-                        "/path/to/doc3"  : "doc @ /path/to/doc3",
-                        "/path/to/dir/"  : "doc @ /path/to/dir/",
-                        "/path_to/doc4"  : "doc @ /path_to/doc4"
-                    }),
-                });
-                                            
-                const doc = router.createDocument('/path/to/doc');
-                expect(doc.store).to.equal(router);
-            });
-        });
+    describe(`doc = store.loadDocument(path, source)`, () => {
         
         describe('doc.path', () => {
             
-            it("should contain the normalized path of the documet in the store", () => {
+            it("should contain the normalized path of the documet in the store", async () => {
                 var router = new Router({
                     "path/to": new MemoryStore({
                         "/"    : "doc @ /path/to/",
@@ -342,14 +113,14 @@ describe("Router", () => {
                     }),
                 });
 
-                var doc = router.createDocument('path/to/../to/doc');
+                var doc = await router.loadDocument('path/to/../to/doc');
                 expect(doc.path).to.equal('/path/to/doc');
             });
         });
         
         describe('doc.source', () => {
             
-            it("should contain the stringified source passed to the constructor", () => {
+            it("should contain the stringified source passed to the constructor", async () => {
                 var router = new Router({
                     "path/to": new MemoryStore({
                         "/"    : "doc @ /path/to/",
@@ -366,11 +137,11 @@ describe("Router", () => {
                     }),
                 });
 
-                var doc = router.createDocument('/path/to/doc', {toString: () => 'doc @ /path/to/doc'});
-                expect(doc.source).to.equal('doc @ /path/to/doc');
+                var doc = await router.loadDocument('/path/to/doc1');
+                expect(doc.source).to.equal('doc @ /path/to/doc1');
             });            
             
-            it("should default to an empty string if the source parameter is omitted", () => {
+            it("should default to an empty string if the source parameter is omitted", async () => {
                 var router = new Router({
                     "path/to": new MemoryStore({
                         "/"    : "doc @ /path/to/",
@@ -387,7 +158,7 @@ describe("Router", () => {
                     }),
                 });
 
-                var doc = router.createDocument('/path/to/doc');
+                var doc = await router.loadDocument('/path/to/doc');
                 expect(doc.source).to.equal('');
             });            
         });
@@ -398,6 +169,7 @@ describe("Router", () => {
                 var router = new Router({
                     "path/to": new MemoryStore({
                         "/"    : "doc @ /path/to/",
+                        "doc"  : '2*x=<% y:2*x %>',
                         "doc1" : "doc @ /path/to/doc1"
                     }),
                     "/path/to/store2": new MemoryStore({
@@ -411,7 +183,7 @@ describe("Router", () => {
                     }),
                 });
 
-                const doc = router.createDocument('/path/to/doc', '2*x=<% y:2*x %>');
+                const doc = await router.loadDocument('/path/to/doc');
                 expect(doc.evaluate).to.be.a("function");
                 const context = document.createContext({x:10});
                 const docns = await doc.evaluate(context);
@@ -422,7 +194,7 @@ describe("Router", () => {
         
         describe('context = doc.createContext(...presets)', () => {
             
-            it("should return a valid document context", () => {
+            it("should return a valid document context", async () => {
                 var router = new Router({
                     "path/to": new MemoryStore({
                         "/"    : "doc @ /path/to/",
@@ -439,7 +211,7 @@ describe("Router", () => {
                     }),
                 });
 
-                const doc = router.createDocument('/path/to/doc1');
+                const doc = await router.loadDocument('/path/to/doc1');
                 const context = doc.createContext();
                 const document_context = document.createContext();
                 for (let key in document_context) {
@@ -450,7 +222,7 @@ describe("Router", () => {
                 expect(swan.types.unwrap(context.this)).to.equal(context);
             });
             
-            it("should contain the document path as `__path__`", () => {
+            it("should contain a reference to the document as `__doc__`", async () => {
                 var router = new Router({
                     "path/to": new MemoryStore({
                         "/"    : "doc @ /path/to/",
@@ -467,12 +239,12 @@ describe("Router", () => {
                     }),
                 });
 
-                var doc = router.createDocument('/path/to/doc1');
+                var doc = await router.loadDocument('/path/to/doc1');
                 var context = doc.createContext();
-                expect(context.__path__).to.equal('/path/to/doc1');
+                expect(context.__doc__).to.equal(doc);
             });
             
-            it("should contain the document parent path as `__dirpath__`", () => {
+            it("should contain the document store path as `__store__`", async () => {
                 var router = new Router({
                     "path/to": new MemoryStore({
                         "/"    : "doc @ /path/to/",
@@ -489,16 +261,16 @@ describe("Router", () => {
                     }),
                 });
 
-                var doc = router.createDocument('/path/to/doc1');
+                var doc = await router.loadDocument('/path/to/doc1');
                 var context = doc.createContext();
-                expect(context.__dirpath__).to.equal('/path/to/');
+                expect(context.__store__).to.equal(router);
 
-                var doc = router.createDocument('/path/to/');
+                var doc = await router.loadDocument('/path/to/');
                 var context = doc.createContext();
-                expect(context.__dirpath__).to.equal('/path/to/');
+                expect(context.__store__).to.equal(router);
             });
             
-            it("should contain the passed namespaces properties", () => {
+            it("should contain the passed namespaces properties", async () => {
                 var router = new Router({
                     "path/to": new MemoryStore({
                         "/"    : "doc @ /path/to/",
@@ -515,7 +287,7 @@ describe("Router", () => {
                     }),
                 });
 
-                const doc = router.createDocument('/path/to/doc1');
+                const doc = await router.loadDocument('/path/to/doc1');
                 const context = doc.createContext({x:10, y:20}, {y:30, z:40});
                 expect(context.x).to.equal(10);
                 expect(context.y).to.equal(30);
@@ -524,7 +296,7 @@ describe("Router", () => {
             
             describe('docns = await context.import(path)', () => {
                 
-                it("should be a function", () => {
+                it("should be a function", async () => {
                     var router = new Router({
                         "path/to": new MemoryStore({
                             "/"    : "doc @ /path/to/",
@@ -541,7 +313,7 @@ describe("Router", () => {
                         }),
                     });
 
-                    const doc = router.createDocument('/path/to/doc1');
+                    const doc = await router.loadDocument('/path/to/doc1');
                     const context = doc.createContext();
                     expect(context.import).to.be.a("function");
                 });
@@ -550,20 +322,20 @@ describe("Router", () => {
                     var router = new Router({
                         "path/to": new MemoryStore({
                             "/"    : "doc @ /path/to/",
-                            "doc1" : "<% doc2 = import '/path_to/doc4' %>doc @ <% __path__ %>",
+                            "doc1" : "<% doc2 = import '/path_to/doc4' %>doc @ <% __doc__.path %>",
                         }),
                         "/path/to/store2": new MemoryStore({
                             "/"             : "doc @ /path/to/store2/",
                             "/path/to/doc2" : "doc @ /path/to/store2/path/to/doc2"
                         }),
                         "/": new MemoryStore({
-                            "/path/to/doc3"  : "doc @ <% __path__ %>",
-                            "/path/to/dir/"  : "doc @ <% __path__ %>",
-                            "/path_to/doc4"  : "doc @ <% __path__ %>"
+                            "/path/to/doc3"  : "doc @ <% __doc__.path %>",
+                            "/path/to/dir/"  : "doc @ <% __doc__.path %>",
+                            "/path_to/doc4"  : "doc @ <% __doc__.path %>"
                         }),
                     });
 
-                    var doc = router.createDocument('/path/to/doc');
+                    var doc = await router.loadDocument('/path/to/doc');
                     const doc1ns = await doc.createContext().import('/path/to/doc1');
                     expect(doc1ns.__text__).to.equal("doc @ /path/to/doc1");
                     expect(doc1ns.doc2.__text__).to.equal('doc @ /path_to/doc4')
@@ -573,15 +345,15 @@ describe("Router", () => {
                     var router = new Router({
                         "path/to": new MemoryStore({
                             "/"    : "doc @ /path/to/",
-                            "doc1" : "<% doc2 = import './store2/doc2' %>doc @ <% __path__ %>"
+                            "doc1" : "<% doc2 = import './store2/doc2' %>doc @ <% __doc__.path %>"
                         }),
                         "/path/to/store2": new MemoryStore({
-                            "/"     : "doc @ <% __path__ %>",
-                            "/doc2" : "doc @ <% __path__ %>"
+                            "/"     : "doc @ <% __doc__.path %>",
+                            "/doc2" : "doc @ <% __doc__.path %>"
                         }),
                     });
 
-                    var doc = router.createDocument('/path/to/doc');
+                    var doc = await router.loadDocument('/path/to/doc');
                     const doc1ns = await doc.createContext().import('/path/to/doc1');
                     expect(doc1ns.__text__).to.equal("doc @ /path/to/doc1");
                     expect(doc1ns.doc2.__text__).to.equal('doc @ /path/to/store2/doc2');
@@ -590,75 +362,27 @@ describe("Router", () => {
                 it("should cache the documents", async () => {
                     var router = new Router({
                         "path/to": new MemoryStore({
-                            "/"    : "doc @ /path/to/",
-                            "doc1" : "doc @ <% __path__ %><% doc2 = import 'doc2' %>",
-                            "doc2" : "doc @ <% __path__ %>",
+                            "doc1": "2*x=<% y:2*x %>",
+                            "doc2": "<% docnum = 2, doc3 = import '/path/to/doc3' %>doc2",
+                            "doc3": "<% docnum = 3 %>doc3",
+                            "doc4": "<% import 'doc3', import './doc3', import '/path/to/doc2'%>doc4"
                         }),
                     });
 
                     const xstore = Object.create(router);
-                    xstore.count = 0;
-                    xstore.read = path => {
-                        xstore.count += 1;
+                    xstore.loaded = [];
+                    xstore.read = function (path) {
+                        xstore.loaded.push(router.normalizePath(path))
                         return router.read(path);
-                    }                        
-                    var doc = xstore.createDocument('/path/to/doc');
+                    }
 
-                    var doc2ns = await doc.createContext().import('/path/to/doc2');
-                    expect(xstore.count).to.equal(1);
-                    expect(doc2ns.__text__).to.equal("doc @ /path/to/doc2");
-
-                    var doc2ns = await doc.createContext().import('/path/to/doc2');
-                    expect(xstore.count).to.equal(1);
-                    expect(doc2ns.__text__).to.equal("doc @ /path/to/doc2");
-                    
-                    var doc1ns = await doc.createContext().import('/path/to/doc1');
-                    expect(xstore.count).to.equal(2);
-                    expect(doc1ns.__text__).to.equal("doc @ /path/to/doc1");
-                    expect(doc1ns.doc2.__text__).to.equal('doc @ /path/to/doc2')
+                    const doc4 = await xstore.loadDocument('/path/to/doc4');
+                    const doc4ns = await doc4.evaluate(doc4.createContext());
+                    expect(xstore.loaded).to.deep.equal(['/path/to/doc4', '/path/to/doc3', '/path/to/doc2'])
                 });
             });
         });
     }); 
-    
-    describe(`doc = await store.loadDocument(path)`, () => {
-        
-        it("shoudl return a document object containing the source mapped to the given path", async () => {
-            var router = new Router({
-                "path/to": new MemoryStore({
-                    "/"    : "doc @ /path/to/",
-                    "doc1" : "doc @ /path/to/doc1"
-                }),
-            });
-
-            const doc = await router.loadDocument('/path/to/doc1');
-            expect(doc).to.be.instanceof(router.createDocument('').constructor);
-            expect(doc.store).to.equal(router);
-            expect(doc.path).to.equal('/path/to/doc1');
-            expect(doc.source).to.equal('doc @ /path/to/doc1');
-        });
-    });
-    
-    describe(`doc = await store.loadDocument('/path/to/dir/.info')`, () => {
-        
-        it("shoudl return a document defining the 'item' name, containing the list of children of `/path/to/dir/`", async () => {
-            var router = new Router({
-                "path/to": new MemoryStore({
-                    "/"    : "...",
-                    "doc1" : "...",
-                    "doc2" : "...",
-                }),
-                "path/to/dir": new MemoryStore({
-                    "doc3" : "...",
-                    "doc4" : "...",
-                }),
-            });
-
-            const doc = await router.loadDocument('/path/to/.info');
-            expect(doc).to.be.instanceof(router.createDocument('').constructor);
-            expect(doc.source).to.equal("<% items = ['', 'dir/', 'doc1', 'doc2'] %>");
-        });
-    });
     
     describe(`doc = await store.evaluateDocument(path, ...presets)`, () => {
         
@@ -666,7 +390,7 @@ describe("Router", () => {
             var router = new Router({
                 "path/to": new MemoryStore({
                     "/"    : "doc @ /path/to/",
-                    "doc1" : "doc @ <% __path__ %><% y = 2*x %>"
+                    "doc1" : "doc @ <% __doc__.path %><% y = 2*x %>"
                 }),
             });
 
@@ -676,24 +400,4 @@ describe("Router", () => {
             expect(docns.y).to.equal(20);
         });
     });    
-    
-    describe(`doc = await store.evaluateDocument('/path/to/dir/.info')`, () => {
-        
-        it("shoudl return a namespace containing the 'item' name, containing the list of children of `/path/to/dir/`", async () => {
-            var router = new Router({
-                "path/to": new MemoryStore({
-                    "/"    : "...",
-                    "doc1" : "...",
-                    "doc2" : "...",
-                }),
-                "path/to/dir": new MemoryStore({
-                    "doc3" : "...",
-                    "doc4" : "...",
-                }),
-            });
-
-            const docns = await router.evaluateDocument('/path/to/.info');
-            expect(docns.items).to.deep.equal(['', 'dir/', 'doc1', 'doc2']);
-        });
-    });        
 });
