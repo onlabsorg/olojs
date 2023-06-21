@@ -1,1 +1,1 @@
-new doc @ /path/to/
+doc @ /path/to/
