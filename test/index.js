@@ -12,6 +12,7 @@ describe("olojs", () => {
     require("./file-store");
     require("./http-store");
     require("./router");
+    require("./uri-store");
     require("./http-server");
 
     describe("index", () => {

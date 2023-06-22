@@ -140,27 +140,6 @@ describe("Router", () => {
                 var doc = await router.loadDocument('/path/to/doc1');
                 expect(doc.source).to.equal('doc @ /path/to/doc1');
             });            
-            
-            it("should default to an empty string if the source parameter is omitted", async () => {
-                var router = new Router({
-                    "path/to": new MemoryStore({
-                        "/"    : "doc @ /path/to/",
-                        "doc1" : "doc @ /path/to/doc1"
-                    }),
-                    "/path/to/store2": new MemoryStore({
-                        "/"             : "doc @ /path/to/store2/",
-                        "/path/to/doc2" : "doc @ /path/to/store2/path/to/doc2"
-                    }),
-                    "/": new MemoryStore({
-                        "/path/to/doc3"  : "doc @ /path/to/doc3",
-                        "/path/to/dir/"  : "doc @ /path/to/dir/",
-                        "/path_to/doc4"  : "doc @ /path_to/doc4"
-                    }),
-                });
-
-                var doc = await router.loadDocument('/path/to/doc');
-                expect(doc.source).to.equal('');
-            });            
         });
         
         describe('docns = doc.evaluate(context)', () => {

@@ -7,7 +7,7 @@
 ** DONE HTTPStore: remove write operations, test and update documentation
 ** TODO BrowserStore: remove write operations, test and update documentation
 ** DONE Router: remove write operations, test and update documentation
-** TODO ProtocolHub: create
+** DONE URIStore: create
 A ProtocolHub is store hat maps protocols to sub-storees.
 ** DONE Adattare http-server
 
