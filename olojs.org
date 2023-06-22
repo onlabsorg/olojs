@@ -9,10 +9,7 @@
 ** DONE Router: remove write operations, test and update documentation
 ** TODO ProtocolHub: create
 A ProtocolHub is store hat maps protocols to sub-storees.
-** TODO Adattare http-server
-- [ ] Prima di tutto spostare gli stores ed http-server in stilo
-- [ ] Modificare express plugin in un plugin basoto su un dato loader
-- [ ] Modificare server
+** DONE Adattare http-server
 
 * PROJ branch olo-document
 ** TODO Design
