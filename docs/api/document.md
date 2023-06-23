@@ -11,6 +11,7 @@ docns = await evaluate(context);
     // docns.__text__: "Twice x is 20"
 ```
   
+
 olojs.document.parse - function
 ----------------------------------------------------------------------------
 Compiles a document source to an `evaluate` function that takes as input
@@ -28,6 +29,7 @@ docns = await evaluate(context);
 - `docns.__text__` is a string obtained by replacing every inline expression 
   with its strigified value. 
   
+
 olojs.document.createContext - function
 ----------------------------------------------------------------------------
 Creates a custom document evaluation context, by adding to the basic
@@ -40,4 +42,5 @@ context = olojs.document.createContext(...namespaces)
 - `context`: an object containing all the named values and functions that
   will be visible to the document inline expressions.
   
+
 

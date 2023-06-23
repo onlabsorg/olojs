@@ -43,13 +43,13 @@ the files with `.olo` extension as olojs documents.
 ### [olo.HTTPStore](./api/http-store.md)
 The `HTTPStore` is a store backed by a remote store served over HTTP.
 
-### [olo.BrowserStore](./api/browser-store.md) [browser only]
-The `BrowserStore` is a store backed by the browser permanent storage ([IndexDB]
-or [localStorage]).
-
 ### [olo.Router](./api/router.md)
 A `Router` is a Store that bundles together multiple stores making them appear
 as a single store.
+
+### [olo.URIStore](./api/uri-store.md)
+A `URIStore` is a Store that bundles together multiple stores, each mapped to 
+a different URI scheme.
 
 ### [olo.HTTPServer](./api/http-server.md) [NodeJS only]
 The `HTTPServer` module contains functions for creating HTTP servers exposing

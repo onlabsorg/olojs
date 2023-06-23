@@ -25,7 +25,7 @@ generate-documentation http-store
 generate-documentation file-store
 generate-documentation memory-store
 generate-documentation router
+generate-documentation uri-store
 generate-documentation http-server
-generate-src-documentation browser-store
 
 echo

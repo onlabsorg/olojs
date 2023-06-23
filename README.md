@@ -80,8 +80,8 @@ store = new olo.FileStore('/home/my-olodocs-store');
 
 > In this example a file-system-based store is used, but a store can be any
 > object implementing the [Store] interface. olojs comes with a number of
-> predefined stores, namely [MemoryStore], [FileStore], [HTTPStore],
-> [BrowserStore] and a multi-store [Router].
+> predefined stores, namely [MemoryStore], [FileStore], [HTTPStore], a 
+> multi-store [Router] and a URI-based [URIStore]. 
 
 Load, evaluate and render a [document]:
 
@@ -109,8 +109,7 @@ doc = await remoteStore.loadDocument('/path/to/doc');
 > and Brave. In order to use the olojs library in the browser, you should require
 > the module `@onlabsorg/olojs/browser`. The only difference between the NodeJS
 > version and the browser version is that the latter doesn't contain the
-> [FileStore] class and the [HTTPServer] object, but it contains the
-> [BrowserStore] instead.
+> [FileStore] class and the [HTTPServer] object.
 
 
 ### Learn more
@@ -143,6 +142,6 @@ doc = await remoteStore.loadDocument('/path/to/doc');
 [HTTPStore]: ./docs/api/http-store.md
 [HTTPServer]: ./docs/api/http-server.md
 [Router]: ./docs/api/router.md
-[BrowserStore]: ./docs/api/browser-store.md
+[URIStore]: ./docs/api/uri-store.md
 [stilo]: https://github.com/onlabsorg/stilo/blob/main/README.md
 [olowiki]: https://github.com/onlabsorg/olowiki/blob/master/README.md

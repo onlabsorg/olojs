@@ -10,9 +10,9 @@ describe("olojs", () => {
     require("../document");
     require("../store");
     require("../memory-store");
-    require("../browser-store");
     // require("./http-store");
     require("../router");
+    require("../uri-store");
     
     
     describe("index", () => {
@@ -31,10 +31,6 @@ describe("olojs", () => {
 
         it("should export the `MemoryStore` class", () => {
             expect(olo.MemoryStore).to.equal(require("../../lib/memory-store"));
-        });
-
-        it("should export the `BrowserStore` class", () => {
-            expect(olo.BrowserStore).to.equal(require("../../src/browser-store"));
         });
 
         it("should export the `HTTPStore` class", () => {

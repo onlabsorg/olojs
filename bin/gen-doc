@@ -23,6 +23,7 @@ exports.parseDocumentation = function (code) {
         docBlock = docBlock.replace(/^\s*\*\/\s*$/mg, "  \n");      // remove ` */` lines
         docBlock = docBlock.replace(/^\s*\*$/mg, "  \n");               // remove leading `*` from empty lines
         docBlock = docBlock.replace(/^\s*\*\s{2}/mg, "");           // remove leading ` *  ` from lines
+        docBlock = docBlock + "\n";                                 // add an empty line after the block
         documentation += docBlock;
     }
 
