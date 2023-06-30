@@ -5,10 +5,11 @@
 ** DONE FileStore: remove write operations, test and update documentation
 ** DONE MemoryStore: remove write operations, test and update documentation
 ** DONE HTTPStore: remove write operations, test and update documentation
-** TODO BrowserStore: remove write operations, test and update documentation
+** DONE BrowserStore: remove
 ** DONE Router: remove write operations, test and update documentation
 ** DONE URIStore: create
 ** DONE Adattare http-server
+** DONE Update documentation
 
 * PROJ branch olo-document
 ** TODO Design
