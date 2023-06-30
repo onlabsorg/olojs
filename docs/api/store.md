@@ -14,15 +14,11 @@ store = new Store();
 ```
   
 
-  
-
 store = Store()
 --------------------------------------------------------------------------
 The Store class is meant to be used as base class for creating custom
 stores, but when instantiatete directly it behaves like a read-only empty
 store.
-  
-
   
 
 async store.read: String path -> String source
@@ -41,14 +37,10 @@ When instantiated directly, the base store `read` method returns always
 an empty string.
   
 
-  
-
 store.normalizePath: String -> String
 ------------------------------------------------------------------------
 This method takes a path string as argument and returns its normalized
 version, by resolving '.', '..' and '//' and by adding a leading '/'.
-  
-
   
 
 store.resolvePath: (String basePath, String subPath) -> String absPath
