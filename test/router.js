@@ -378,5 +378,96 @@ describe("Router", () => {
             expect(docns.x).to.equal(10);
             expect(docns.y).to.equal(20);
         });
-    });    
+    });
+
+    describe("substore = router.createSubStore(rootPath)", () => {
+
+        it("should be a Store object", () => {
+            var router = new Router({
+                "aaa": new MemoryStore({
+                    "/path/to/doc1" : "doc @ aaa://path/to/doc1",
+                    "/path/to/doc2" : "doc @ aaa://path/to/doc2",
+                    "/path/to/doc3" : "doc @ aaa://path/to/doc3",
+                }),
+                "bbb": new MemoryStore({
+                    "/path/to/doc1" : "doc @ bbb://path/to/doc1",
+                    "/path/to/doc2" : "doc @ bbb://path/to/doc2",
+                    "/path/to/doc3" : "doc @ bbb://path/to/doc3",
+                }),
+                "ccc": new MemoryStore({
+                    "/path/to/doc1" : "doc @ ccc://path/to/doc1",
+                    "/path/to/doc2" : "doc @ ccc://path/to/doc2",
+                    "/path/to/doc3" : "doc @ ccc://path/to/doc3",
+                }),
+            });
+            const substore = router.createSubStore('/aaa/path/');
+            expect(substore).to.be.instanceof(Store);
+        });
+
+        describe("substore.read(path)", () => {
+
+            it("should delegate to store.read(rootPath+path)", async () => {
+                var router = new Router({
+                    "aaa": new MemoryStore({
+                        "/path/to/doc1" : "doc @ /aaa/path/to/doc1",
+                        "/path/to/doc2" : "doc @ /aaa/path/to/doc2",
+                        "/path/to/doc3" : "doc @ /aaa/path/to/doc3",
+                    }),
+                    "bbb": new MemoryStore({
+                        "/path/to/doc1" : "doc @ /bbb/path/to/doc1",
+                        "/path/to/doc2" : "doc @ /bbb/path/to/doc2",
+                        "/path/to/doc3" : "doc @ /bbb/path/to/doc3",
+                    }),
+                    "ccc": new MemoryStore({
+                        "/path/to/doc1" : "doc @ /ccc/path/to/doc1",
+                        "/path/to/doc2" : "doc @ /ccc/path/to/doc2",
+                        "/path/to/doc3" : "doc @ /ccc/path/to/doc3",
+                    }),
+                });
+
+                var substore = router.createSubStore('/aaa/path/');
+                expect(await substore.read('to/doc1')).to.equal("doc @ /aaa/path/to/doc1");
+                expect(await substore.read('/to/doc1')).to.equal("doc @ /aaa/path/to/doc1");
+                expect(await substore.read('../to/doc1')).to.equal("doc @ /aaa/path/to/doc1");
+
+                var substore = router.createSubStore('/aaa/path');
+                expect(await substore.read('to/doc1')).to.equal("doc @ /aaa/path/to/doc1");
+                expect(await substore.read('/to/doc1')).to.equal("doc @ /aaa/path/to/doc1");
+                expect(await substore.read('../to/doc1')).to.equal("doc @ /aaa/path/to/doc1");
+
+                var substore = router.createSubStore('/aaa');
+                expect(await substore.read('/path/to/doc1')).to.equal("doc @ /aaa/path/to/doc1");
+                expect(await substore.read('path/to/doc1')).to.equal("doc @ /aaa/path/to/doc1");
+                expect(await substore.read('../path/to/doc1')).to.equal("doc @ /aaa/path/to/doc1");
+            });
+        });
+
+        describe("substore.createSubStore(path)", () => {
+
+            it("should delegate to store.createSubStore(rootPath+path)", async () => {
+                var router = new Router({
+                    "aaa": new MemoryStore({
+                        "/path/to/doc1" : "doc @ /aaa/path/to/doc1",
+                        "/path/to/doc2" : "doc @ /aaa/path/to/doc2",
+                        "/path/to/doc3" : "doc @ /aaa/path/to/doc3",
+                    }),
+                    "bbb": new MemoryStore({
+                        "/path/to/doc1" : "doc @ /bbb/path/to/doc1",
+                        "/path/to/doc2" : "doc @ /bbb/path/to/doc2",
+                        "/path/to/doc3" : "doc @ /bbb/path/to/doc3",
+                    }),
+                    "ccc": new MemoryStore({
+                        "/path/to/doc1" : "doc @ /ccc/path/to/doc1",
+                        "/path/to/doc2" : "doc @ /ccc/path/to/doc2",
+                        "/path/to/doc3" : "doc @ /ccc/path/to/doc3",
+                    }),
+                });
+                var substore = router.createSubStore('/aaa/path/');
+                var sub_substore = substore.createSubStore("to")
+                expect(await sub_substore.read('doc1')).to.equal("doc @ /aaa/path/to/doc1");
+                expect(await sub_substore.read('/doc1')).to.equal("doc @ /aaa/path/to/doc1");
+                expect(await sub_substore.read('../doc1')).to.equal("doc @ /aaa/path/to/doc1");
+            });
+        });
+    });
 });
