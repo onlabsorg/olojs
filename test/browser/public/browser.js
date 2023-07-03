@@ -15,7 +15,7 @@
   \************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-eval("\nconst olo = module.exports = {};\n\nolo.expression = __webpack_require__(/*! ./lib/expression */ \"../../lib/expression.js\");\n\nolo.document = __webpack_require__(/*! ./lib/document */ \"../../lib/document.js\");\n\nolo.Store = __webpack_require__(/*! ./lib/store */ \"../../lib/store.js\");\nolo.MemoryStore = __webpack_require__(/*! ./lib/memory-store */ \"../../lib/memory-store.js\");\nolo.HTTPStore = __webpack_require__(/*! ./lib/http-store */ \"../../lib/http-store.js\");\nolo.Router = __webpack_require__(/*! ./lib/router */ \"../../lib/router.js\");\n\n\n//# sourceURL=webpack:///../../browser.js?");
+eval("\nconst olo = module.exports = {};\n\nolo.expression = __webpack_require__(/*! ./lib/expression */ \"../../lib/expression.js\");\n\nolo.document = __webpack_require__(/*! ./lib/document */ \"../../lib/document.js\");\n\nolo.Store = __webpack_require__(/*! ./lib/store */ \"../../lib/store.js\");\nolo.MemoryStore = __webpack_require__(/*! ./lib/memory-store */ \"../../lib/memory-store.js\");\nolo.HTTPStore = __webpack_require__(/*! ./lib/http-store */ \"../../lib/http-store.js\");\nolo.Router = __webpack_require__(/*! ./lib/router */ \"../../lib/router.js\");\nolo.URIStore = __webpack_require__(/*! ./lib/uri-store */ \"../../lib/uri-store.js\");\n\n\n//# sourceURL=webpack:///../../browser.js?");
 
 /***/ }),
 
