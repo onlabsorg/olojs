@@ -1,19 +1,5 @@
 #+title: Olojs
 
-* PROJ branch read-only
-** DONE Remove write operation from Store class and simplify methods
-** DONE FileStore: remove write operations, test and update documentation
-** DONE MemoryStore: remove write operations, test and update documentation
-** DONE HTTPStore: remove write operations, test and update documentation
-** DONE BrowserStore: remove
-** DONE Router: remove write operations, test and update documentation
-** DONE URIStore: create
-** DONE Adattare http-server
-** DONE Update documentation
-
-* PROJ branch olo-document
-** TODO Design
-
 * BACKLOG
 * ARCHIVE
 ** SHUT Version 0.27.3
@@ -21,3 +7,13 @@
 - [X] Implementation
 - [X] Test
 - [X] Documentation
+** SHUT branch read-only
+*** DONE Remove write operation from Store class and simplify methods
+*** DONE FileStore: remove write operations, test and update documentation
+*** DONE MemoryStore: remove write operations, test and update documentation
+*** DONE HTTPStore: remove write operations, test and update documentation
+*** DONE BrowserStore: remove
+*** DONE Router: remove write operations, test and update documentation
+*** DONE URIStore: create
+*** DONE Adattare http-server
+*** DONE Update documentation
