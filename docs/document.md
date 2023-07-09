@@ -51,7 +51,7 @@ docns = await evaluate(context);
         // dons.name: "Bob", 
         // docns.age: 27, 
         // docns.id: "Bob27"
-        // dons.__text__: "Bob is 27 years old."
+        // dons.__str__: "Bob is 27 years old."
 ```
 
 For a more in depth documentation of the `document` module, read the
@@ -77,7 +77,7 @@ This document defines some helper functions that create html tags.
 ```
 
 Once evaluated, this document returns a `data` namespace containing two functions:
-`bold` and `img` and the `__text__` string `"This document defines some helper 
+`bold` and `img` and the `__str__` string `"This document defines some helper 
 functions that create html tags."`
 
 Let's now assume that the same store contains also the following document mapped
@@ -103,9 +103,9 @@ Once evaluated, the `/path/to/mycat` document returns the following object:
     tags: {
         bold:   text => '<b>' + text + '</b>',
         italic: text => '<i>' + text + '</i>',
-        __text__: "This document defines some helper functions that create html tags."
+        __str__: "This document defines some helper functions that create html tags."
     }
-    __text__: "I have a <b>persian</b> cat named <i>Izad</i>!"
+    __str__: "I have a <b>persian</b> cat named <i>Izad</i>!"
 }
 ```
 
@@ -137,7 +137,7 @@ Document markup
 olo-documents are markup agnostic: they are just text with the addition of 
 rendered inline expressions; nevertheless, any markup language can be used.
 
-The document namespace contains a `__text__` that contains the rendered text
+The document namespace contains a `__str__` that contains the rendered text
 and can be modified by the inline expressions. This varable can be used to 
 render the text as markdown as follows:
 
@@ -146,7 +146,7 @@ render the text as markdown as follows:
 Paragraph ...
 
 <% render_markdown = require 'markdown' %>
-<% __text__ = render_markdown __text__ %>
+<% __str__ = render_markdown __str__ %>
 ```
 
 At the moment, the only markup available is `markdown`, but more markup languages 

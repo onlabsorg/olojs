@@ -118,7 +118,7 @@ module.exports = (description, options={}) => describe(description, () => {
                     const context = document.createContext({x:10});
                     const docns = await doc.evaluate(context);
                     expect(docns.y).to.equal(20);
-                    expect(docns.__text__).to.equal('2*x=20');
+                    expect(docns.__str__).to.equal('2*x=20');
                 });
             });
 
@@ -168,18 +168,18 @@ module.exports = (description, options={}) => describe(description, () => {
                         const doc = await store.loadDocument('path/to/x/../doc3');
                         const doc2ns = await doc.createContext().import('/exp/doc2');
                         expect(doc2ns.docnum).to.equal(2);
-                        expect(doc2ns.__text__).to.equal("doc2");
+                        expect(doc2ns.__str__).to.equal("doc2");
                         expect(doc2ns.doc3.docnum).to.equal(3)
-                        expect(doc2ns.doc3.__text__).to.equal('doc3')
+                        expect(doc2ns.doc3.__str__).to.equal('doc3')
                     });
 
                     it("should resolve paths relative to the document path", async () => {
                         const doc = await store.loadDocument('/exp/doc1');
                         const doc2ns = await doc.createContext().import('./doc2');
                         expect(doc2ns.docnum).to.equal(2);
-                        expect(doc2ns.__text__).to.equal("doc2");
+                        expect(doc2ns.__str__).to.equal("doc2");
                         expect(doc2ns.doc3.docnum).to.equal(3)
-                        expect(doc2ns.doc3.__text__).to.equal('doc3')
+                        expect(doc2ns.doc3.__str__).to.equal('doc3')
                     });
 
                     it("should cache the documents", async () => {
@@ -203,9 +203,9 @@ module.exports = (description, options={}) => describe(description, () => {
             it("should load and evaluate a document from the store", async () => {
                 const doc2ns = await store.evaluateDocument('/exp/doc2');
                 expect(doc2ns.docnum).to.equal(2);
-                expect(doc2ns.__text__).to.equal("doc2");
+                expect(doc2ns.__str__).to.equal("doc2");
                 expect(doc2ns.doc3.docnum).to.equal(3)
-                expect(doc2ns.doc3.__text__).to.equal('doc3')
+                expect(doc2ns.doc3.__str__).to.equal('doc3')
             });
         });    
     }

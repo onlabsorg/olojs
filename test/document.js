@@ -54,14 +54,14 @@ describe("document", () => {
                 expect(docns.b).to.equal(20);
             });
             
-            describe("docns.__text__", () => {
+            describe("docns.__str__", () => {
                 
                 it("should be string obtained replacing the swan expressions with their stringified return value", async () => {
                     var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
                     var evaluate = document.parse(source);
                     var context = document.createContext();
                     var docns = await evaluate(context);
-                    expect(docns.__text__).to.equal("a + b = 30");
+                    expect(docns.__str__).to.equal("a + b = 30");
                 });
 
                 it("should render [[Undefined Syntax]] for expression with syntax error", async () => {
@@ -70,15 +70,15 @@ describe("document", () => {
                     expect(evaluate).to.be.a("function");
                     var context = document.createContext();
                     var docns = await evaluate(context);
-                    expect(docns.__text__).to.equal("[[Undefined Syntax]]!");
+                    expect(docns.__str__).to.equal("[[Undefined Syntax]]!");
                 });
                 
                 it("should be editable by the inline expressions", async () => {
-                    var source = `delete me <% __text__ = "" %>Hello World!`;
+                    var source = `delete me <% __str__ = "" %>Hello World!`;
                     var evaluate = document.parse(source);
                     var context = document.createContext();
                     var docns = await evaluate(context);
-                    expect(docns.__text__).to.equal("Hello World!");
+                    expect(docns.__str__).to.equal("Hello World!");
                 });
             });
         });        

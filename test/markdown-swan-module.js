@@ -10,6 +10,6 @@ describe("markdown swan module", () => {
         });
         const doc = await store.loadDocument('/test/doc');
         const docns = await doc.evaluate(doc.createContext());
-        expect(docns.__text__).to.equal("<p><em>bold</em></p>\n");
+        expect(docns.__str__).to.equal("<p><em>bold</em></p>\n");
     });
 });

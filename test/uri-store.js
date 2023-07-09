@@ -216,7 +216,7 @@ describe("URIStore", () => {
                 const context = document.createContext({x:10});
                 const docns = await doc.evaluate(context);
                 expect(docns.y).to.equal(20);
-                expect(docns.__text__).to.equal('2*x=20');
+                expect(docns.__str__).to.equal('2*x=20');
             });            
         });
         
@@ -350,8 +350,8 @@ describe("URIStore", () => {
 
                     var doc = await uriStore.loadDocument('aaa://path/to/doc');
                     const doc1ns = await doc.createContext().import('aaa://path/to/doc1');
-                    expect(doc1ns.__text__).to.equal("doc @ aaa://path/to/doc1");
-                    expect(doc1ns.doc2.__text__).to.equal('doc @ bbb://path/to/doc2')
+                    expect(doc1ns.__str__).to.equal("doc @ aaa://path/to/doc1");
+                    expect(doc1ns.doc2.__str__).to.equal('doc @ bbb://path/to/doc2')
                 });
 
                 it("should resolve paths relative to the document path", async () => {
@@ -364,8 +364,8 @@ describe("URIStore", () => {
 
                     var doc = await uriStore.loadDocument('aaa://path/to/doc');
                     const doc1ns = await doc.createContext().import('doc1');
-                    expect(doc1ns.__text__).to.equal("doc @ aaa://path/to/doc1");
-                    expect(doc1ns.doc2.__text__).to.equal('doc @ aaa://path/to/doc2');
+                    expect(doc1ns.__str__).to.equal("doc @ aaa://path/to/doc1");
+                    expect(doc1ns.doc2.__str__).to.equal('doc @ aaa://path/to/doc2');
                 });
 
                 it("should cache the documents", async () => {
@@ -403,7 +403,7 @@ describe("URIStore", () => {
             });
 
             const docns = await uriStore.evaluateDocument('/path/to/doc1', {x:10});
-            expect(docns.__text__).to.equal('doc @ home://path/to/doc1');
+            expect(docns.__str__).to.equal('doc @ home://path/to/doc1');
             expect(docns.x).to.equal(10);
             expect(docns.y).to.equal(20);
         });

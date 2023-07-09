@@ -44,7 +44,7 @@
     "webpack-cli": "^4.7.2"
   },
   "dependencies": {
-    "@onlabsorg/swan-js": "^0.12.x",
+    "@onlabsorg/swan-js": "^0.13.x",
     "cors": "^2.8.5",
     "dompurify": "^2.2.6",
     "express": "^4.17.1",

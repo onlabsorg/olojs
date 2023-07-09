@@ -167,7 +167,7 @@ describe("Router", () => {
                 const context = document.createContext({x:10});
                 const docns = await doc.evaluate(context);
                 expect(docns.y).to.equal(20);
-                expect(docns.__text__).to.equal('2*x=20');
+                expect(docns.__str__).to.equal('2*x=20');
             });            
         });
         
@@ -316,8 +316,8 @@ describe("Router", () => {
 
                     var doc = await router.loadDocument('/path/to/doc');
                     const doc1ns = await doc.createContext().import('/path/to/doc1');
-                    expect(doc1ns.__text__).to.equal("doc @ /path/to/doc1");
-                    expect(doc1ns.doc2.__text__).to.equal('doc @ /path_to/doc4')
+                    expect(doc1ns.__str__).to.equal("doc @ /path/to/doc1");
+                    expect(doc1ns.doc2.__str__).to.equal('doc @ /path_to/doc4')
                 });
 
                 it("should resolve paths relative to the document path", async () => {
@@ -334,8 +334,8 @@ describe("Router", () => {
 
                     var doc = await router.loadDocument('/path/to/doc');
                     const doc1ns = await doc.createContext().import('/path/to/doc1');
-                    expect(doc1ns.__text__).to.equal("doc @ /path/to/doc1");
-                    expect(doc1ns.doc2.__text__).to.equal('doc @ /path/to/store2/doc2');
+                    expect(doc1ns.__str__).to.equal("doc @ /path/to/doc1");
+                    expect(doc1ns.doc2.__str__).to.equal('doc @ /path/to/store2/doc2');
                 });
 
                 it("should cache the documents", async () => {
@@ -374,7 +374,7 @@ describe("Router", () => {
             });
 
             const docns = await router.evaluateDocument('/path/to/doc1', {x:10});
-            expect(docns.__text__).to.equal('doc @ /path/to/doc1');
+            expect(docns.__str__).to.equal('doc @ /path/to/doc1');
             expect(docns.x).to.equal(10);
             expect(docns.y).to.equal(20);
         });
