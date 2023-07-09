@@ -8,7 +8,7 @@ evaluate = olojs.document.parse(source);
 context = olojs.document.createContext({x:10});
 docns = await evaluate(context);    
     // docns.x: :10
-    // docns.__text__: "Twice x is 20"
+    // docns.__str__: "Twice x is 20"
 ```
   
 
@@ -26,7 +26,7 @@ docns = await evaluate(context);
   returns its namespace
 - `docns` is an object containing all the names defined by the inline
   expressions of the document (the document namespace).
-- `docns.__text__` is a string obtained by replacing every inline expression 
+- `docns.__str__` is a string obtained by replacing every inline expression
   with its strigified value. 
   
 
