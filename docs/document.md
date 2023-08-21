@@ -149,9 +149,37 @@ Paragraph ...
 <% __str__ = render_markdown __str__ %>
 ```
 
+Another way to decorate the rendered document is defining a `__renderdoc__` function
+that takes the rendered document text (i.e. the `__str__` string after complete rendering)
+and returns another string. The returned string will be the new rendered document. For
+example, rendering the document as markdown can be achieved with the following expression,
+placed anywhere in the document.
+
+```
+<% __renderdoc__ = require 'markdown' %>
+```
+
 At the moment, the only markup available is `markdown`, but more markup languages 
 may be added in the future.
 
+
+Customize expression rendering
+--------------------------------------------------------------------------------
+The return value of each expression gets stringified using the `context.str`
+function by default. This behavior can be modified by defining a `__renderexp__`
+function that will take the expression value as input and will return its
+string representation. For example, the following document ...
+
+```
+<% __renderexp__ = value -> `[ {% value %} ]`
+2 x 5 = <% 2*5 %>
+```
+
+... will render to:
+
+```
+2 x 5 = [ 10 ] 
+```
 
 
 Learn more

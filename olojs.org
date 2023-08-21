@@ -1,6 +1,16 @@
 #+title: Olojs
 
 * BACKLOG
+** TODO Improve error rendering
+e.g. add a custom 'post_render' function parameter to the parse
+function or a __render__ function to the context
+
+** TODO Add __renderdoc__ function to context
+Decorate the text after rendering is complete.
+
+** TODO Add __renderexp__ function to context
+Decorate each expression result before stringifying it
+
 * ARCHIVE
 ** SHUT Version 0.27.3
 *** DONE Implement markdown module

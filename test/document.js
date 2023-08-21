@@ -64,6 +64,16 @@ describe("document", () => {
                     expect(docns.__str__).to.equal("a + b = 30");
                 });
 
+                it("should decorate the expression value with context.__renderexp__ if it is a function, before stringifying", async () => {
+                    var source = `a = <%a:10%>`;
+                    var evaluate = document.parse(source);
+                    var context = document.createContext({
+                        __renderexp__: async value => value+1
+                    });
+                    var docns = await evaluate(context);
+                    expect(docns.__str__).to.equal("a = 11");
+                });
+
                 it("should render [[Undefined Syntax]] for expression with syntax error", async () => {
                     var source = `<% $x = 10 %>!`;
                     var evaluate = document.parse(source);
@@ -80,6 +90,16 @@ describe("document", () => {
                     var docns = await evaluate(context);
                     expect(docns.__str__).to.equal("Hello World!");
                 });
+
+                it("should be decorated by context.__renderdoc__ if it is a function", async () => {
+                    var source = `<%a=10%><%b=a+10%>a + b = <%a+b%>`;
+                    var evaluate = document.parse(source);
+                    var context = document.createContext({
+                        __renderdoc__: text => `[[${text}]]`
+                    });
+                    var docns = await evaluate(context);
+                    expect(docns.__str__).to.equal("[[a + b = 30]]");
+                })
             });
         });        
     });
