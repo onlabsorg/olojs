@@ -43,4 +43,42 @@ context = olojs.document.createContext(...namespaces)
   will be visible to the document inline expressions.
   
 
+class Document
+------------------------------------------------------------------------
+Creates a document object representing a document contained in a given
+store, at the given path and having a ginve source.
+```js
+const doc = new Document(store, '/path/to/doc', "Lorem ipsum ...")
+```
+If omitted, the source parameters defaults to an empty string.
+### doc.store: Store
+The store in which the document is contained.
+### doc.path: String
+The normalize path of the document, within its store.
+### doc.source: String
+The source of the document.
+### doc.evaluate: Object context -> Object namespace
+This is the source compiled to a function as returned by `document.parse`.
+  
+
+  
+
+### doc.createContext: (...Objects preset) -> Object context
+Created a valid evaluation context that can be passed to the
+`doc.evaluate` function to evaluate this document. The returned
+context contains the following special names:
+- `context.__path__`: the document path
+- `context.import`: a function that loads and evaluates a document and
+  returns its namespace; if a relative path is passed as argument to
+  this function, it will be resolved as relative to this document path
+- All the name contained in the passed preset objects
+  
+
+async Document.load: (Store store, String path) -> Document doc
+---------------------------------------------------------------------
+Given a store and a document path, loads the source of the document
+located at path within that store and returns the Document instance
+with parameters `store`, `path` and `source`.
+  
+
 
