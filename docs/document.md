@@ -191,4 +191,4 @@ Learn more
 
 
 [swan]: https://github.com/onlabsorg/swan-js/blob/main/docs/swan.md
-[Store]: ./api/store.md
+[Store]: ./api/stores/store.md

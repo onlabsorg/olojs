@@ -4,7 +4,7 @@ var swan = require("@onlabsorg/swan-js");
 
 var document = require("../lib/document");
 var Document = document.Document;
-var MemoryStore = require("../lib/memory-store");
+var MemoryStore = require("../lib/stores/memory-store");
 
 
 describe("document", () => {
@@ -228,7 +228,7 @@ describe("document", () => {
         });
     })
 
-    describe("doc = await Document.load(store, path)", () => {
+    describe("doc = await document.load(store, path)", () => {
 
         it("should fetch the source and return the corresponding Document instance", async () => {
             const store = new MemoryStore({
@@ -237,7 +237,7 @@ describe("document", () => {
                 '/path/to/doc3': `Doc @ /path/to/doc3`,
             });
 
-            const doc = await Document.load(store, '/path/to/doc2');
+            const doc = await document.load(store, '/path/to/doc2');
             expect(doc).to.be.instanceof(Document);
             expect(doc.path).to.equal('/path/to/doc2');
             expect(doc.source).to.equal(`Doc @ /path/to/doc2`);

@@ -2,10 +2,10 @@ var expect = require("chai").expect;
 var fs = require("fs");
 var pathlib = require("path");
 var document = require("../lib/document");
-var Store = require("../lib/store");
-var MemoryStore = require("../lib/memory-store");
-var Router = require("../lib/router");
-var HTTPServer = require("../lib/http-server");
+var Store = require("../lib/stores/store");
+var MemoryStore = require("../lib/stores/memory-store");
+var Router = require("../lib/stores/router");
+var HTTPServer = require("../lib/servers/http-server");
 
 var http = require('http');
 var express = require('express');
@@ -21,14 +21,20 @@ describe("HTTPServer", () => {
 
             class PrivateStore extends Store {
                 read (path) {throw new Store.ReadPermissionDeniedError(path)}
+                write (path, source) {throw new Store.WritePermissionDeniedError(path)}
+                delete (path) {throw new Store.WritePermissionDeniedError(path)}
             }
 
             class NotAllowedStore extends Store {
                 read (path) {throw new Store.ReadOperationNotAllowedError(path)}
+                write (path, source) {throw new Store.WriteOperationNotAllowedError(path)}
+                delete (path) {throw new Store.WriteOperationNotAllowedError(path)}
             }
 
             class ErrorStore extends Store {
                 read (path) {throw new Error()}
+                write (path, source) {throw new Error()}
+                delete (path) {throw new Error()}
             }
 
             homeStore = new MemoryStore({
@@ -50,7 +56,7 @@ describe("HTTPServer", () => {
 
         describe("HTTP GET /docs/*", () => {
 
-            it("should return the document source mapped to path by the passed loader", async () => {
+            it("should return the document source mapped to path by the passed store", async () => {
 
                 var response = await fetch(`http://localhost:8888/docs/path/to/doc1`, {
                     method: 'get',
@@ -62,7 +68,7 @@ describe("HTTPServer", () => {
                 expect(await response.text()).to.equal("document @ /path/to/doc1");
             });
 
-            it("should return the status code 403 if the backend environment throws ReadPermissionDenied", async () => {
+            it("should return the status code 403 if the backend store throws ReadPermissionDenied", async () => {
                 var response = await fetch(`http://localhost:8888/docs/private/path/to/doc`, {
                     method: 'get',
                     headers: {
@@ -72,7 +78,7 @@ describe("HTTPServer", () => {
                 expect(response.status).to.equal(403);
             });
 
-            it("should return the status code 405 if the backend environment throws Store.ReadOperationNotDefined", async () => {
+            it("should return the status code 405 if the backend store throws ReadOperationNotDefined", async () => {
                 var response = await fetch(`http://localhost:8888/docs/hidden/path/to/doc`, {
                     method: 'get',
                     headers: {
@@ -82,7 +88,7 @@ describe("HTTPServer", () => {
                 expect(response.status).to.equal(405);
             });
 
-            it("should return the status code 500 if the backend environment throws a generic error", async () => {
+            it("should return the status code 500 if the backend store throws a generic error", async () => {
                 var response = await fetch(`http://localhost:8888/docs/error/path/to/doc`, {
                     method: 'get',
                     headers: {
@@ -103,26 +109,126 @@ describe("HTTPServer", () => {
             });
         });
 
+        describe("HTTP PUT /docs/*", () => {
+
+            it("should modify the document source mapped to path by the passed store", async () => {
+
+                var response = await fetch(`http://localhost:8888/docs/path/to/doc1`, {
+                    method: 'put',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                    body: "xxx1"
+                });
+                expect(response.status).to.equal(200);
+                expect(await homeStore.read('/path/to/doc1')).to.equal("xxx1");
+            });
+
+            it("should return the status code 403 if the backend store throws ReadPermissionDenied", async () => {
+                var response = await fetch(`http://localhost:8888/docs/private/path/to/doc`, {
+                    method: 'put',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                    body: "xxx"
+                });
+                expect(response.status).to.equal(403);
+            });
+
+            it("should return the status code 405 if the backend store throws ReadOperationNotDefined", async () => {
+                var response = await fetch(`http://localhost:8888/docs/hidden/path/to/doc`, {
+                    method: 'put',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                    body: "xxx"
+                });
+                expect(response.status).to.equal(405);
+            });
+
+            it("should return the status code 500 if the backend store throws a generic error", async () => {
+                var response = await fetch(`http://localhost:8888/docs/error/path/to/doc`, {
+                    method: 'put',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                    body: "xxx"
+                });
+                expect(response.status).to.equal(500);
+            });
+        });
+
+        describe("HTTP DELETE /docs/*", () => {
+
+            it("should modify the document source mapped to path by the passed store", async () => {
+
+                var response = await fetch(`http://localhost:8888/docs/path/to/doc1`, {
+                    method: 'delete',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                });
+                expect(response.status).to.equal(200);
+                expect(await homeStore.read('/path/to/doc1')).to.equal("");
+            });
+
+            it("should return the status code 403 if the backend store throws ReadPermissionDenied", async () => {
+                var response = await fetch(`http://localhost:8888/docs/private/path/to/doc`, {
+                    method: 'delete',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                });
+                expect(response.status).to.equal(403);
+            });
+
+            it("should return the status code 405 if the backend store throws ReadOperationNotDefined", async () => {
+                var response = await fetch(`http://localhost:8888/docs/hidden/path/to/doc`, {
+                    method: 'delete',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                });
+                expect(response.status).to.equal(405);
+            });
+
+            it("should return the status code 500 if the backend store throws a generic error", async () => {
+                var response = await fetch(`http://localhost:8888/docs/error/path/to/doc`, {
+                    method: 'delete',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                });
+                expect(response.status).to.equal(500);
+            });
+        });
+
         after((done) => {
             server.close(done);
         });
     });
 
-    describe("HTTPServer.create", () => {
+    describe("HTTPServer.createServer", () => {
         var homeStore, server;
 
         before((done) => {
 
             class PrivateStore extends Store {
                 read (path) {throw new Store.ReadPermissionDeniedError(path)}
+                write (path, source) {throw new Store.WritePermissionDeniedError(path)}
+                delete (path) {throw new Store.WritePermissionDeniedError(path)}
             }
 
             class NotAllowedStore extends Store {
                 read (path) {throw new Store.ReadOperationNotAllowedError(path)}
+                write (path, source) {throw new Store.WriteOperationNotAllowedError(path)}
+                delete (path) {throw new Store.WriteOperationNotAllowedError(path)}
             }
 
             class ErrorStore extends Store {
                 read (path) {throw new Error()}
+                write (path, source) {throw new Error()}
+                delete (path) {throw new Error()}
             }
 
             homeStore = new MemoryStore({
@@ -136,7 +242,7 @@ describe("HTTPServer", () => {
                 '/error/': new ErrorStore(),
             });
 
-            server = HTTPServer.create(router);
+            server = HTTPServer.createServer(router);
             server.listen(8888, done);
         });
 
@@ -192,6 +298,100 @@ describe("HTTPServer", () => {
                     },
                 });
                 expect(response.status).to.equal(415);
+            });
+        });
+
+        describe("HTTP PUT /*", () => {
+
+            it("should modify the document source mapped to path by the passed store", async () => {
+
+                var response = await fetch(`http://localhost:8888/path/to/doc1`, {
+                    method: 'put',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                    body: "xxx1"
+                });
+                expect(response.status).to.equal(200);
+                expect(await homeStore.read('/path/to/doc1')).to.equal("xxx1");
+            });
+
+            it("should return the status code 403 if the backend store throws ReadPermissionDenied", async () => {
+                var response = await fetch(`http://localhost:8888/private/path/to/doc`, {
+                    method: 'put',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                    body: "xxx"
+                });
+                expect(response.status).to.equal(403);
+            });
+
+            it("should return the status code 405 if the backend store throws ReadOperationNotDefined", async () => {
+                var response = await fetch(`http://localhost:8888/hidden/path/to/doc`, {
+                    method: 'put',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                    body: "xxx"
+                });
+                expect(response.status).to.equal(405);
+            });
+
+            it("should return the status code 500 if the backend store throws a generic error", async () => {
+                var response = await fetch(`http://localhost:8888/error/path/to/doc`, {
+                    method: 'put',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                    body: "xxx"
+                });
+                expect(response.status).to.equal(500);
+            });
+        });
+
+        describe("HTTP DELETE /*", () => {
+
+            it("should modify the document source mapped to path by the passed store", async () => {
+
+                var response = await fetch(`http://localhost:8888/path/to/doc1`, {
+                    method: 'delete',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                });
+                expect(response.status).to.equal(200);
+                expect(await homeStore.read('/path/to/doc1')).to.equal("");
+            });
+
+            it("should return the status code 403 if the backend store throws ReadPermissionDenied", async () => {
+                var response = await fetch(`http://localhost:8888/private/path/to/doc`, {
+                    method: 'delete',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                });
+                expect(response.status).to.equal(403);
+            });
+
+            it("should return the status code 405 if the backend store throws ReadOperationNotDefined", async () => {
+                var response = await fetch(`http://localhost:8888/hidden/path/to/doc`, {
+                    method: 'delete',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                });
+                expect(response.status).to.equal(405);
+            });
+
+            it("should return the status code 500 if the backend store throws a generic error", async () => {
+                var response = await fetch(`http://localhost:8888/error/path/to/doc`, {
+                    method: 'delete',
+                    headers: {
+                        'Accept': 'text/*'
+                    },
+                });
+                expect(response.status).to.equal(500);
             });
         });
 

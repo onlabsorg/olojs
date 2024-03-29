@@ -5,13 +5,12 @@ olo.expression = require("./lib/expression");
 
 olo.document = require("./lib/document");
 
-olo.Store = require('./lib/store');
-olo.MemoryStore = require('./lib/memory-store');
-olo.FileStore = require('./lib/file-store');
-olo.HTTPStore = require('./lib/http-store');
-olo.Router = require('./lib/router');
-olo.URIStore = require('./lib/uri-store');
+olo.Store = require('./lib/stores/store');
+olo.MemoryStore = require('./lib/stores/memory-store');
+olo.FileStore = require('./lib/stores/file-store');
+olo.HTTPStore = require('./lib/stores/http-store');
+olo.Router = require('./lib/stores/router');
+olo.HyperStore = require('./lib/stores/hyper-store');
+olo.SubStore = require('./lib/stores/sub-store');
 
-olo.HTTPServer = require('./lib/http-server');
-
-
+olo.HTTPServer = require('./lib/servers/http-server');

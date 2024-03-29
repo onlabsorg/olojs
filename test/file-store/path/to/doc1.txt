@@ -1,1 +1,1 @@
-doc @ /path/to/doc1
+New source 1

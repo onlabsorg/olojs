@@ -8,7 +8,7 @@ describe("markdown swan module", () => {
         const store = new olojs.MemoryStore({
             '/test/doc': "<% require 'markdown' '*bold*' %>"
         });
-        const doc = await store.loadDocument('/test/doc');
+        const doc = await olojs.document.load(store, '/test/doc');
         const docns = await doc.evaluate(doc.createContext());
         expect(docns.__str__).to.equal("<p><em>bold</em></p>\n");
     });

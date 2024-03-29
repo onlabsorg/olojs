@@ -20,12 +20,13 @@ generate-src-documentation () {
 }
 
 generate-documentation document
-generate-documentation store
-generate-documentation http-store
-generate-documentation file-store
-generate-documentation memory-store
-generate-documentation router
-generate-documentation uri-store
-generate-documentation http-server
+generate-documentation stores/store
+generate-documentation stores/http-store
+generate-documentation stores/file-store
+generate-documentation stores/memory-store
+generate-documentation stores/router
+generate-documentation stores/hyper-store
+generate-documentation stores/sub-store
+generate-documentation servers/http-server
 
 echo

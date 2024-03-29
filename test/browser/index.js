@@ -12,7 +12,8 @@ describe("olojs", () => {
     require("../memory-store");
     // require("./http-store");
     require("../router");
-    require("../uri-store");
+    require("../hyper-store");
+    require("../sub-store");
     
     
     describe("index", () => {
@@ -26,19 +27,27 @@ describe("olojs", () => {
         });
 
         it("should export the `Store` class", () => {
-            expect(olo.Store).to.equal(require("../../lib/store"));
+            expect(olo.Store).to.equal(require("../../lib/stores/store"));
         });
 
         it("should export the `MemoryStore` class", () => {
-            expect(olo.MemoryStore).to.equal(require("../../lib/memory-store"));
+            expect(olo.MemoryStore).to.equal(require("../../lib/stores/memory-store"));
         });
 
         it("should export the `HTTPStore` class", () => {
-            expect(olo.HTTPStore).to.equal(require("../../lib/http-store"));
+            expect(olo.HTTPStore).to.equal(require("../../lib/stores/http-store"));
         });
 
         it("should export the `Router` class", () => {
-            expect(olo.Router).to.equal(require("../../lib/router"));
-        });    
-    });    
+            expect(olo.Router).to.equal(require("../../lib/stores/router"));
+        });
+
+        it("should export the `HyperStore` class", () => {
+            expect(olo.HyperStore).to.equal(require("../../lib/stores/hyper-store"));
+        });
+
+        it("should export the `SubStore` class", () => {
+            expect(olo.SubStore).to.equal(require("../../lib/stores/sub-store"));
+        });
+    });
 });

@@ -76,6 +76,7 @@ Import olojs and connect to a store:
 ```js
 olo = require('@onlabsorg/olojs');
 store = new olo.FileStore('/home/my-olodocs-store');
+Document = olo.document.Document;
 ```
 
 > In this example a file-system-based store is used, but a store can be any
@@ -86,9 +87,9 @@ store = new olo.FileStore('/home/my-olodocs-store');
 Load, evaluate and render a [document]:
 
 ```js
-doc = await store.loadDocument('/path/to/doc'); // fetch the document
-context = doc.createContext({pi:3.14});         // create an evaluation context
-docns = await doc.evaluate(context);            // evaluate the document
+doc = await olo.document.load(store, '/path/to/doc'); // fetch the document
+context = doc.createContext({pi:3.14});               // create an evaluation context
+docns = await doc.evaluate(context);                  // evaluate the document
 ```
 
 Serve the store via HTTP:
@@ -130,18 +131,16 @@ doc = await remoteStore.loadDocument('/path/to/doc');
 ### Related projects
 * [stilo] is a command-line interface written in NodeJS that allows you to
   create and mange local olojs document repositories.
-* [brenda] is a HTTP client and [stilo] plugin for rendering olojs
-  documents in the browser
 
 
 [swan]: https://github.com/onlabsorg/swan-js/blob/main/docs/swan.md
 [document]: ./docs/document.md
-[Store]: ./docs/api/store.md
-[MemoryStore]: ./docs/api/memory-store.md
-[FileStore]: ./docs/api/file-store.md
-[HTTPStore]: ./docs/api/http-store.md
-[HTTPServer]: ./docs/api/http-server.md
-[Router]: ./docs/api/router.md
-[URIStore]: ./docs/api/uri-store.md
+[Store]: ./docs/api/stores/store.md
+[MemoryStore]: ./docs/api/stores/memory-store.md
+[FileStore]: ./docs/api/stores/file-store.md
+[HTTPStore]: ./docs/api/stores/http-store.md
+[HTTPServer]: ./docs/api/servers/http-server.md
+[Router]: ./docs/api/stores/router.md
+[URIStore]: ./docs/api/stores/hyper-store.md
 [stilo]: https://github.com/onlabsorg/stilo/blob/main/README.md
 [brenda]: https://github.com/onlabsorg/olowiki/blob/main/README.md

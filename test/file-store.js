@@ -4,7 +4,7 @@ var pathlib = require('path');
 var fs = require("fs");
 var rimraf = require("rimraf");
 var mkdirp = require("mkdirp");
-var FileStore = require("../lib/file-store");
+var FileStore = require("../lib/stores/file-store");
 
 
 
