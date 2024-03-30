@@ -39,6 +39,9 @@ The `MemoryStore` is a store backed by an in-memory object.
 The `FileStore` is a store backed by a file-system directory which treats all
 the files with `.olo` extension as olojs documents.
 
+### [olo.BrowserStore](./api/stores/browser-store.md) [Browser only]
+The `BrowserStore` is a store backed by the browser storage.
+
 ### [olo.HTTPStore](./api/stores/http-store.md)
 The `HTTPStore` is a store backed by a remote store served over HTTP.
 

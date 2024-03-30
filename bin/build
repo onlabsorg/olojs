@@ -29,4 +29,7 @@ generate-documentation stores/hyper-store
 generate-documentation stores/sub-store
 generate-documentation servers/http-server
 
+echo "- docs/api/stores/browser-store.md"
+bin/gen-doc "src/browser-store.js" > "docs/api/stores/browser-store.md"
+
 echo

@@ -1,33 +1,29 @@
   
 
-MemoryStore
+BrowserStore
 ============================================================================
 This store maps file-like paths to olo-document sources stored in the
-local memory.
+browser storage.
   
 
 ```js
-memStore = new MemoryStore({
-    "/path/to/doc1": "source of doc1",
-    "/path/to/doc2": "source of doc2",
-    ...
-})
+browserStore = new BrowserStore(storeId);
 ```
   
 
-> MemoryStore inherits from the [Store](./store.md) class and overrides the
+> BrowserStore inherits from the [Store](./store.md) class and overrides the
 > methods described below.
   
 
   
 
-async memStore.read: String path -> String source
+async browserStore.read: String path -> String source
 ------------------------------------------------------------------------
-Retrieves the in-memory document source mapped to the given path.
+Retrieves the in-browser document source mapped to the given path.
   
 
 ```js
-const source = await memStore.read("/path/to/doc");
+const source = await browserStore.read("/path/to/doc");
 ```
   
 
@@ -39,13 +35,13 @@ const source = await memStore.read("/path/to/doc");
 
   
 
-async memStore.write: (String path, String source) -> undefined
+async browserStore.write: (String path, String source) -> undefined
 ------------------------------------------------------------------------
-Maps a document path to a source, in memory.
+Maps a document path to a source, in the browser storage.
   
 
 ```js
-memStore.write("/path/to/doc", source);
+browserStore.write("/path/to/doc", source);
 ```
   
 
@@ -56,13 +52,13 @@ memStore.write("/path/to/doc", source);
 
   
 
-async memStore.delete: String path -> undefined
+async browserStore.delete: String path -> undefined
 ------------------------------------------------------------------------
-Erases the doc source mapped in memory to the given path.
+Erases the doc source mapped in the browser storage to the given path.
   
 
 ```js
-memStore.delete("/path/to/doc");
+browserStore.delete("/path/to/doc");
 ```
   
 

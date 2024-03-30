@@ -110,7 +110,8 @@ doc = await remoteStore.loadDocument('/path/to/doc');
 > and Brave. In order to use the olojs library in the browser, you should require
 > the module `@onlabsorg/olojs/browser`. The only difference between the NodeJS
 > version and the browser version is that the latter doesn't contain the
-> [FileStore] class and the [HTTPServer] object.
+> [FileStore] class and the [HTTPServer] object and contains the [BrowserStore]
+> instead.
 
 
 ### Learn more
@@ -138,9 +139,10 @@ doc = await remoteStore.loadDocument('/path/to/doc');
 [Store]: ./docs/api/stores/store.md
 [MemoryStore]: ./docs/api/stores/memory-store.md
 [FileStore]: ./docs/api/stores/file-store.md
+[BrowserStore]: ./docs/api/stores/browser-store.md
 [HTTPStore]: ./docs/api/stores/http-store.md
 [HTTPServer]: ./docs/api/servers/http-server.md
 [Router]: ./docs/api/stores/router.md
-[URIStore]: ./docs/api/stores/hyper-store.md
+[HyperStore]: ./docs/api/stores/hyper-store.md
 [stilo]: https://github.com/onlabsorg/stilo/blob/main/README.md
 [brenda]: https://github.com/onlabsorg/olowiki/blob/main/README.md

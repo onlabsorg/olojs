@@ -12,8 +12,8 @@ which can be summarized as follows:
 olojs comes with the following pre-defined stores:
 
 * [MemoryStore](./api/stores/memory-store.md) which holds documents stored in memory
-* [FileStore](./api/stores/file-store.md) which holds documents stored as files (NodeJS
-  only)
+* [FileStore](./api/stores/file-store.md) which holds documents stored as files (NodeJS only)
+* [BrowserStore](./api/stores/browser-store.md) which holds documents stored in the browser storage (Browser only)
 * [HTTPStore](./api/stores/http-store.md) which interfaces with a remote store served
   via HTTP (see also [HTTPServer])
 * [Router](./api/stores/router.md) which bounds together multiple stores while
